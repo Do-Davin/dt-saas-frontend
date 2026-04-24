@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 .env
+
+dt-saas-frontend/.claude/settings.local.json
+CLAUDE.md
+components.json
+skills-lock.json
+.agents
+.claude

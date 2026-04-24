@@ -1,1 +1,125 @@
 @import "tailwindcss";
+
+/*
+  ─── DT SaaS brand theme ────────────────────────────────────────────────────
+  Primary  : #0F4269  →  hsl(206, 75%, 24%)
+  Background: #F9F9F9 →  hsl(0, 0%, 97.6%)
+  Fonts    : Oxygen (English) → Noto Sans Khmer (Khmer) → system-ui
+  ────────────────────────────────────────────────────────────────────────────
+*/
+
+/* Register shadcn CSS variables as Tailwind v4 theme tokens.
+   Components reference these as bg-primary, text-foreground, etc.          */
+@theme inline {
+  --color-background:         hsl(var(--background));
+  --color-foreground:         hsl(var(--foreground));
+  --color-card:               hsl(var(--card));
+  --color-card-foreground:    hsl(var(--card-foreground));
+  --color-popover:            hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary:            hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary:          hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted:              hsl(var(--muted));
+  --color-muted-foreground:   hsl(var(--muted-foreground));
+  --color-accent:             hsl(var(--accent));
+  --color-accent-foreground:  hsl(var(--accent-foreground));
+  --color-destructive:        hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border:             hsl(var(--border));
+  --color-input:              hsl(var(--input));
+  --color-ring:               hsl(var(--ring));
+  --radius:                   var(--radius-base);
+
+  /* Brand font stack — Tailwind's font-sans utility resolves to this.
+     Oxygen loads Latin/Extended-Latin; Noto Sans Khmer catches Khmer glyphs
+     before the browser falls back to system-ui.                             */
+  --font-sans: "Oxygen", "Noto Sans Khmer", system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    /* ── Brand overrides ─────────────────────────────────────────────────── */
+    --background:          0 0% 97.6%;   /* #F9F9F9 — off-white page surface  */
+    --foreground:          210 15% 10%;  /* near-black with slight brand tint  */
+
+    /* Cards sit on top of the page background; pure white creates elevation  */
+    --card:                0 0% 100%;
+    --card-foreground:     210 15% 10%;
+
+    --popover:             0 0% 100%;
+    --popover-foreground:  210 15% 10%;
+
+    /* Primary: DT SaaS brand blue #0F4269                                   */
+    --primary:             206 75% 24%;
+    --primary-foreground:  0 0% 100%;    /* white on brand blue               */
+
+    /* Secondary / accent: a very light brand-blue tint                       */
+    --secondary:           207 30% 95%;
+    --secondary-foreground: 206 75% 24%;
+
+    --muted:               207 20% 93%;
+    --muted-foreground:    210 10% 46%;
+
+    --accent:              207 30% 95%;
+    --accent-foreground:   206 75% 24%;
+
+    --destructive:         0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Borders/inputs: a light blue-grey that reads as neutral                */
+    --border:              210 15% 88%;
+    --input:               210 15% 88%;
+
+    /* Ring matches primary so focus outlines use the brand colour            */
+    --ring:                206 75% 24%;
+
+    --radius-base:         0.5rem;
+  }
+
+  .dark {
+    --background:          210 30% 8%;
+    --foreground:          0 0% 98%;
+
+    --card:                210 25% 11%;
+    --card-foreground:     0 0% 98%;
+
+    --popover:             210 25% 11%;
+    --popover-foreground:  0 0% 98%;
+
+    /* Brand blue lightened for dark-mode contrast                            */
+    --primary:             206 65% 58%;
+    --primary-foreground:  210 30% 8%;
+
+    --secondary:           210 20% 18%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted:               210 20% 18%;
+    --muted-foreground:    210 10% 60%;
+
+    --accent:              210 20% 18%;
+    --accent-foreground:   0 0% 98%;
+
+    --destructive:         0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border:              210 15% 22%;
+    --input:               210 15% 22%;
+    --ring:                206 65% 58%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    /* font-sans is resolved from --font-sans in @theme above */
+    font-family: var(--font-sans);
+    /* Improve text rendering on all platforms */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

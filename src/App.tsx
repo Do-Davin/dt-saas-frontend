@@ -1,14 +1,7 @@
-import './index.css'
+import { DigitalMenu } from "./features/digital-menu";
 
 function App() {
-
-  return (
-    <>
-      <div className='flex font-bold items-center justify-center h-screen text-9xl'>
-        DT SaaS
-      </div>
-    </>
-  )
+  return <DigitalMenu />;
 }
 
-export default App
+export default App;
