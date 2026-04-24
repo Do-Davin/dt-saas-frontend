@@ -11,6 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useMenuStore } from "../store";
 import { useDigitalMenuUIStore } from "../store/uiStore";
+import { useLanguageStore } from "../store/languageStore";
+import { tText } from "../utils/tText";
+import { uiLabels } from "../utils/uiLabels";
 import type { Product } from "../types/digitalMenu.types";
 
 interface ProductCardProps {
@@ -30,6 +33,8 @@ const DIETARY_TAG_LABELS: Record<string, string> = {
 export function ProductCard({ product }: ProductCardProps) {
   const addToCart = useMenuStore((s) => s.addToCart);
   const openProductModal = useDigitalMenuUIStore((s) => s.openProductModal);
+  const language = useLanguageStore((s) => s.language);
+  const t = uiLabels[language];
 
   return (
     <Card
@@ -41,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="aspect-video w-full overflow-hidden bg-muted">
           <img
             src={product.imageUrl}
-            alt={product.name}
+            alt={tText(product.name, language)}
             className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
@@ -54,12 +59,12 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Header — name + add button via CardAction */}
       <CardHeader className="px-4 pt-4 pb-1">
         <CardTitle className="text-base leading-snug">
-          {product.name}
+          {tText(product.name, language)}
         </CardTitle>
 
         {product.description && (
           <CardDescription className="line-clamp-2">
-            {product.description}
+            {tText(product.description, language)}
           </CardDescription>
         )}
 
@@ -70,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
             className="h-8 w-8 shrink-0"
             disabled={!product.isAvailable}
             onClick={(e) => { e.stopPropagation(); addToCart(product); }}
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={`Add ${tText(product.name, language)} to cart`}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -86,7 +91,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {!product.isAvailable && (
             <Badge variant="destructive" className="text-xs">
-              Sold Out
+              {t.soldOut}
             </Badge>
           )}
 

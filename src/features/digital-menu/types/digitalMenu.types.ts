@@ -1,3 +1,10 @@
+// ─── Localisation ────────────────────────────────────────────────────────────
+
+export type Language = "en" | "kh";
+
+/** Bilingual text container. `en` is always required; `kh` is optional. */
+export type LocalizedText = { en: string; kh?: string };
+
 // ─── Availability ────────────────────────────────────────────────────────────
 
 export type DayOfWeek =
@@ -44,8 +51,6 @@ export interface BusinessContact {
   phone?: string;
   email?: string;
   website?: string;
-  /** Telegram username without the @ prefix (e.g. "dtkitchen"). */
-  telegram?: string;
 }
 
 /** Public-facing business information shown on the digital menu. */
@@ -53,10 +58,12 @@ export interface Business {
   id: string;
   /** URL-friendly identifier used in public menu routes (e.g. /menu/dt-kitchen). */
   slug: string;
+  /** Brand name — never translated. */
   name: string;
   logoUrl?: string;
   coverImageUrl?: string;
-  description?: string;
+  heroImages?: string[];
+  description?: LocalizedText;
   cuisineTypes?: string[];
   /** ISO 4217 currency code (e.g. "USD"). */
   currency: string;
@@ -71,8 +78,8 @@ export interface Business {
 export interface Category {
   id: string;
   businessId: string;
-  name: string;
-  description?: string;
+  name: LocalizedText;
+  description?: LocalizedText;
   imageUrl?: string;
   /** Zero-based display order within the menu. */
   position: number;
@@ -124,8 +131,8 @@ export interface ProductOptionGroup {
 export interface Product {
   id: string;
   categoryId: string;
-  name: string;
-  description?: string;
+  name: LocalizedText;
+  description?: LocalizedText;
   /** Base price in the business's currency. */
   price: number;
   imageUrl?: string;

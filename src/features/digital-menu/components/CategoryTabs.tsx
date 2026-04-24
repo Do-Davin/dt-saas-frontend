@@ -2,11 +2,16 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useMenuStore } from "../store";
 import { useDigitalMenuUIStore } from "../store/uiStore";
+import { useLanguageStore } from "../store/languageStore";
+import { tText } from "../utils/tText";
+import { uiLabels } from "../utils/uiLabels";
 
 export function CategoryTabs() {
   const categories = useMenuStore((s) => s.categories);
   const selectedCategoryId = useDigitalMenuUIStore((s) => s.selectedCategoryId);
   const selectCategory = useDigitalMenuUIStore((s) => s.selectCategory);
+  const language = useLanguageStore((s) => s.language);
+  const t = uiLabels[language];
 
   return (
     <ScrollArea className="pt-1">
@@ -19,7 +24,7 @@ export function CategoryTabs() {
           onClick={() => selectCategory(null)}
           aria-pressed={selectedCategoryId === null}
         >
-          All
+          {t.allCategories}
         </Button>
         {categories.map((cat) => (
           <Button
@@ -29,7 +34,7 @@ export function CategoryTabs() {
             onClick={() => selectCategory(cat.id)}
             aria-pressed={selectedCategoryId === cat.id}
           >
-            {cat.name}
+            {tText(cat.name, language)}
           </Button>
         ))}
       </div>

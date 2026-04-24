@@ -1,4 +1,4 @@
-import { Plus, Send, UtensilsCrossed, X } from "lucide-react";
+import { Plus, UtensilsCrossed, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useMenuStore } from "../store";
 import { useDigitalMenuUIStore } from "../store/uiStore";
-
-interface ProductDetailModalProps {
-  /** Telegram username without @ — passed from the business so the modal stays decoupled from the data store. */
-  telegramHandle?: string;
-}
+import { useLanguageStore } from "../store/languageStore";
+import { tText } from "../utils/tText";
+import { uiLabels } from "../utils/uiLabels";
 
 const DIETARY_TAG_LABELS: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -27,20 +25,16 @@ const DIETARY_TAG_LABELS: Record<string, string> = {
   spicy: "Spicy",
 };
 
-export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) {
+export function ProductDetailModal() {
   const addToCart = useMenuStore((s) => s.addToCart);
 
   const product = useDigitalMenuUIStore((s) => s.selectedProduct);
   const isOpen = useDigitalMenuUIStore((s) => s.isProductModalOpen);
   const close = useDigitalMenuUIStore((s) => s.closeProductModal);
+  const language = useLanguageStore((s) => s.language);
+  const t = uiLabels[language];
 
   if (!product) return null;
-
-  const telegramUrl = telegramHandle
-    ? `https://t.me/${telegramHandle}?text=${encodeURIComponent(
-        `Hi! I'd like to ask about: ${product.name}`
-      )}`
-    : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
@@ -70,7 +64,7 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
             <div className="aspect-video w-full overflow-hidden bg-muted">
               <img
                 src={product.imageUrl}
-                alt={product.name}
+                alt={tText(product.name, language)}
                 className="h-full w-full object-cover"
               />
             </div>
@@ -90,7 +84,7 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
           {/* Name + price */}
           <div className="flex flex-wrap items-start justify-between gap-2">
             <DialogTitle className="text-lg leading-snug">
-              {product.name}
+              {tText(product.name, language)}
             </DialogTitle>
             <span className="text-base font-semibold">
               ${product.price.toFixed(2)}
@@ -101,7 +95,7 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
           {((!product.isAvailable) || (product.dietaryTags && product.dietaryTags.length > 0)) && (
             <div className="flex flex-wrap gap-1.5">
               {!product.isAvailable && (
-                <Badge variant="destructive">Sold Out</Badge>
+                <Badge variant="destructive">{t.soldOut}</Badge>
               )}
               {product.dietaryTags?.map((tag) => (
                 <Badge key={tag} variant="secondary">
@@ -118,14 +112,14 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
             <DialogDescription
               className="text-sm text-foreground leading-relaxed"
             >
-              {product.description}
+              {tText(product.description, language)}
             </DialogDescription>
           )}
 
           {/* Allergens */}
           {product.allergens && product.allergens.length > 0 && (
             <p className="text-sm">
-              <span className="font-medium">Allergens: </span>
+              <span className="font-medium">{t.allergens}: </span>
               <span className="capitalize text-muted-foreground">
                 {product.allergens.join(", ")}
               </span>
@@ -142,18 +136,6 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
 
         {/* Footer — always visible, never scrolls away */}
         <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:flex-row">
-          {telegramUrl && (
-            <Button asChild variant="outline" className="gap-2 sm:flex-1">
-              <a
-                href={telegramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Send className="h-4 w-4" aria-hidden="true" />
-                Ask on Telegram
-              </a>
-            </Button>
-          )}
           <Button
             className="gap-2 sm:flex-1"
             disabled={!product.isAvailable}
@@ -163,7 +145,7 @@ export function ProductDetailModal({ telegramHandle }: ProductDetailModalProps) 
             }}
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
-            Add to Order
+            {t.addToOrder}
           </Button>
         </DialogFooter>
       </DialogContent>

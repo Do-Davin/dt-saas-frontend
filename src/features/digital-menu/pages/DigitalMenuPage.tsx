@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMenuStore } from "../store";
 import { useDigitalMenuUIStore } from "../store/uiStore";
+import { useLanguageStore } from "../store/languageStore";
+import { tText } from "../utils/tText";
+import { uiLabels } from "../utils/uiLabels";
 import { MenuHeader } from "../components/MenuHeader";
-import { BusinessHeader } from "../components/BusinessHeader";
+import { BusinessHeroCarousel } from "../components/BusinessHeroCarousel";
 import { CategoryTabs } from "../components/CategoryTabs";
 import { ProductGrid } from "../components/ProductGrid";
 import { CartDrawer } from "../components/CartDrawer";
@@ -17,8 +20,6 @@ import {
   mockProducts,
 } from "../data/mockMenuData";
 
-// Resolve business + its categories + products by slug.
-// Swap this for an API call when a backend is ready.
 function resolveBySlug(slug: string) {
   if (slug !== mockBusiness.slug) return null;
   const categories = mockCategories.filter(
@@ -33,7 +34,7 @@ function resolveBySlug(slug: string) {
 export function DigitalMenuPage() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
 
-  // ── Data store ────────────────────────────────��───────────────────────────
+  // ── Data store ────────────────────────────────────────────────────────────
   const setMenuData = useMenuStore((s) => s.setMenuData);
   const setLoading = useMenuStore((s) => s.setLoading);
   const storeProducts = useMenuStore((s) => s.items);
@@ -45,7 +46,10 @@ export function DigitalMenuPage() {
   const setSearchQuery = useDigitalMenuUIStore((s) => s.setSearchQuery);
   const clearSearch = useDigitalMenuUIStore((s) => s.clearSearch);
 
-  // Load data and reset UI state whenever the slug changes.
+  // ── Language ──────────────────────────────────────────────────────────────
+  const language = useLanguageStore((s) => s.language);
+  const t = uiLabels[language];
+
   useEffect(() => {
     const resolved = resolveBySlug(businessSlug);
     if (!resolved) return;
@@ -54,11 +58,9 @@ export function DigitalMenuPage() {
     setLoading(false);
     selectCategory(null);
     clearSearch();
-    // Scroll to top on every business navigation (SPA-friendly).
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [businessSlug, setMenuData, setLoading, selectCategory, clearSearch]);
 
-  // Synchronous guard — used for redirect and passing business to components.
   const resolved = resolveBySlug(businessSlug);
   if (!resolved) return <Navigate to="/not-found" replace />;
 
@@ -67,24 +69,32 @@ export function DigitalMenuPage() {
 
   const visibleProducts = storeProducts
     .filter((p) => !selectedCategoryId || p.categoryId === selectedCategoryId)
-    .filter(
-      (p) =>
-        !trimmedQuery ||
-        p.name.toLowerCase().includes(trimmedQuery) ||
-        p.description?.toLowerCase().includes(trimmedQuery)
-    );
+    .filter((p) => {
+      if (!trimmedQuery) return true;
+      // Search across both languages so switching language doesn't break results.
+      const nameHit =
+        p.name.en.toLowerCase().includes(trimmedQuery) ||
+        (p.name.kh ?? "").toLowerCase().includes(trimmedQuery);
+      const descHit = p.description
+        ? p.description.en.toLowerCase().includes(trimmedQuery) ||
+          (p.description.kh ?? "").toLowerCase().includes(trimmedQuery)
+        : false;
+      return nameHit || descHit;
+    });
 
   const emptyMessage = trimmedQuery
-    ? `No results for "${searchQuery.trim()}".`
-    : "No items are available in this category right now.";
+    ? t.noSearchResults(searchQuery.trim())
+    : t.noCategoryItems;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky nav — business name + cart button */}
+      {/* Sticky nav — business name (brand, not translated) + lang switcher + cart */}
       <MenuHeader restaurantName={resolved.business.name} />
 
-      {/* Business info — logo, description, location, Telegram */}
-      <BusinessHeader business={resolved.business} />
+      {/* Hero carousel */}
+      <div className="mx-auto max-w-3xl px-4 py-4">
+        <BusinessHeroCarousel business={resolved.business} />
+      </div>
 
       {/* Search + category filter */}
       <div className="sticky top-[57px] z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -96,11 +106,11 @@ export function DigitalMenuPage() {
             />
             <Input
               type="search"
-              placeholder="Search menu…"
+              placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-9"
-              aria-label="Search menu items"
+              aria-label={t.searchPlaceholder}
             />
             {searchQuery && (
               <Button
@@ -126,7 +136,7 @@ export function DigitalMenuPage() {
 
       {/* Overlays */}
       <CartDrawer />
-      <ProductDetailModal telegramHandle={resolved.business.contact?.telegram} />
+      <ProductDetailModal />
     </div>
   );
 }
