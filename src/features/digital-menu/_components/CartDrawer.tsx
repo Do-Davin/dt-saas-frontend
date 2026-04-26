@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMenuStore } from "../store";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
-import { uiLabels } from "../utils/uiLabels";
+import { useMenuStore } from "../_store";
+import { useLanguageStore } from "../_store/languageStore";
+import { tText } from "../_utils/tText";
+import { uiLabels } from "../_utils/uiLabels";
 
 export function CartDrawer() {
   const cart = useMenuStore((s) => s.cart);
@@ -28,7 +28,6 @@ export function CartDrawer() {
   return (
     <Sheet open={isCartOpen} onOpenChange={toggleCart}>
       <SheetContent className="flex flex-col overflow-hidden p-0">
-        {/* ── Header ──────────────────────────────────────────────────────── */}
         <SheetHeader className="flex-row items-center justify-between border-b px-5 py-4">
           <div className="flex items-center gap-2">
             <SheetTitle className="text-base">{t.cartTitle}</SheetTitle>
@@ -50,7 +49,6 @@ export function CartDrawer() {
           )}
         </SheetHeader>
 
-        {/* ── Body ────────────────────────────────────────────────────────── */}
         {cart.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -119,7 +117,6 @@ export function CartDrawer() {
               </ul>
             </ScrollArea>
 
-            {/* ── Footer ────────────────────────────────────────────────── */}
             <SheetFooter className="flex-col gap-3 border-t px-5 py-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">

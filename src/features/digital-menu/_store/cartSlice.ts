@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { Product } from "../types/digitalMenu.types";
+import type { Product } from "../_types/digitalMenu.types";
 
 export interface CartItem {
   item: Product;

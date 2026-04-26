@@ -3,35 +3,17 @@ import type {
   Business,
   Category,
   Product,
-} from "../types/digitalMenu.types";
-
-// ─── Shared helpers ───────────────────────────────────────────────────────────
+} from "../_types/digitalMenu.types";
 
 const WEEKDAYS_OPEN: Availability = {
   isTemporarilyUnavailable: false,
   schedule: [
     { day: "monday", isOpen: true, hours: [{ open: "11:00", close: "22:00" }] },
-    {
-      day: "tuesday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "22:00" }],
-    },
-    {
-      day: "wednesday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "22:00" }],
-    },
-    {
-      day: "thursday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "22:00" }],
-    },
+    { day: "tuesday", isOpen: true, hours: [{ open: "11:00", close: "22:00" }] },
+    { day: "wednesday", isOpen: true, hours: [{ open: "11:00", close: "22:00" }] },
+    { day: "thursday", isOpen: true, hours: [{ open: "11:00", close: "22:00" }] },
     { day: "friday", isOpen: true, hours: [{ open: "11:00", close: "23:00" }] },
-    {
-      day: "saturday",
-      isOpen: true,
-      hours: [{ open: "10:00", close: "23:00" }],
-    },
+    { day: "saturday", isOpen: true, hours: [{ open: "10:00", close: "23:00" }] },
     { day: "sunday", isOpen: false, hours: [] },
   ],
 };
@@ -40,28 +22,14 @@ const LUNCH_ONLY: Availability = {
   isTemporarilyUnavailable: false,
   schedule: [
     { day: "monday", isOpen: true, hours: [{ open: "11:00", close: "15:00" }] },
-    {
-      day: "tuesday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "15:00" }],
-    },
-    {
-      day: "wednesday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "15:00" }],
-    },
-    {
-      day: "thursday",
-      isOpen: true,
-      hours: [{ open: "11:00", close: "15:00" }],
-    },
+    { day: "tuesday", isOpen: true, hours: [{ open: "11:00", close: "15:00" }] },
+    { day: "wednesday", isOpen: true, hours: [{ open: "11:00", close: "15:00" }] },
+    { day: "thursday", isOpen: true, hours: [{ open: "11:00", close: "15:00" }] },
     { day: "friday", isOpen: true, hours: [{ open: "11:00", close: "15:00" }] },
     { day: "saturday", isOpen: false, hours: [] },
     { day: "sunday", isOpen: false, hours: [] },
   ],
 };
-
-// ─── Business ─────────────────────────────────────────────────────────────────
 
 export const mockBusiness: Business = {
   id: "biz-001",
@@ -91,8 +59,6 @@ export const mockBusiness: Business = {
     "/mock-images/sushi.png",
   ],
 };
-
-// ─── Categories ───────────────────────────────────────────────────────────────
 
 export const mockCategories: Category[] = [
   {
@@ -140,115 +106,122 @@ export const mockCategories: Category[] = [
   },
 ];
 
-// ─── Products ─────────────────────────────────────────────────────────────────
-
 export const mockProducts: Product[] = [
   {
     id: "prod-bbq",
+    categoryId: "cat-mains",
     name: { en: "Barbecue Skewers", kh: "សាច់អាំងជក់" },
     description: {
       en: "Grilled meat skewers with smoky flavor and house BBQ sauce",
-      km: "សាច់អាំងលើឈើឆ្កាង មានរសជាតិឆ្ងាញ់ជាមួយសូស BBQ",
+      kh: "សាច់អាំងលើឈើឆ្កាង មានរសជាតិឆ្ងាញ់ជាមួយសូស BBQ",
     },
     price: 5.99,
     imageUrl: "/mock-images/barbecue.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 0,
   },
   {
     id: "prod-coffee",
+    categoryId: "cat-drinks",
     name: { en: "Iced Coffee", kh: "កាហ្វេទឹកកក" },
     description: {
       en: "Freshly brewed coffee served over ice with rich aroma",
-      km: "កាហ្វេថ្មីៗ ដាក់ទឹកកក មានក្លិនឈ្ងុយ",
+      kh: "កាហ្វេថ្មីៗ ដាក់ទឹកកក មានក្លិនឈ្ងុយ",
     },
     price: 2.5,
     imageUrl: "/mock-images/coffee.png",
     isAvailable: true,
-    categoryId: "cat-drinks",
+    position: 0,
   },
   {
     id: "prod-fruit",
+    categoryId: "cat-desserts",
     name: { en: "Fresh Fruit Bowl", kh: "ផ្លែឈើស្រស់" },
     description: {
       en: "A mix of seasonal fresh fruits, sweet and refreshing",
-      km: "ផ្លែឈើស្រស់ជាច្រើនប្រភេទ មានរសជាតិផ្អែមត្រជាក់",
+      kh: "ផ្លែឈើស្រស់ជាច្រើនប្រភេទ មានរសជាតិផ្អែមត្រជាក់",
     },
     price: 3.5,
     imageUrl: "/mock-images/fruit.png",
     isAvailable: true,
-    categoryId: "cat-desserts",
+    position: 0,
   },
   {
     id: "prod-matcha",
+    categoryId: "cat-drinks",
     name: { en: "Matcha Latte", kh: "ម៉ាចាឡាតេ" },
     description: {
       en: "Creamy Japanese matcha blended with fresh milk",
-      km: "តែបៃតងម៉ាចា លាយជាមួយទឹកដោះគោ មានរសជាតិទន់",
+      kh: "តែបៃតងម៉ាចា លាយជាមួយទឹកដោះគោ មានរសជាតិទន់",
     },
     price: 3.0,
     imageUrl: "/mock-images/matcha.png",
     isAvailable: true,
-    categoryId: "cat-drinks",
+    position: 1,
   },
   {
     id: "prod-noodle",
+    categoryId: "cat-mains",
     name: { en: "Stir-Fried Noodles", kh: "មីឆា" },
     description: {
       en: "Savory stir-fried noodles with vegetables and sauce",
-      km: "មីឆាជាមួយបន្លែ និងសូស មានរសជាតិឆ្ងាញ់",
+      kh: "មីឆាជាមួយបន្លែ និងសូស មានរសជាតិឆ្ងាញ់",
     },
     price: 4.5,
     imageUrl: "/mock-images/noodle.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 1,
   },
   {
     id: "prod-salmon",
+    categoryId: "cat-mains",
     name: { en: "Grilled Salmon", kh: "ត្រីសាម៉ុនអាំង" },
     description: {
       en: "Fresh salmon grilled to perfection with light seasoning",
-      km: "ត្រីសាម៉ុនអាំង មានរសជាតិទន់ និងឆ្ងាញ់",
+      kh: "ត្រីសាម៉ុនអាំង មានរសជាតិទន់ និងឆ្ងាញ់",
     },
     price: 8.99,
     imageUrl: "/mock-images/salmon.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 2,
   },
   {
     id: "prod-steak",
+    categoryId: "cat-mains",
     name: { en: "Beef Steak", kh: "ស្ទេកសាច់គោ" },
     description: {
       en: "Juicy grilled beef steak cooked to your preference",
-      km: "សាច់គោអាំង មានរសជាតិទន់ និងជូរជ្រាប",
+      kh: "សាច់គោអាំង មានរសជាតិទន់ និងជូរជ្រាប",
     },
     price: 10.99,
     imageUrl: "/mock-images/steak.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 3,
   },
   {
     id: "prod-sushi",
+    categoryId: "cat-mains",
     name: { en: "Sushi Platter", kh: "ស៊ូស៊ី" },
     description: {
       en: "Assorted sushi rolls with fresh fish and rice",
-      km: "ស៊ូស៊ីជាច្រើនប្រភេទ ជាមួយត្រីស្រស់",
+      kh: "ស៊ូស៊ីជាច្រើនប្រភេទ ជាមួយត្រីស្រស់",
     },
     price: 7.5,
     imageUrl: "/mock-images/sushi.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 4,
   },
   {
     id: "prod-wagyu",
+    categoryId: "cat-mains",
     name: { en: "Wagyu Beef", kh: "សាច់វ៉ាគ្យូ" },
     description: {
       en: "Premium wagyu beef with rich marbling and tenderness",
-      km: "សាច់វ៉ាគ្យូគុណភាពខ្ពស់ មានជាតិខ្លាញ់ទន់ល្អ",
+      kh: "សាច់វ៉ាគ្យូគុណភាពខ្ពស់ មានជាតិខ្លាញ់ទន់ល្អ",
     },
     price: 15.99,
     imageUrl: "/mock-images/wagyu.png",
     isAvailable: true,
-    categoryId: "cat-mains",
+    position: 5,
   },
 ];

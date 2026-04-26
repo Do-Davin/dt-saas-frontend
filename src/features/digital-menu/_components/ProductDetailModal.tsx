@@ -9,11 +9,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useMenuStore } from "../store";
-import { useDigitalMenuUIStore } from "../store/uiStore";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
-import { uiLabels } from "../utils/uiLabels";
+import { useMenuStore } from "../_store";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
+import { useLanguageStore } from "../_store/languageStore";
+import { tText } from "../_utils/tText";
+import { uiLabels } from "../_utils/uiLabels";
 
 const DIETARY_TAG_LABELS: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -36,20 +36,14 @@ export function ProductDetailModal() {
 
   if (!product) return null;
 
+  const hasBadges = !product.isAvailable || (product.dietaryTags?.length ?? 0) > 0;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
-      {/*
-        flex flex-col + max-h keeps the modal within the viewport on every screen.
-        gap-0 overrides the default grid gap-4 so image, body, and footer are flush.
-        overflow-hidden ensures the image doesn't escape the rounded corners.
-        100svh (small viewport) accounts for mobile browser chrome (URL bar, nav).
-      */}
       <DialogContent
         className="flex flex-col gap-0 overflow-hidden p-0 max-h-[calc(100svh-2rem)] sm:max-w-xl"
         showCloseButton={false}
       >
-        {/* Close button — own version so we can give it a contrast backdrop
-            over images that may be dark or light                              */}
         <button
           onClick={close}
           className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -58,7 +52,6 @@ export function ProductDetailModal() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Image — shrink-0 keeps it from being squashed when body is short */}
         <div className="shrink-0">
           {product.imageUrl ? (
             <div className="aspect-video w-full overflow-hidden bg-muted">
@@ -78,10 +71,7 @@ export function ProductDetailModal() {
           )}
         </div>
 
-        {/* Scrollable body — min-h-0 is required for flex children to
-            actually scroll rather than expand the container              */}
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pt-4 pb-2">
-          {/* Name + price */}
           <div className="flex flex-wrap items-start justify-between gap-2">
             <DialogTitle className="text-lg leading-snug">
               {tText(product.name, language)}
@@ -91,8 +81,7 @@ export function ProductDetailModal() {
             </span>
           </div>
 
-          {/* Availability + dietary tags */}
-          {((!product.isAvailable) || (product.dietaryTags && product.dietaryTags.length > 0)) && (
+          {hasBadges && (
             <div className="flex flex-wrap gap-1.5">
               {!product.isAvailable && (
                 <Badge variant="destructive">{t.soldOut}</Badge>
@@ -107,16 +96,12 @@ export function ProductDetailModal() {
 
           <Separator />
 
-          {/* Full description — no line-clamp */}
           {product.description && (
-            <DialogDescription
-              className="text-sm text-foreground leading-relaxed"
-            >
+            <DialogDescription className="text-sm text-foreground leading-relaxed">
               {tText(product.description, language)}
             </DialogDescription>
           )}
 
-          {/* Allergens */}
           {product.allergens && product.allergens.length > 0 && (
             <p className="text-sm">
               <span className="font-medium">{t.allergens}: </span>
@@ -126,7 +111,6 @@ export function ProductDetailModal() {
             </p>
           )}
 
-          {/* Calories */}
           {product.calories != null && (
             <p className="text-sm text-muted-foreground">
               {product.calories} kcal
@@ -134,7 +118,6 @@ export function ProductDetailModal() {
           )}
         </div>
 
-        {/* Footer — always visible, never scrolls away */}
         <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:flex-row">
           <Button
             className="gap-2 sm:flex-1"

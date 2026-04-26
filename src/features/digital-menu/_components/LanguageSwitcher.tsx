@@ -1,5 +1,5 @@
-import { useLanguageStore } from "../store/languageStore";
-import type { Language } from "../types/digitalMenu.types";
+import { useLanguageStore } from "../_store/languageStore";
+import type { Language } from "../_types/digitalMenu.types";
 
 const LANGS: { code: Language; flag: string; label: string }[] = [
   { code: "en", flag: "🇺🇸", label: "English" },

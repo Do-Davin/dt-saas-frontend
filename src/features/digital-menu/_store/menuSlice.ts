@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { Category, Product } from "../types/digitalMenu.types";
+import type { Category, Product } from "../_types/digitalMenu.types";
 
 export interface MenuSlice {
   categories: Category[];

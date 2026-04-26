@@ -3,22 +3,21 @@ import { useParams, Navigate } from "react-router";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useMenuStore } from "../store";
-import { useDigitalMenuUIStore } from "../store/uiStore";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
-import { uiLabels } from "../utils/uiLabels";
-import { MenuHeader } from "../components/MenuHeader";
-import { BusinessHeroCarousel } from "../components/BusinessHeroCarousel";
-import { CategoryTabs } from "../components/CategoryTabs";
-import { ProductGrid } from "../components/ProductGrid";
-import { CartDrawer } from "../components/CartDrawer";
-import { ProductDetailModal } from "../components/ProductDetailModal";
+import { useMenuStore } from "../_store";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
+import { useLanguageStore } from "../_store/languageStore";
+import { uiLabels } from "../_utils/uiLabels";
+import { MenuHeader } from "../_components/MenuHeader";
+import { BusinessHeroCarousel } from "../_components/BusinessHeroCarousel";
+import { CategoryTabs } from "../_components/CategoryTabs";
+import { ProductGrid } from "../_components/ProductGrid";
+import { CartDrawer } from "../_components/CartDrawer";
+import { ProductDetailModal } from "../_components/ProductDetailModal";
 import {
   mockBusiness,
   mockCategories,
   mockProducts,
-} from "../data/mockMenuData";
+} from "../_data/mockMenuData";
 
 function resolveBySlug(slug: string) {
   if (slug !== mockBusiness.slug) return null;
@@ -34,27 +33,24 @@ function resolveBySlug(slug: string) {
 export function DigitalMenuPage() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
 
-  // ── Data store ────────────────────────────────────────────────────────────
   const setMenuData = useMenuStore((s) => s.setMenuData);
   const setLoading = useMenuStore((s) => s.setLoading);
   const storeProducts = useMenuStore((s) => s.items);
 
-  // ── UI store ──────────────────────────────────────────────────────────────
   const selectedCategoryId = useDigitalMenuUIStore((s) => s.selectedCategoryId);
   const selectCategory = useDigitalMenuUIStore((s) => s.selectCategory);
   const searchQuery = useDigitalMenuUIStore((s) => s.searchQuery);
   const setSearchQuery = useDigitalMenuUIStore((s) => s.setSearchQuery);
   const clearSearch = useDigitalMenuUIStore((s) => s.clearSearch);
 
-  // ── Language ──────────────────────────────────────────────────────────────
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
 
   useEffect(() => {
-    const resolved = resolveBySlug(businessSlug);
-    if (!resolved) return;
+    const data = resolveBySlug(businessSlug);
+    if (!data) return;
     setLoading(true);
-    setMenuData(resolved.categories, resolved.products);
+    setMenuData(data.categories, data.products);
     setLoading(false);
     selectCategory(null);
     clearSearch();
@@ -64,14 +60,13 @@ export function DigitalMenuPage() {
   const resolved = resolveBySlug(businessSlug);
   if (!resolved) return <Navigate to="/not-found" replace />;
 
-  // ── Filtering ─────────────────────────────────────────────────────────────
   const trimmedQuery = searchQuery.trim().toLowerCase();
 
   const visibleProducts = storeProducts
     .filter((p) => !selectedCategoryId || p.categoryId === selectedCategoryId)
     .filter((p) => {
       if (!trimmedQuery) return true;
-      // Search across both languages so switching language doesn't break results.
+      // Search both languages so results survive a language switch mid-query.
       const nameHit =
         p.name.en.toLowerCase().includes(trimmedQuery) ||
         (p.name.kh ?? "").toLowerCase().includes(trimmedQuery);
@@ -88,16 +83,13 @@ export function DigitalMenuPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky nav — business name (brand, not translated) + lang switcher + cart */}
       <MenuHeader restaurantName={resolved.business.name} />
 
-      {/* Hero carousel */}
       <div className="mx-auto max-w-3xl px-4 py-4">
         <BusinessHeroCarousel business={resolved.business} />
       </div>
 
-      {/* Search + category filter */}
-      <div className="sticky top-[57px] z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="sticky top-14.25 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto max-w-3xl px-4 pt-3">
           <div className="relative">
             <Search
@@ -129,12 +121,10 @@ export function DigitalMenuPage() {
         <CategoryTabs />
       </div>
 
-      {/* Product grid */}
       <main className="mx-auto max-w-3xl px-4 py-6">
         <ProductGrid products={visibleProducts} emptyMessage={emptyMessage} />
       </main>
 
-      {/* Overlays */}
       <CartDrawer />
       <ProductDetailModal />
     </div>

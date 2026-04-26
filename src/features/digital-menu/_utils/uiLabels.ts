@@ -1,4 +1,4 @@
-import type { Language } from "../types/digitalMenu.types";
+import type { Language } from "../_types/digitalMenu.types";
 
 export type UILabels = {
   allCategories: string;

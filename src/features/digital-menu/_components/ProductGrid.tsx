@@ -1,7 +1,7 @@
 import { UtensilsCrossed } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "./ProductCard";
-import type { Product } from "../types/digitalMenu.types";
+import type { Product } from "../_types/digitalMenu.types";
 
 interface ProductGridProps {
   products: Product[];

@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router";
-import { DigitalMenuPage } from "./pages/DigitalMenuPage";
-import { NotFoundPage } from "./pages/NotFoundPage";
+import { DigitalMenuPage } from "./_pages/DigitalMenuPage";
+import { NotFoundPage } from "./_pages/NotFoundPage";
 
 export const digitalMenuRouter = createBrowserRouter([
   {

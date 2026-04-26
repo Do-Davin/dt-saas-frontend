@@ -1,10 +1,10 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { useMenuStore } from "../store";
-import { useDigitalMenuUIStore } from "../store/uiStore";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
-import { uiLabels } from "../utils/uiLabels";
+import { useMenuStore } from "../_store";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
+import { useLanguageStore } from "../_store/languageStore";
+import { tText } from "../_utils/tText";
+import { uiLabels } from "../_utils/uiLabels";
 
 export function CategoryTabs() {
   const categories = useMenuStore((s) => s.categories);
@@ -16,8 +16,6 @@ export function CategoryTabs() {
   return (
     <ScrollArea className="pt-1">
       <div className="mx-auto flex max-w-3xl gap-1 px-4 py-2">
-        {/* min-h-[44px] ensures touch targets meet the 44px mobile minimum
-            while keeping the visual pill size controlled by px/py             */}
         <Button
           variant={selectedCategoryId === null ? "default" : "ghost"}
           className="shrink-0 rounded-full px-4 py-2 text-sm min-h-[44px]"

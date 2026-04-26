@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useMenuStore } from "../store";
-import { useDigitalMenuUIStore } from "../store/uiStore";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
-import { uiLabels } from "../utils/uiLabels";
-import type { Product } from "../types/digitalMenu.types";
+import { useMenuStore } from "../_store";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
+import { useLanguageStore } from "../_store/languageStore";
+import { tText } from "../_utils/tText";
+import { uiLabels } from "../_utils/uiLabels";
+import type { Product } from "../_types/digitalMenu.types";
 
 interface ProductCardProps {
   product: Product;
@@ -41,7 +41,6 @@ export function ProductCard({ product }: ProductCardProps) {
       className="overflow-hidden gap-0 py-0 cursor-pointer"
       onClick={() => openProductModal(product)}
     >
-      {/* Image */}
       {product.imageUrl ? (
         <div className="aspect-video w-full overflow-hidden bg-muted">
           <img
@@ -56,7 +55,6 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       )}
 
-      {/* Header — name + add button via CardAction */}
       <CardHeader className="px-4 pt-4 pb-1">
         <CardTitle className="text-base leading-snug">
           {tText(product.name, language)}
@@ -82,7 +80,6 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardAction>
       </CardHeader>
 
-      {/* Footer row — price, tags, availability */}
       <CardContent className="px-4 pb-4 pt-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold">

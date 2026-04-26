@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Language } from "../types/digitalMenu.types";
+import type { Language } from "../_types/digitalMenu.types";
 
 interface LanguageState {
   language: Language;

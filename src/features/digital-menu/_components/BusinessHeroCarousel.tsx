@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, MapPin, ImageOff } from "lucide-react";
-import type { Business } from "../types/digitalMenu.types";
-import { useLanguageStore } from "../store/languageStore";
-import { tText } from "../utils/tText";
+import type { Business } from "../_types/digitalMenu.types";
+import { useLanguageStore } from "../_store/languageStore";
+import { tText } from "../_utils/tText";
 
 interface BusinessHeroCarouselProps {
   business: Business;
@@ -34,7 +34,10 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
     () => setIndex((i) => (i + 1) % images.length),
     [images.length],
   );
-  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  const prev = useCallback(
+    () => setIndex((i) => (i - 1 + images.length) % images.length),
+    [images.length],
+  );
 
   useEffect(() => {
     if (!hasMultiple || paused) return;
@@ -50,7 +53,6 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* ── Images ──────────────────────────────────────────────────────────── */}
       <div className="relative aspect-video w-full sm:aspect-16/6">
         {hasImages ? (
           <>
@@ -66,10 +68,8 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
               />
             ))}
 
-            {/* Gradient scrim: transparent top → solid bottom */}
             <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
 
-            {/* ── Business info ──────────────────────────────────────────── */}
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-10 sm:px-5 sm:pb-5">
               <h2 className="text-xl font-bold text-white sm:text-2xl">
                 {business.name}
@@ -88,7 +88,6 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
                 </p>
               )}
 
-              {/* Dots — sit at the bottom-right corner, inside the scrim */}
               {hasMultiple && (
                 <div className="absolute bottom-4 right-4 flex items-center gap-1.5 sm:bottom-5 sm:right-5">
                   {images.map((_, i) => (
@@ -110,7 +109,6 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
               )}
             </div>
 
-            {/* ── Prev / Next ────────────────────────────────────────────── */}
             {hasMultiple && (
               <>
                 <button
@@ -131,7 +129,6 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
             )}
           </>
         ) : (
-          /* ── Fallback ─────────────────────────────────────────────────── */
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-muted">
             <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-muted-foreground/10">
               <ImageOff className="h-6 w-6 text-muted-foreground/30" aria-hidden="true" />
