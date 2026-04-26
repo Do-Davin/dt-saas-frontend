@@ -13,6 +13,7 @@ import { BusinessHeroCarousel } from "../components/BusinessHeroCarousel";
 import { CategoryTabs } from "../components/CategoryTabs";
 import { ProductGrid } from "../components/ProductGrid";
 import { CartDrawer } from "../components/CartDrawer";
+import { BottomCartButton } from "../components/BottomCartButton";
 import { ProductDetailModal } from "../components/ProductDetailModal";
 import {
   mockBusiness,
@@ -137,6 +138,7 @@ export function DigitalMenuPage() {
       {/* Overlays */}
       <CartDrawer />
       <ProductDetailModal />
+      <BottomCartButton />
     </div>
   );
 }
