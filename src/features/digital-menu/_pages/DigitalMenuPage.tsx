@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useMenuStore } from "../_store";
 import { useDigitalMenuUIStore } from "../_store/uiStore";
 import { useLanguageStore } from "../_store/languageStore";
+// import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
 import { MenuHeader } from "../_components/MenuHeader";
 import { BusinessHeroCarousel } from "../_components/BusinessHeroCarousel";
 import { CategoryTabs } from "../_components/CategoryTabs";
 import { ProductGrid } from "../_components/ProductGrid";
 import { CartDrawer } from "../_components/CartDrawer";
+import { BottomCartButton } from "../_components/BottomCartButton";
 import { ProductDetailModal } from "../_components/ProductDetailModal";
 import {
   mockBusiness,
@@ -127,6 +129,7 @@ export function DigitalMenuPage() {
 
       <CartDrawer />
       <ProductDetailModal />
+      <BottomCartButton />
     </div>
   );
 }
