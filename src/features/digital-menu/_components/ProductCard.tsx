@@ -15,6 +15,7 @@ import { useLanguageStore } from "../_store/languageStore";
 import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
 import type { Product } from "../_types/digitalMenu.types";
+import { PriceDisplay } from "./PriceDisplay";
 
 interface ProductCardProps {
   product: Product;
@@ -82,9 +83,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <CardContent className="px-4 pb-4 pt-2">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm font-semibold">
-            ${product.price.toFixed(2)}
-          </span>
+          <PriceDisplay price={product.price} />
 
           {!product.isAvailable && (
             <Badge variant="destructive" className="text-xs">
