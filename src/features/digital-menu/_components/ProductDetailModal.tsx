@@ -14,6 +14,7 @@ import { useDigitalMenuUIStore } from "../_store/uiStore";
 import { useLanguageStore } from "../_store/languageStore";
 import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
+import { PriceDisplay } from "./PriceDisplay";
 
 const DIETARY_TAG_LABELS: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -76,9 +77,7 @@ export function ProductDetailModal() {
             <DialogTitle className="text-lg leading-snug">
               {tText(product.name, language)}
             </DialogTitle>
-            <span className="text-base font-semibold">
-              ${product.price.toFixed(2)}
-            </span>
+            <PriceDisplay price={product.price} />
           </div>
 
           {hasBadges && (
