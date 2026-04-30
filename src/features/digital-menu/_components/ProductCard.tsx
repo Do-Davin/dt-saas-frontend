@@ -83,7 +83,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <CardContent className="px-4 pb-4 pt-2">
         <div className="flex flex-wrap items-center gap-2">
-          <PriceDisplay price={product.price} currency="KHR" />
+          <PriceDisplay price={product.price} />
 
           {!product.isAvailable && (
             <Badge variant="destructive" className="text-xs">
