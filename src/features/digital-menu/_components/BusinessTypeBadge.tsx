@@ -23,6 +23,8 @@ function formatBusinessType(type: string) {
 export function BusinessTypeBadge({ type }: BusinessTypeBadgeProps) {
     const label = formatBusinessType(type)
 
+    if (!label) return null;
+
     return (
         <Badge className="px-2 py-0.5 text-xs font-medium" data-testid="business-type-badge">
             {label}
