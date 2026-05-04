@@ -35,6 +35,7 @@ export const mockBusiness: Business = {
   id: "biz-001",
   slug: "dt-kitchen",
   name: "DT Kitchen",
+  businessType: "COFFEE_SHOP",
   description: {
     en: "Fresh, seasonal dishes with a modern twist.",
     kh: "មុខម្ហូបស្រស់ ច្នៃប្រឌិតទំនើប។",

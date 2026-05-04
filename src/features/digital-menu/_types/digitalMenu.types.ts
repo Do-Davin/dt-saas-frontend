@@ -60,6 +60,8 @@ export interface Business {
   slug: string;
   /** Brand name — never translated. */
   name: string;
+  /** Enum-style business category (e.g. "COFFEE_SHOP", "CAR_WASH"). */
+  businessType?: string;
   logoUrl?: string;
   coverImageUrl?: string;
   heroImages?: string[];

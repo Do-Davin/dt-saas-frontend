@@ -85,7 +85,7 @@ export function DigitalMenuPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <MenuHeader restaurantName={resolved.business.name} />
+      <MenuHeader restaurantName={resolved.business.name} businessType={resolved.business.businessType} />
 
       <div className="mx-auto max-w-3xl px-4 py-4">
         <BusinessHeroCarousel business={resolved.business} />
