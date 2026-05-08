@@ -99,7 +99,7 @@ export function DigitalMenuPage() {
               aria-hidden="true"
             />
             <Input
-              type="search"
+              type="text"
               placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
