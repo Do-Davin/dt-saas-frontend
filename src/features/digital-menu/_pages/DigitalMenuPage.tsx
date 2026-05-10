@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useLayoutEffect, useState } from "react";
 import { useParams, Navigate } from "react-router";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -48,6 +48,30 @@ export function DigitalMenuPage() {
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
 
+  const searchRef = useRef<HTMLDivElement | null>(null);
+  const [topOffset, setTopOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    const headerEl = document.querySelector("header");
+
+    function measure() {
+      const headerH = headerEl?.getBoundingClientRect().height ?? 0;
+      setTopOffset(headerH);
+    }
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    if (headerEl) ro.observe(headerEl);
+    if (searchRef.current) ro.observe(searchRef.current);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
   useEffect(() => {
     const data = resolveBySlug(businessSlug);
     if (!data) return;
@@ -91,7 +115,11 @@ export function DigitalMenuPage() {
         <BusinessHeroCarousel business={resolved.business} />
       </div>
 
-      <div className="sticky top-14.25 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div
+        ref={searchRef}
+        className="sticky z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
+        style={{ top: `${topOffset}px` }}
+      >
         <div className="mx-auto max-w-3xl px-4 pt-3">
           <div className="relative">
             <Search
