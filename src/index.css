@@ -113,6 +113,14 @@
     border-color: hsl(var(--border));
   }
 
+  html {
+    /* Reserve scrollbar gutter so page width doesn't shift between short/long
+       content (e.g. switching categories). overflow-y: scroll is the fallback
+       for browsers without scrollbar-gutter support. */
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+  }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));

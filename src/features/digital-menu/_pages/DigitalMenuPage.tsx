@@ -48,28 +48,19 @@ export function DigitalMenuPage() {
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
 
-  const searchRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
   const [topOffset, setTopOffset] = useState(0);
 
   useLayoutEffect(() => {
-    const headerEl = document.querySelector("header");
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
 
-    function measure() {
-      const headerH = headerEl?.getBoundingClientRect().height ?? 0;
-      setTopOffset(headerH);
-    }
+    const ro = new ResizeObserver(([entry]) => {
+      setTopOffset(entry.contentRect.height);
+    });
+    ro.observe(headerEl);
 
-    measure();
-
-    const ro = new ResizeObserver(measure);
-    if (headerEl) ro.observe(headerEl);
-    if (searchRef.current) ro.observe(searchRef.current);
-    window.addEventListener("resize", measure);
-
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    return () => ro.disconnect();
   }, []);
 
   useEffect(() => {
@@ -109,14 +100,17 @@ export function DigitalMenuPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <MenuHeader restaurantName={resolved.business.name} businessType={resolved.business.businessType} />
+      <MenuHeader
+        ref={headerRef}
+        restaurantName={resolved.business.name}
+        businessType={resolved.business.businessType}
+      />
 
       <div className="mx-auto max-w-3xl px-4 py-4">
         <BusinessHeroCarousel business={resolved.business} />
       </div>
 
       <div
-        ref={searchRef}
         className="sticky z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
         style={{ top: `${topOffset}px` }}
       >
@@ -151,7 +145,7 @@ export function DigitalMenuPage() {
         <CategoryTabs />
       </div>
 
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main className="mx-auto max-w-3xl px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))]">
         <ProductGrid products={visibleProducts} emptyMessage={emptyMessage} />
       </main>
 
