@@ -12,8 +12,12 @@ export type OwnerRequestsState =
   | { status: "error"; message: string }
   | { status: "ready"; items: CustomerRequestListItem[] };
 
+type SettledState =
+  | { status: "error"; message: string }
+  | { status: "ready"; items: CustomerRequestListItem[] };
+
 // Loads the owner request list for a single business. Pass `null` when the
-// current business is not selected yet — the hook stays in "idle" and never
+// current business is not selected yet — the hook returns "idle" and never
 // issues a request.
 //
 // Server state lives in this hook (useState) on purpose. It is page-local —
@@ -21,23 +25,32 @@ export type OwnerRequestsState =
 // add coordination cost without any sharing benefit. If a future feature
 // needs to share or invalidate this data, migrate to TanStack Query rather
 // than reinventing a cache in Zustand.
+//
+// Lint-compliance note (react-hooks/set-state-in-effect): the effect does
+// NOT call setState synchronously in its body. The visible "idle" and
+// "loading" states are *derived* from `businessId` and from whether the
+// most recent settled fetch was for the current `businessId`. Only the
+// async resolution of `listOwnerRequests` writes state, and the
+// `forBusinessId` tag tells the derivation which businessId that write
+// belongs to — so a stale resolution can never leak onto a different
+// business's view.
 export function useOwnerRequests(
   businessId: string | null
 ): OwnerRequestsState {
-  const [state, setState] = useState<OwnerRequestsState>(() =>
-    businessId ? { status: "loading" } : { status: "idle" }
-  );
+  const [fetched, setFetched] = useState<
+    { forBusinessId: string; state: SettledState } | null
+  >(null);
 
   useEffect(() => {
-    if (!businessId) {
-      setState({ status: "idle" });
-      return;
-    }
+    if (!businessId) return;
     let cancelled = false;
-    setState({ status: "loading" });
     listOwnerRequests(businessId)
       .then((items) => {
-        if (!cancelled) setState({ status: "ready", items });
+        if (cancelled) return;
+        setFetched({
+          forBusinessId: businessId,
+          state: { status: "ready", items },
+        });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -45,12 +58,19 @@ export function useOwnerRequests(
           err instanceof ApiError
             ? err.message
             : "Something went wrong while loading requests.";
-        setState({ status: "error", message });
+        setFetched({
+          forBusinessId: businessId,
+          state: { status: "error", message },
+        });
       });
     return () => {
       cancelled = true;
     };
   }, [businessId]);
 
-  return state;
+  if (!businessId) return { status: "idle" };
+  if (!fetched || fetched.forBusinessId !== businessId) {
+    return { status: "loading" };
+  }
+  return fetched.state;
 }

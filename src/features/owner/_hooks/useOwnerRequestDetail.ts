@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import {
   getOwnerRequest,
@@ -19,6 +19,22 @@ export type OwnerRequestDetailState =
   | { status: "error"; message: string }
   | { status: "ready"; request: CustomerRequestDetail };
 
+type SettledDetail =
+  | { status: "error"; message: string }
+  | { status: "ready"; request: CustomerRequestDetail };
+
+interface UpdateRecord {
+  forKey: string;
+  pending: boolean;
+  error: string | null;
+}
+
+const EMPTY_UPDATE: UpdateRecord = {
+  forKey: "",
+  pending: false,
+  error: null,
+};
+
 export interface OwnerRequestDetailResult {
   state: OwnerRequestDetailState;
   updateStatus: (next: RequestStatus) => Promise<void>;
@@ -32,39 +48,39 @@ export interface OwnerRequestDetailResult {
 // useOwnerRequests: page-local, not shared, so a Zustand slice would add
 // coordination cost without any sharing benefit. Migrate to TanStack Query
 // when this data needs to be shared, invalidated, or refetched cross-page.
+//
+// Lint-compliance note (react-hooks/set-state-in-effect): the effect does
+// NOT call setState synchronously in its body. Both fetched-state and
+// update-state carry a `forKey` tag (`${businessId}::${requestId}`). The
+// visible state, isUpdatingStatus, and updateError are all *derived* by
+// comparing those tags against the current key — so navigating to a
+// different request automatically discards in-flight updates and stale
+// fetches without any setState in the effect body.
 export function useOwnerRequestDetail(
   businessId: string | null,
   requestId: string | undefined
 ): OwnerRequestDetailResult {
-  const ready = Boolean(businessId && requestId);
-  const [state, setState] = useState<OwnerRequestDetailState>(() =>
-    ready ? { status: "loading" } : { status: "idle" }
-  );
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
-
-  // Stable key for the currently-mounted (businessId, requestId) pair.
-  // Used to drop late PATCH/GET resolutions after the user has navigated
-  // to a different request, preventing data from one request leaking onto
-  // the page of another.
   const currentKey =
     businessId && requestId ? `${businessId}::${requestId}` : "";
-  const currentKeyRef = useRef(currentKey);
-  useEffect(() => {
-    currentKeyRef.current = currentKey;
-  }, [currentKey]);
+
+  const [fetched, setFetched] = useState<{
+    forKey: string;
+    state: SettledDetail;
+  } | null>(null);
+  const [updateRecord, setUpdateRecord] =
+    useState<UpdateRecord>(EMPTY_UPDATE);
 
   useEffect(() => {
-    setUpdateError(null);
-    if (!businessId || !requestId) {
-      setState({ status: "idle" });
-      return;
-    }
+    if (!businessId || !requestId) return;
+    const submittedKey = `${businessId}::${requestId}`;
     let cancelled = false;
-    setState({ status: "loading" });
     getOwnerRequest(businessId, requestId)
       .then((request) => {
-        if (!cancelled) setState({ status: "ready", request });
+        if (cancelled) return;
+        setFetched({
+          forKey: submittedKey,
+          state: { status: "ready", request },
+        });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -72,36 +88,63 @@ export function useOwnerRequestDetail(
           err instanceof ApiError
             ? err.message
             : "Something went wrong while loading the request.";
-        setState({ status: "error", message });
+        setFetched({
+          forKey: submittedKey,
+          state: { status: "error", message },
+        });
       });
     return () => {
       cancelled = true;
     };
   }, [businessId, requestId]);
 
+  let state: OwnerRequestDetailState;
+  if (!currentKey) {
+    state = { status: "idle" };
+  } else if (!fetched || fetched.forKey !== currentKey) {
+    state = { status: "loading" };
+  } else {
+    state = fetched.state;
+  }
+
+  const isUpdatingStatus =
+    updateRecord.forKey === currentKey && updateRecord.pending;
+  const updateError =
+    updateRecord.forKey === currentKey ? updateRecord.error : null;
+
   async function updateStatus(next: RequestStatus): Promise<void> {
     if (!businessId || !requestId) return;
-    if (isUpdatingStatus) return;
     const submittedKey = `${businessId}::${requestId}`;
-    setIsUpdatingStatus(true);
-    setUpdateError(null);
+    if (
+      updateRecord.forKey === submittedKey &&
+      updateRecord.pending
+    ) {
+      return;
+    }
+    setUpdateRecord({ forKey: submittedKey, pending: true, error: null });
     try {
       const updated = await updateOwnerRequestStatus(
         businessId,
         requestId,
         next
       );
-      if (currentKeyRef.current !== submittedKey) return;
-      setState({ status: "ready", request: updated });
+      setFetched({
+        forKey: submittedKey,
+        state: { status: "ready", request: updated },
+      });
+      setUpdateRecord({
+        forKey: submittedKey,
+        pending: false,
+        error: null,
+      });
     } catch (err: unknown) {
-      if (currentKeyRef.current !== submittedKey) return;
       const message =
         err instanceof ApiError ? err.message : "Could not update status.";
-      setUpdateError(message);
-    } finally {
-      if (currentKeyRef.current === submittedKey) {
-        setIsUpdatingStatus(false);
-      }
+      setUpdateRecord({
+        forKey: submittedKey,
+        pending: false,
+        error: message,
+      });
     }
   }
 
