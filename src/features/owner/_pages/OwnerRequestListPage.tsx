@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useOwnerRequests } from "../_hooks/useOwnerRequests";
@@ -97,12 +98,15 @@ export function OwnerRequestListPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled
-                  aria-disabled="true"
-                  title="Detail view not implemented yet"
+                  asChild
                   className="mt-2"
                 >
-                  View
+                  <Link
+                    to={`/owner/requests/${encodeURIComponent(req.id)}`}
+                    aria-label={`View request ${req.id}`}
+                  >
+                    View
+                  </Link>
                 </Button>
               </div>
             </div>

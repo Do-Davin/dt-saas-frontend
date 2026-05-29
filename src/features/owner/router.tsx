@@ -4,6 +4,7 @@ import { RequireOwnerAuth } from "./_components/RequireOwnerAuth";
 import { OwnerLoginPlaceholderPage } from "./_pages/OwnerLoginPlaceholderPage";
 import { OwnerHomePage } from "./_pages/OwnerHomePage";
 import { OwnerRequestListPage } from "./_pages/OwnerRequestListPage";
+import { OwnerRequestDetailPage } from "./_pages/OwnerRequestDetailPage";
 
 // Route objects for the owner dashboard surface. Mounted by the top-level
 // router in src/router.tsx. Future production target: dashboard.dtsaas.com.
@@ -30,6 +31,7 @@ export const ownerRoutes: RouteObject[] = [
       { index: true, element: <Navigate to="/owner/home" replace /> },
       { path: "home", element: <OwnerHomePage /> },
       { path: "requests", element: <OwnerRequestListPage /> },
+      { path: "requests/:requestId", element: <OwnerRequestDetailPage /> },
     ],
   },
 ];

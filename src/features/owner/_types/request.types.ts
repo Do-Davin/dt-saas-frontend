@@ -41,3 +41,32 @@ export interface CustomerRequestListItem {
   createdAt: string;
   items?: CustomerRequestItemSummary[];
 }
+
+// Detail-page item. Includes price snapshots the list does not surface.
+// Snapshot fields are intentionally numbers, not Money objects — currency is
+// not yet on the type. When currency is added to the response, wire Intl
+// formatting at the component boundary, not here.
+export interface CustomerRequestDetailItem {
+  id?: string;
+  productId?: string;
+  name?: string;
+  nameKm?: string;
+  quantity?: number;
+  unitPriceSnapshot?: number;
+  totalPriceSnapshot?: number;
+  note?: string;
+}
+
+export interface CustomerRequestDetail {
+  id: string;
+  type: RequestType;
+  status: RequestStatus;
+  customerName?: string;
+  customerPhone?: string;
+  customerNote?: string;
+  branchId?: string;
+  branchName?: string;
+  createdAt: string;
+  updatedAt?: string;
+  items?: CustomerRequestDetailItem[];
+}
