@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useOwnerRequestDetail } from "../_hooks/useOwnerRequestDetail";
 import { RequestStatusBadge } from "../_components/RequestStatusBadge";
+import { RequestStatusActions } from "../_components/RequestStatusActions";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type {
   CustomerRequestDetail,
   CustomerRequestDetailItem,
+  RequestStatus,
   RequestType,
 } from "../_types/request.types";
 
@@ -22,7 +24,8 @@ const TYPE_LABEL: Record<RequestType, string> = {
 export function OwnerRequestDetailPage() {
   const businessId = useCurrentBusinessId();
   const { requestId } = useParams<{ requestId: string }>();
-  const state = useOwnerRequestDetail(businessId, requestId);
+  const { state, updateStatus, isUpdatingStatus, updateError } =
+    useOwnerRequestDetail(businessId, requestId);
 
   return (
     <PageShell>
@@ -54,7 +57,12 @@ export function OwnerRequestDetailPage() {
           description={state.message}
         />
       ) : (
-        <DetailContent request={state.request} />
+        <DetailContent
+          request={state.request}
+          onUpdateStatus={updateStatus}
+          isUpdatingStatus={isUpdatingStatus}
+          updateError={updateError}
+        />
       )}
     </PageShell>
   );
@@ -76,7 +84,19 @@ function PageShell({ children }: { children: ReactNode }) {
   );
 }
 
-function DetailContent({ request }: { request: CustomerRequestDetail }) {
+interface DetailContentProps {
+  request: CustomerRequestDetail;
+  onUpdateStatus: (next: RequestStatus) => void;
+  isUpdatingStatus: boolean;
+  updateError: string | null;
+}
+
+function DetailContent({
+  request,
+  onUpdateStatus,
+  isUpdatingStatus,
+  updateError,
+}: DetailContentProps) {
   const showUpdated =
     request.updatedAt && request.updatedAt !== request.createdAt;
 
@@ -167,9 +187,17 @@ function DetailContent({ request }: { request: CustomerRequestDetail }) {
         </section>
       ) : null}
 
-      <p className="text-xs text-muted-foreground">
-        Read-only view. Status actions will be added in a later phase.
-      </p>
+      <section className="rounded-lg border bg-card p-4 sm:p-6">
+        <h3 className="text-sm font-semibold tracking-tight">Status actions</h3>
+        <div className="mt-3">
+          <RequestStatusActions
+            currentStatus={request.status}
+            isUpdating={isUpdatingStatus}
+            error={updateError}
+            onUpdate={onUpdateStatus}
+          />
+        </div>
+      </section>
     </div>
   );
 }

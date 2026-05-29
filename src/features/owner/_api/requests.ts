@@ -7,6 +7,7 @@ import { withOwnerAuthHeaders } from "../_auth/ownerToken";
 import type {
   CustomerRequestDetail,
   CustomerRequestListItem,
+  RequestStatus,
 } from "../_types/request.types";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -67,5 +68,28 @@ export async function getOwnerRequest(
     url: `/businesses/${encodeURIComponent(businessId)}/requests/${encodeURIComponent(requestId)}`,
     headers: withOwnerAuthHeaders(),
   });
+  return normalizeDetailResponse(data);
+}
+
+// PATCH request status. Backend remains the source of truth for valid
+// transitions — the frontend only mirrors allowed buttons for UX, and any
+// disallowed transition the user sneaks through will be rejected server-side.
+//
+// If the backend responds with an empty body (e.g. 204), refetch the detail
+// so callers always receive an up-to-date CustomerRequestDetail.
+export async function updateOwnerRequestStatus(
+  businessId: string,
+  requestId: string,
+  status: RequestStatus
+): Promise<CustomerRequestDetail> {
+  const data = await apiFetch<unknown>({
+    method: "PATCH",
+    url: `/businesses/${encodeURIComponent(businessId)}/requests/${encodeURIComponent(requestId)}/status`,
+    headers: withOwnerAuthHeaders(),
+    data: { status },
+  });
+  if (!data) {
+    return getOwnerRequest(businessId, requestId);
+  }
   return normalizeDetailResponse(data);
 }
