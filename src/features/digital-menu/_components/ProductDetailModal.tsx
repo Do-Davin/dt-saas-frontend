@@ -167,7 +167,7 @@ function ProductModalBody({
               onClick={() => setMode("request")}
             >
               <Send className="h-4 w-4" aria-hidden="true" />
-              Send request
+              {t.sendRequest}
             </Button>
             <Button
               className="gap-2 sm:flex-1"
@@ -190,14 +190,13 @@ function ProductModalBody({
               size="sm"
               className="-ml-2"
               onClick={() => setMode("detail")}
-              aria-label="Back to item details"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Back
+              {t.back}
             </Button>
           </div>
           <DialogTitle className="text-lg leading-snug">
-            Send request
+            {t.sendRequest}
           </DialogTitle>
           <PublicRequestForm
             businessSlug={businessSlug}

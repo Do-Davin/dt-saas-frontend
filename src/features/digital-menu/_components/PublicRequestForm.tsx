@@ -1,9 +1,11 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { ApiError } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { createCatalogRequest } from "../_api/requests";
+import { useLanguageStore } from "../_store/languageStore";
+import { uiLabels } from "../_utils/uiLabels";
 
 interface PublicRequestFormProps {
   businessSlug: string;
@@ -35,6 +37,9 @@ export function PublicRequestForm({
   onSuccess,
   onCancel,
 }: PublicRequestFormProps) {
+  const language = useLanguageStore((s) => s.language);
+  const t = uiLabels[language];
+
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -47,16 +52,15 @@ export function PublicRequestForm({
 
   function validate(): FormErrors {
     const next: FormErrors = {};
-    if (!customerName.trim()) next.customerName = "Please enter your name.";
+    if (!customerName.trim()) next.customerName = t.validationNameRequired;
     if (!customerPhone.trim())
-      next.customerPhone = "Please enter your phone number.";
+      next.customerPhone = t.validationPhoneRequired;
     if (!Number.isFinite(quantity) || quantity < 1)
-      next.quantity = "Quantity must be at least 1.";
+      next.quantity = t.validationQuantityMin;
     return next;
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function submitRequest(): Promise<void> {
     if (isSubmitting) return;
     const found = validate();
     setErrors(found);
@@ -80,9 +84,7 @@ export function PublicRequestForm({
       onSuccess?.();
     } catch (err: unknown) {
       const message =
-        err instanceof ApiError
-          ? err.message
-          : "Could not send your request. Please try again.";
+        err instanceof ApiError ? err.message : t.genericRequestError;
       setSubmit({ status: "error", message });
     }
   }
@@ -90,13 +92,13 @@ export function PublicRequestForm({
   if (submit.status === "success") {
     return (
       <div className="space-y-4 py-4 text-center">
-        <p className="text-base font-semibold">Request sent successfully.</p>
+        <p className="text-base font-semibold">{t.requestSentSuccessfully}</p>
         <p className="text-sm text-muted-foreground">
-          Thanks for your request. The business will get back to you soon.
+          {t.requestSuccessDescription}
         </p>
         {onCancel ? (
           <Button variant="outline" onClick={onCancel}>
-            Close
+            {t.close}
           </Button>
         ) : null}
       </div>
@@ -104,15 +106,26 @@ export function PublicRequestForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        submitRequest();
+      }}
+      className="space-y-4"
+      noValidate
+    >
       <div>
         <div className="text-xs uppercase tracking-wide text-muted-foreground">
-          Item
+          {t.cartItem}
         </div>
         <div className="text-sm font-medium">{productName}</div>
       </div>
 
-      <Field label="Your name" htmlFor="req-name" error={errors.customerName}>
+      <Field
+        label={t.yourName}
+        htmlFor="req-name"
+        error={errors.customerName}
+      >
         <Input
           id="req-name"
           value={customerName}
@@ -125,7 +138,7 @@ export function PublicRequestForm({
       </Field>
 
       <Field
-        label="Phone number"
+        label={t.phoneNumber}
         htmlFor="req-phone"
         error={errors.customerPhone}
       >
@@ -142,7 +155,7 @@ export function PublicRequestForm({
         />
       </Field>
 
-      <Field label="Quantity" htmlFor="req-qty" error={errors.quantity}>
+      <Field label={t.quantity} htmlFor="req-qty" error={errors.quantity}>
         <Input
           id="req-qty"
           type="number"
@@ -159,7 +172,7 @@ export function PublicRequestForm({
         />
       </Field>
 
-      <Field label="Item note (optional)" htmlFor="req-item-note">
+      <Field label={t.itemNote} htmlFor="req-item-note">
         <textarea
           id="req-item-note"
           value={itemNote}
@@ -170,7 +183,7 @@ export function PublicRequestForm({
         />
       </Field>
 
-      <Field label="Note to the business (optional)" htmlFor="req-note">
+      <Field label={t.noteToBusiness} htmlFor="req-note">
         <textarea
           id="req-note"
           value={customerNote}
@@ -189,7 +202,7 @@ export function PublicRequestForm({
 
       <div className="flex gap-2">
         <Button type="submit" className="flex-1" disabled={isSubmitting}>
-          {isSubmitting ? "Sending…" : "Send request"}
+          {isSubmitting ? t.sending : t.sendRequest}
         </Button>
         {onCancel ? (
           <Button
@@ -198,7 +211,7 @@ export function PublicRequestForm({
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            {t.cancel}
           </Button>
         ) : null}
       </div>
