@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import { digitalMenuRoutes } from "./features/digital-menu";
+import { ownerRoutes } from "./features/owner/router";
 
 /**
  * Top-level app router.
@@ -12,20 +13,31 @@ import { digitalMenuRoutes } from "./features/digital-menu";
  *   - admin.dtsaas.com      → internal DT SaaS Admin app
  *
  * Surfaces MUST NOT be merged into one domain that swaps behavior after
- * login. When owner and admin work begins, each surface gets its own router
- * and entry point (planned: src/apps/dashboard/, src/apps/admin/) — do not
- * add their routes to this file.
+ * login. When admin work begins, it gets its own router and entry point
+ * (planned: src/apps/admin/) — do not add its routes here.
  *
- * For now this is the catalog surface router. Features contribute a
- * `RouteObject[]` array (e.g. digitalMenuRoutes) and never mount their own
- * <RouterProvider>.
+ * Today, owner routes live alongside catalog routes in this single router
+ * for local development convenience. In production, owner routes belong on
+ * dashboard.dtsaas.com and must split into their own entry point — see
+ * docs/production-app-boundaries.md.
+ *
+ * Features contribute a `RouteObject[]` array (e.g. digitalMenuRoutes,
+ * ownerRoutes) and never mount their own <RouterProvider>.
+ *
+ * Ordering note: digitalMenuRoutes ends with a `*` catch-all that renders
+ * NotFoundPage. React Router 7 ranks more-specific paths above `*`, so the
+ * `/owner/...` routes still match correctly. If a deeper owner path
+ * collision ever appears, move the `*` out of digitalMenuRoutes and place
+ * it explicitly at the end of this array.
  */
 export const appRouter = createBrowserRouter([
   // ── catalog surface (future host: catalog.dtsaas.com) ──────────────────
   ...digitalMenuRoutes,
 
   // ── owner dashboard surface (future host: dashboard.dtsaas.com) ────────
-  // Lives in its own router/entry once introduced. Do not add owner routes here.
+  // Lives here for local dev; planned to move to src/apps/dashboard/ with its
+  // own entry point when production deployment splits subdomains.
+  ...ownerRoutes,
 
   // ── admin surface (future host: admin.dtsaas.com) ──────────────────────
   // Lives in its own router/entry once introduced. Do not add admin routes here.
