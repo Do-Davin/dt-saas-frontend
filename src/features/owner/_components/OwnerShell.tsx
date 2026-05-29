@@ -21,14 +21,12 @@ export function OwnerShell() {
             >
               Home
             </Link>
-            {/* Requests page is not implemented yet — placeholder only. */}
-            <span
-              aria-disabled="true"
-              title="Coming soon"
-              className="rounded-md px-2.5 py-1.5 text-muted-foreground cursor-not-allowed select-none"
+            <Link
+              to="/owner/requests"
+              className="rounded-md px-2.5 py-1.5 text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               Requests
-            </span>
+            </Link>
           </nav>
         </div>
       </header>
