@@ -1,7 +1,8 @@
-import { DigitalMenu } from "./features/digital-menu";
+import { RouterProvider } from "react-router";
+import { appRouter } from "./router";
 
 function App() {
-  return <DigitalMenu />;
+  return <RouterProvider router={appRouter} />;
 }
 
 export default App;

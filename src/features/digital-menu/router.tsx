@@ -1,8 +1,11 @@
-import { createBrowserRouter, Navigate } from "react-router";
+import { Navigate, type RouteObject } from "react-router";
 import { DigitalMenuPage } from "./_pages/DigitalMenuPage";
 import { NotFoundPage } from "./_pages/NotFoundPage";
 
-export const digitalMenuRouter = createBrowserRouter([
+// Route objects for the public Catalog / Digital Menu feature.
+// Mounted by the top-level catalog app router in src/router.tsx.
+// This file must NOT create its own <RouterProvider>.
+export const digitalMenuRoutes: RouteObject[] = [
   {
     path: "/",
     element: <Navigate to="/menu/dt-kitchen" replace />,
@@ -19,4 +22,4 @@ export const digitalMenuRouter = createBrowserRouter([
     path: "*",
     element: <NotFoundPage />,
   },
-]);
+];
