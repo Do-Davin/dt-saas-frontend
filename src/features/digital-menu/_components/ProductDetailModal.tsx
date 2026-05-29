@@ -1,4 +1,5 @@
-import { Plus, UtensilsCrossed, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Plus, Send, UtensilsCrossed, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,7 @@ import { useLanguageStore } from "../_store/languageStore";
 import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
 import { PriceDisplay } from "./PriceDisplay";
+import { PublicRequestForm } from "./PublicRequestForm";
 
 const DIETARY_TAG_LABELS: Record<string, string> = {
   vegetarian: "Vegetarian",
@@ -26,7 +28,11 @@ const DIETARY_TAG_LABELS: Record<string, string> = {
   spicy: "Spicy",
 };
 
-export function ProductDetailModal() {
+interface ProductDetailModalProps {
+  businessSlug: string;
+}
+
+export function ProductDetailModal({ businessSlug }: ProductDetailModalProps) {
   const addToCart = useMenuStore((s) => s.addToCart);
 
   const product = useDigitalMenuUIStore((s) => s.selectedProduct);
@@ -35,8 +41,20 @@ export function ProductDetailModal() {
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
 
+  const [mode, setMode] = useState<"detail" | "request">("detail");
+
+  // Reset to the detail view whenever the modal closes or the selected
+  // product changes, so the next opening starts on the product summary.
+  useEffect(() => {
+    if (!isOpen) setMode("detail");
+  }, [isOpen]);
+  useEffect(() => {
+    setMode("detail");
+  }, [product?.id]);
+
   if (!product) return null;
 
+  const productName = tText(product.name, language);
   const hasBadges = !product.isAvailable || (product.dietaryTags?.length ?? 0) > 0;
 
   return (
@@ -53,83 +71,120 @@ export function ProductDetailModal() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="shrink-0">
-          {product.imageUrl ? (
-            <div className="aspect-video w-full overflow-hidden bg-muted">
-              <img
-                src={product.imageUrl}
-                alt={tText(product.name, language)}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="flex aspect-video w-full items-center justify-center bg-muted">
-              <UtensilsCrossed
-                className="h-10 w-10 text-muted-foreground/40"
-                aria-hidden="true"
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pt-4 pb-2">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <DialogTitle className="text-lg leading-snug">
-              {tText(product.name, language)}
-            </DialogTitle>
-            <PriceDisplay price={product.price} />
-          </div>
-
-          {hasBadges && (
-            <div className="flex flex-wrap gap-1.5">
-              {!product.isAvailable && (
-                <Badge variant="destructive">{t.soldOut}</Badge>
+        {mode === "detail" ? (
+          <>
+            <div className="shrink-0">
+              {product.imageUrl ? (
+                <div className="aspect-video w-full overflow-hidden bg-muted">
+                  <img
+                    src={product.imageUrl}
+                    alt={productName}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                  <UtensilsCrossed
+                    className="h-10 w-10 text-muted-foreground/40"
+                    aria-hidden="true"
+                  />
+                </div>
               )}
-              {product.dietaryTags?.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {DIETARY_TAG_LABELS[tag] ?? tag}
-                </Badge>
-              ))}
             </div>
-          )}
 
-          <Separator />
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pt-4 pb-2">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <DialogTitle className="text-lg leading-snug">
+                  {productName}
+                </DialogTitle>
+                <PriceDisplay price={product.price} />
+              </div>
 
-          {product.description && (
-            <DialogDescription className="text-sm text-foreground leading-relaxed">
-              {tText(product.description, language)}
-            </DialogDescription>
-          )}
+              {hasBadges && (
+                <div className="flex flex-wrap gap-1.5">
+                  {!product.isAvailable && (
+                    <Badge variant="destructive">{t.soldOut}</Badge>
+                  )}
+                  {product.dietaryTags?.map((tag) => (
+                    <Badge key={tag} variant="secondary">
+                      {DIETARY_TAG_LABELS[tag] ?? tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
 
-          {product.allergens && product.allergens.length > 0 && (
-            <p className="text-sm">
-              <span className="font-medium">{t.allergens}: </span>
-              <span className="capitalize text-muted-foreground">
-                {product.allergens.join(", ")}
-              </span>
-            </p>
-          )}
+              <Separator />
 
-          {product.calories != null && (
-            <p className="text-sm text-muted-foreground">
-              {product.calories} kcal
-            </p>
-          )}
-        </div>
+              {product.description && (
+                <DialogDescription className="text-sm text-foreground leading-relaxed">
+                  {tText(product.description, language)}
+                </DialogDescription>
+              )}
 
-        <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:flex-row">
-          <Button
-            className="gap-2 sm:flex-1"
-            disabled={!product.isAvailable}
-            onClick={() => {
-              addToCart(product);
-              close();
-            }}
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            {t.addToOrder}
-          </Button>
-        </DialogFooter>
+              {product.allergens && product.allergens.length > 0 && (
+                <p className="text-sm">
+                  <span className="font-medium">{t.allergens}: </span>
+                  <span className="capitalize text-muted-foreground">
+                    {product.allergens.join(", ")}
+                  </span>
+                </p>
+              )}
+
+              {product.calories != null && (
+                <p className="text-sm text-muted-foreground">
+                  {product.calories} kcal
+                </p>
+              )}
+            </div>
+
+            <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:flex-row">
+              <Button
+                variant="outline"
+                className="gap-2 sm:flex-1"
+                disabled={!product.isAvailable}
+                onClick={() => setMode("request")}
+              >
+                <Send className="h-4 w-4" aria-hidden="true" />
+                Send request
+              </Button>
+              <Button
+                className="gap-2 sm:flex-1"
+                disabled={!product.isAvailable}
+                onClick={() => {
+                  addToCart(product);
+                  close();
+                }}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                {t.addToOrder}
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 pt-6 pb-6">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-2"
+                onClick={() => setMode("detail")}
+                aria-label="Back to item details"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                Back
+              </Button>
+            </div>
+            <DialogTitle className="text-lg leading-snug">
+              Send request
+            </DialogTitle>
+            <PublicRequestForm
+              businessSlug={businessSlug}
+              productId={product.id}
+              productName={productName}
+              onCancel={close}
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

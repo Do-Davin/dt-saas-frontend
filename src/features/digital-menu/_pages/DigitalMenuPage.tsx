@@ -150,7 +150,7 @@ export function DigitalMenuPage() {
       </main>
 
       <CartDrawer />
-      <ProductDetailModal />
+      <ProductDetailModal businessSlug={businessSlug} />
       <BottomCartButton />
     </div>
   );
