@@ -1,12 +1,16 @@
-import { useState } from "react";
-import { getCurrentBusinessId } from "../_store/currentBusiness";
+import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 
-// Tiny wrapper around the temporary localStorage helper so pages don't have
-// to spell out the lazy-init pattern. Reads once on mount; changing the
-// localStorage value at runtime still requires a reload until a real business
-// selector exists. When that selector lands, replace this hook with one that
-// subscribes to the selector's state.
+// Returns the currently selected business ID from the owner businesses store.
+// Source of truth is now ownerBusinessesStore.selectedBusinessId, which is
+// loaded by OwnerShell on mount and validated against the backend business list.
+//
+// The return type (string | null) is unchanged, so all existing consumers
+// (OwnerRequestListPage, OwnerRequestDetailPage) work without modification.
+//
+// The old localStorage read (getCurrentBusinessId) is no longer used here —
+// ownerBusinesses store seeds itself from that helper on creation and owns all
+// subsequent reads. currentBusiness.ts itself is kept for now because the store
+// still delegates persistence writes/clears to it.
 export function useCurrentBusinessId(): string | null {
-  const [businessId] = useState<string | null>(() => getCurrentBusinessId());
-  return businessId;
+  return useOwnerBusinessesStore((s) => s.selectedBusinessId);
 }
