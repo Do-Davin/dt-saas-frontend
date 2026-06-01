@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
+import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useOwnerRequests } from "../_hooks/useOwnerRequests";
 import { RequestStatusBadge } from "../_components/RequestStatusBadge";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
@@ -18,22 +19,13 @@ const TYPE_LABEL: Record<RequestType, string> = {
 
 export function OwnerRequestListPage() {
   const businessId = useCurrentBusinessId();
+  const { title: noBusinessTitle, description: noBusinessDesc } =
+    useBusinessContextMessage();
   const requests = useOwnerRequests(businessId);
 
   if (!businessId) {
     return (
-      <OwnerStateBlock
-        title="Current business is not selected yet"
-        description={
-          <span>
-            For local development, set{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">
-              dt.owner.currentBusinessId.v1
-            </code>{" "}
-            in localStorage and reload.
-          </span>
-        }
-      />
+      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
     );
   }
 

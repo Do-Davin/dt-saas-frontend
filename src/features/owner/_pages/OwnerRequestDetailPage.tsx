@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
+import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useOwnerRequestDetail } from "../_hooks/useOwnerRequestDetail";
 import { RequestStatusBadge } from "../_components/RequestStatusBadge";
 import { RequestStatusActions } from "../_components/RequestStatusActions";
@@ -23,6 +24,8 @@ const TYPE_LABEL: Record<RequestType, string> = {
 
 export function OwnerRequestDetailPage() {
   const businessId = useCurrentBusinessId();
+  const { title: noBusinessTitle, description: noBusinessDesc } =
+    useBusinessContextMessage();
   const { requestId } = useParams<{ requestId: string }>();
   const { state, updateStatus, isUpdatingStatus, updateError } =
     useOwnerRequestDetail(businessId, requestId);
@@ -30,18 +33,7 @@ export function OwnerRequestDetailPage() {
   return (
     <PageShell>
       {!businessId ? (
-        <OwnerStateBlock
-          title="Current business is not selected yet"
-          description={
-            <span>
-              For local development, set{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                dt.owner.currentBusinessId.v1
-              </code>{" "}
-              in localStorage and reload.
-            </span>
-          }
-        />
+        <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
       ) : !requestId ? (
         <OwnerStateBlock
           tone="error"

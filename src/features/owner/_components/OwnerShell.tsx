@@ -1,34 +1,20 @@
 import { useEffect } from "react";
-import { Link, Outlet } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
+import { Button } from "@/components/ui/button";
+import { useOwnerAuthStore } from "../_store/ownerAuth";
 import { useOwnerSessionStore } from "../_store/ownerSession";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
-import type { OwnerBusiness } from "../_api/businesses";
-
-// Derive the text to show in the business context slot of the header.
-// Returns null while loading or in edge cases that need no hint.
-function getBusinessHint(
-  isLoading: boolean,
-  businesses: OwnerBusiness[],
-  selectedBusinessId: string | null
-): string | null {
-  if (isLoading) return null;
-  if (businesses.length === 0) return "No business yet";
-  const selected = businesses.find((b) => b.id === selectedBusinessId);
-  if (selected) return selected.name;
-  if (businesses.length > 1) return "Select business";
-  return null;
-}
 
 // Owner dashboard shell — header + nav + outlet.
 //
-// On mount, owner session and business list are loaded in parallel. The store
-// guards (owner !== null / businesses.length > 0) prevent repeated fetches if
-// the shell unmounts and remounts. The outlet renders immediately — neither
-// load blocks page content.
+// On mount, owner session and business list are loaded in parallel. Store
+// guards prevent re-fetching on remount when data is already present.
+// The outlet renders immediately — neither load blocks page content.
 //
-// 401: ownerApiFetch clears the token and redirects before errors reach the
-// stores, so no redirect logic is needed here.
+// 401: ownerApiFetch clears the token and redirects before errors reach
+// the stores, so no redirect logic is needed here.
 export function OwnerShell() {
+  const navigate = useNavigate();
   const owner = useOwnerSessionStore((s) => s.owner);
   const isSessionLoading = useOwnerSessionStore((s) => s.isLoading);
   const businesses = useOwnerBusinessesStore((s) => s.businesses);
@@ -42,11 +28,15 @@ export function OwnerShell() {
     void useOwnerBusinessesStore.getState().loadBusinesses();
   }, []);
 
-  const businessHint = getBusinessHint(
-    isBusinessesLoading,
-    businesses,
-    selectedBusinessId
-  );
+  function handleLogout() {
+    useOwnerAuthStore.getState().clearToken();
+    useOwnerSessionStore.getState().clearOwner();
+    useOwnerBusinessesStore.getState().clearBusinesses();
+    navigate("/owner/login", { replace: true });
+  }
+
+  const selectedBusiness =
+    businesses.find((b) => b.id === selectedBusinessId) ?? null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -55,8 +45,8 @@ export function OwnerShell() {
           <h1 className="text-base sm:text-lg font-semibold tracking-tight">
             DT SaaS Owner Dashboard
           </h1>
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Context hint — hidden on mobile to avoid header crowding */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Owner + business context hint — hidden on mobile */}
             <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
               {isSessionLoading && !owner ? (
                 <span>Loading…</span>
@@ -70,15 +60,52 @@ export function OwnerShell() {
                       {owner.name ?? owner.email}
                     </span>
                   ) : null}
-                  {owner && businessHint ? (
+
+                  {/* Separator — only when owner is known and businesses settled */}
+                  {owner && !isBusinessesLoading ? (
                     <span aria-hidden>·</span>
                   ) : null}
-                  {businessHint ? (
-                    <span className="truncate max-w-32">{businessHint}</span>
+
+                  {/* Business context */}
+                  {!isBusinessesLoading ? (
+                    businesses.length === 0 ? (
+                      <span>No business yet</span>
+                    ) : selectedBusiness ? (
+                      <span
+                        className="truncate max-w-32"
+                        title={selectedBusiness.name}
+                      >
+                        {selectedBusiness.name}
+                      </span>
+                    ) : businesses.length > 1 ? (
+                      <select
+                        className="text-xs rounded border border-input bg-background px-1.5 py-0.5 text-foreground cursor-pointer outline-none"
+                        value={selectedBusinessId ?? ""}
+                        onChange={(e) => {
+                          const id = e.target.value;
+                          if (id) {
+                            useOwnerBusinessesStore
+                              .getState()
+                              .selectBusiness(id);
+                          }
+                        }}
+                        aria-label="Select business"
+                      >
+                        <option value="" disabled>
+                          Select business
+                        </option>
+                        {businesses.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null
                   ) : null}
                 </>
               )}
             </div>
+
             <nav
               aria-label="Owner dashboard sections"
               className="flex items-center gap-1 sm:gap-2 text-sm"
@@ -96,6 +123,10 @@ export function OwnerShell() {
                 Requests
               </Link>
             </nav>
+
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              Log out
+            </Button>
           </div>
         </div>
       </header>
