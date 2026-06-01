@@ -29,7 +29,7 @@ export const useOwnerSessionStore = create<OwnerSessionState>()((set, get) => ({
   error: null,
 
   loadOwner: async () => {
-    if (get().isLoading) return;
+    if (get().isLoading || get().owner !== null) return;
     set({ isLoading: true, error: null });
     try {
       const owner = await getCurrentOwner();

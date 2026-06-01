@@ -47,7 +47,7 @@ export const useOwnerBusinessesStore = create<OwnerBusinessesState>()(
     error: null,
 
     loadBusinesses: async () => {
-      if (get().isLoading) return;
+      if (get().isLoading || get().businesses.length > 0) return;
       set({ isLoading: true, error: null });
       try {
         const businesses = await listOwnerBusinesses();
