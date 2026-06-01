@@ -1,9 +1,22 @@
 // Owner-side Customer Request API.
 // Public catalog code MUST NOT import from this file — the owner JWT must
 // never be attached to public catalog calls (see docs/frontend-auth-api-foundation.md).
+//
+// TODO(spring-boot): confirm these endpoint paths after backend migration:
+//   GET   /businesses/:id/requests
+//   GET   /businesses/:id/requests/:requestId
+//   PATCH /businesses/:id/requests/:requestId/status  — body: { status }
+//
+// TODO(spring-boot): confirm PATCH /status response shape. NestJS returned
+// 200 + body; Spring Boot commonly returns 204 (no body). The empty-body
+// fallback in updateOwnerRequestStatus handles both cases already.
+//
+// TODO(spring-boot): confirm list-response wrapper. normalizeListResponse
+// accepts bare array, { data: [] }, { items: [] }, { requests: [] } to stay
+// resilient until the shape is pinned.
 
-import { ApiError, apiFetch } from "@/lib/api/client";
-import { withOwnerAuthHeaders } from "../_auth/ownerToken";
+import { ApiError } from "@/lib/api/client";
+import { ownerApiFetch } from "./ownerApiFetch";
 import type {
   CustomerRequestDetail,
   CustomerRequestListItem,
@@ -16,9 +29,8 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return proto === Object.prototype || proto === null;
 }
 
-// The backend's exact list-response shape is not yet confirmed. Accept the
-// three most likely shapes — bare array, `{ data: [] }`, `{ items: [] }`,
-// `{ requests: [] }` — and fall back to an empty list rather than throwing.
+// Accept several likely list-response shapes so a minor Spring Boot
+// envelope change cannot crash the page.
 function normalizeListResponse(data: unknown): CustomerRequestListItem[] {
   if (Array.isArray(data)) return data as CustomerRequestListItem[];
   if (isPlainObject(data)) {
@@ -35,17 +47,15 @@ function normalizeListResponse(data: unknown): CustomerRequestListItem[] {
 export async function listOwnerRequests(
   businessId: string
 ): Promise<CustomerRequestListItem[]> {
-  const data = await apiFetch<unknown>({
+  const data = await ownerApiFetch<unknown>({
     method: "GET",
     url: `/businesses/${encodeURIComponent(businessId)}/requests`,
-    headers: withOwnerAuthHeaders(),
   });
   return normalizeListResponse(data);
 }
 
-// Backend may return the detail bare or under `data` / `request` / `item`.
-// If the shape is anything else, surface a consistent ApiError so callers
-// can keep their single-error-type catch.
+// Accept bare object or { data | request | item } wrapper. Unexpected shape
+// surfaces as a typed ApiError so callers keep their single error type.
 function normalizeDetailResponse(data: unknown): CustomerRequestDetail {
   if (isPlainObject(data)) {
     for (const key of ["data", "request", "item"] as const) {
@@ -63,10 +73,9 @@ export async function getOwnerRequest(
   businessId: string,
   requestId: string
 ): Promise<CustomerRequestDetail> {
-  const data = await apiFetch<unknown>({
+  const data = await ownerApiFetch<unknown>({
     method: "GET",
     url: `/businesses/${encodeURIComponent(businessId)}/requests/${encodeURIComponent(requestId)}`,
-    headers: withOwnerAuthHeaders(),
   });
   return normalizeDetailResponse(data);
 }
@@ -75,17 +84,16 @@ export async function getOwnerRequest(
 // transitions — the frontend only mirrors allowed buttons for UX, and any
 // disallowed transition the user sneaks through will be rejected server-side.
 //
-// If the backend responds with an empty body (e.g. 204), refetch the detail
-// so callers always receive an up-to-date CustomerRequestDetail.
+// Empty / 204 body: re-fetches the detail so callers always get an up-to-date
+// CustomerRequestDetail regardless of whether Spring Boot returns 200 or 204.
 export async function updateOwnerRequestStatus(
   businessId: string,
   requestId: string,
   status: RequestStatus
 ): Promise<CustomerRequestDetail> {
-  const data = await apiFetch<unknown>({
+  const data = await ownerApiFetch<unknown>({
     method: "PATCH",
     url: `/businesses/${encodeURIComponent(businessId)}/requests/${encodeURIComponent(requestId)}/status`,
-    headers: withOwnerAuthHeaders(),
     data: { status },
   });
   if (!data) {
