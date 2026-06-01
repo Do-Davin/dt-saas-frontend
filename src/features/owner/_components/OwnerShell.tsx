@@ -30,7 +30,7 @@ export function OwnerShell() {
               </span>
             ) : owner ? (
               <span
-                className="hidden sm:block text-xs text-muted-foreground truncate max-w-[12rem]"
+                className="hidden sm:block text-xs text-muted-foreground truncate max-w-48"
                 title={owner.email}
               >
                 {owner.name ?? owner.email}

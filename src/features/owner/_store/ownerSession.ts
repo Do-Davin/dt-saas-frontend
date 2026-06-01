@@ -9,7 +9,7 @@
 //
 // 401 handling: ownerApiFetch (used inside getCurrentOwner) clears the token
 // and redirects before the error reaches this store, so the catch branch here
-// only fires for non-401 errors (network failure, unrecognised shape, etc.).
+// only fires for non-401 errors (network failure, unrecognized shape, etc.).
 
 import { create } from "zustand";
 import { getCurrentOwner } from "../_api/auth";
