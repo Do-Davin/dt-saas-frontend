@@ -1,7 +1,7 @@
 import { Navigate, type RouteObject } from "react-router";
 import { OwnerShell } from "./_components/OwnerShell";
 import { RequireOwnerAuth } from "./_components/RequireOwnerAuth";
-import { OwnerLoginPlaceholderPage } from "./_pages/OwnerLoginPlaceholderPage";
+import { OwnerLoginPage } from "./_pages/OwnerLoginPlaceholderPage";
 import { OwnerHomePage } from "./_pages/OwnerHomePage";
 import { OwnerRequestListPage } from "./_pages/OwnerRequestListPage";
 import { OwnerRequestDetailPage } from "./_pages/OwnerRequestDetailPage";
@@ -16,7 +16,7 @@ export const ownerRoutes: RouteObject[] = [
   // user can reach it without redirect loops.
   {
     path: "/owner/login",
-    element: <OwnerLoginPlaceholderPage />,
+    element: <OwnerLoginPage />,
   },
   // Everything else under /owner is gated by RequireOwnerAuth and wrapped in
   // OwnerShell.
