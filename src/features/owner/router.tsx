@@ -15,6 +15,9 @@ import { CategoryEditPage } from "./_pages/CategoryEditPage";
 import { ProductListPage } from "./_pages/ProductListPage";
 import { ProductNewPage } from "./_pages/ProductNewPage";
 import { ProductEditPage } from "./_pages/ProductEditPage";
+import { BusinessListPage } from "./_pages/BusinessListPage";
+import { BusinessNewPage } from "./_pages/BusinessNewPage";
+import { BusinessEditPage } from "./_pages/BusinessEditPage";
 
 // Route objects for the owner dashboard surface. Mounted by the top-level
 // router in src/router.tsx. Future production target: dashboard.dtsaas.com.
@@ -52,6 +55,9 @@ export const ownerRoutes: RouteObject[] = [
       { path: "products", element: <ProductListPage /> },
       { path: "products/new", element: <ProductNewPage /> },
       { path: "products/:productId", element: <ProductEditPage /> },
+      { path: "businesses", element: <BusinessListPage /> },
+      { path: "businesses/new", element: <BusinessNewPage /> },
+      { path: "businesses/:businessId", element: <BusinessEditPage /> },
     ],
   },
 ];

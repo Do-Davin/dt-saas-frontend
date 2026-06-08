@@ -117,6 +117,12 @@ export function OwnerShell() {
                 Requests
               </Link>
               <Link
+                to="/owner/businesses"
+                className="rounded-md px-2.5 py-1.5 text-foreground hover:bg-accent hover:text-accent-foreground"
+              >
+                Businesses
+              </Link>
+              <Link
                 to="/owner/branches"
                 className="rounded-md px-2.5 py-1.5 text-foreground hover:bg-accent hover:text-accent-foreground"
               >
