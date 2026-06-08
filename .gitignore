@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 .env
+.env.example
 
 dt-saas-frontend/.claude/settings.local.json
 CLAUDE.md

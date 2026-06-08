@@ -1,3 +1,14 @@
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type { RequestStatus } from "../_types/request.types";
 
@@ -28,9 +39,17 @@ const DESTRUCTIVE_ACTIONS: ReadonlySet<RequestStatus> = new Set([
   "CANCELLED",
 ]);
 
-const CONFIRM_PROMPT: Partial<Record<RequestStatus, string>> = {
-  REJECTED: "Reject this request? This cannot be undone.",
-  CANCELLED: "Cancel this request? This cannot be undone.",
+// Title shown in the AlertDialog for each destructive action.
+const CONFIRM_TITLE: Partial<Record<RequestStatus, string>> = {
+  REJECTED: "Reject this request?",
+  CANCELLED: "Cancel this request?",
+};
+
+// Confirm button label — differs from ACTION_LABEL to avoid "Cancel" being
+// used for both the action and the dismiss button in the same dialog.
+const CONFIRM_ACTION_LABEL: Partial<Record<RequestStatus, string>> = {
+  REJECTED: "Reject",
+  CANCELLED: "Cancel request",
 };
 
 type ButtonVariant = "default" | "outline" | "destructive";
@@ -55,6 +74,7 @@ export function RequestStatusActions({
   onUpdate,
 }: RequestStatusActionsProps) {
   const allowed = TRANSITIONS[currentStatus];
+  const [pendingNext, setPendingNext] = useState<RequestStatus | null>(null);
 
   if (allowed.length === 0) {
     return (
@@ -67,35 +87,67 @@ export function RequestStatusActions({
   function handleClick(next: RequestStatus) {
     if (isUpdating) return;
     if (DESTRUCTIVE_ACTIONS.has(next)) {
-      const prompt = CONFIRM_PROMPT[next] ?? "Are you sure?";
-      // Browser confirm is intentional for MVP — no AlertDialog primitive in
-      // the project today, and the spec forbids installing a new dialog package.
-      // Replace with an inline confirmation once a primitive is added.
-      if (!window.confirm(prompt)) return;
+      setPendingNext(next);
+      return;
     }
     onUpdate(next);
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {allowed.map((next) => (
-          <Button
-            key={next}
-            size="sm"
-            variant={variantFor(next)}
-            disabled={isUpdating}
-            onClick={() => handleClick(next)}
-          >
-            {ACTION_LABEL[next]}
-          </Button>
-        ))}
+    <>
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-2">
+          {allowed.map((next) => (
+            <Button
+              key={next}
+              size="sm"
+              variant={variantFor(next)}
+              disabled={isUpdating}
+              onClick={() => handleClick(next)}
+            >
+              {ACTION_LABEL[next]}
+            </Button>
+          ))}
+        </div>
+        {error ? (
+          <p className="text-sm text-destructive" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
-    </div>
+
+      <AlertDialog
+        open={pendingNext !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingNext(null);
+        }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingNext
+                ? (CONFIRM_TITLE[pendingNext] ?? "Are you sure?")
+                : "Are you sure?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (pendingNext) onUpdate(pendingNext);
+              }}
+            >
+              {pendingNext
+                ? (CONFIRM_ACTION_LABEL[pendingNext] ?? ACTION_LABEL[pendingNext])
+                : "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

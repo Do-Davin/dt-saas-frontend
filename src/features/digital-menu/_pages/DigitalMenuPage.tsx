@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useMenuStore } from "../_store";
 import { useDigitalMenuUIStore } from "../_store/uiStore";
 import { useLanguageStore } from "../_store/languageStore";
-// import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
+import { useCatalog } from "../_hooks/useCatalog";
 import { MenuHeader } from "../_components/MenuHeader";
 import { BusinessHeroCarousel } from "../_components/BusinessHeroCarousel";
 import { CategoryTabs } from "../_components/CategoryTabs";
@@ -15,25 +15,10 @@ import { ProductGrid } from "../_components/ProductGrid";
 import { CartDrawer } from "../_components/CartDrawer";
 import { BottomCartButton } from "../_components/BottomCartButton";
 import { ProductDetailModal } from "../_components/ProductDetailModal";
-import {
-  mockBusiness,
-  mockCategories,
-  mockProducts,
-} from "../_data/mockMenuData";
-
-function resolveBySlug(slug: string) {
-  if (slug !== mockBusiness.slug) return null;
-  const categories = mockCategories.filter(
-    (c) => c.businessId === mockBusiness.id
-  );
-  const products = mockProducts.filter((p) =>
-    categories.some((c) => c.id === p.categoryId)
-  );
-  return { business: mockBusiness, categories, products };
-}
 
 export function DigitalMenuPage() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
+  const catalog = useCatalog(businessSlug);
 
   const setMenuData = useMenuStore((s) => s.setMenuData);
   const setLoading = useMenuStore((s) => s.setLoading);
@@ -63,19 +48,50 @@ export function DigitalMenuPage() {
     return () => ro.disconnect();
   }, []);
 
+  // Mirror the loading flag for any consumers that read it from the store.
   useEffect(() => {
-    const data = resolveBySlug(businessSlug);
-    if (!data) return;
-    setLoading(true);
-    setMenuData(data.categories, data.products);
-    setLoading(false);
+    setLoading(
+      catalog.status === "loading" || catalog.status === "idle"
+    );
+  }, [catalog.status, setLoading]);
+
+  // Sync resolved catalog data into the menu store and reset per-slug UI
+  // (category selection / search). `readyData` is the stable state object
+  // held inside useCatalog when ready, so this effect only fires on real
+  // transitions — not on every render while loading.
+  const readyData = catalog.status === "ready" ? catalog : null;
+  useEffect(() => {
+    if (!readyData) return;
+    setMenuData(readyData.categories, readyData.products);
     selectCategory(null);
     clearSearch();
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [businessSlug, setMenuData, setLoading, selectCategory, clearSearch]);
+  }, [readyData, setMenuData, selectCategory, clearSearch]);
 
-  const resolved = resolveBySlug(businessSlug);
-  if (!resolved) return <Navigate to="/not-found" replace />;
+  if (catalog.status === "notFound") {
+    return <Navigate to="/not-found" replace />;
+  }
+
+  if (catalog.status === "idle" || catalog.status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+        Loading menu…
+      </div>
+    );
+  }
+
+  if (catalog.status === "error") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-6">
+        <div className="max-w-sm text-center">
+          <h2 className="text-base font-semibold">Could not load menu</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {catalog.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const trimmedQuery = searchQuery.trim().toLowerCase();
 
@@ -102,12 +118,12 @@ export function DigitalMenuPage() {
     <div className="min-h-screen bg-background">
       <MenuHeader
         ref={headerRef}
-        restaurantName={resolved.business.name}
-        businessType={resolved.business.businessType}
+        restaurantName={catalog.business.name}
+        businessType={catalog.business.businessType}
       />
 
       <div className="mx-auto max-w-3xl px-4 py-4">
-        <BusinessHeroCarousel business={resolved.business} />
+        <BusinessHeroCarousel business={catalog.business} />
       </div>
 
       <div

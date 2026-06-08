@@ -1,10 +1,8 @@
 // Owner auth API.
 // Public catalog code must not import this file.
 //
-// loginOwner   — POST /auth/login, no token required, uses apiFetch directly.
+// loginOwner      — POST /auth/login, no token required, uses apiFetch directly.
 // getCurrentOwner — GET /auth/me, token required, uses ownerApiFetch.
-//
-// TODO(spring-boot): confirm both endpoint paths after backend migration.
 
 import { apiFetch } from "@/lib/api/client";
 import { ownerApiFetch } from "./ownerApiFetch";
@@ -16,16 +14,15 @@ export interface OwnerLoginRequest {
   password: string;
 }
 
-// Intentionally permissive — all fields optional so a shape change does not
-// cause a TypeScript error before the contract is pinned.
+// Confirmed Spring Boot shapes: { token } or { accessToken }.
+// Nested { data: { token } } retained as a fallback in case the response is
+// wrapped by a global envelope interceptor on the backend.
 interface OwnerLoginResponse {
   token?: string;
   accessToken?: string;
-  jwt?: string;
   data?: {
     token?: string;
     accessToken?: string;
-    jwt?: string;
   };
 }
 
@@ -33,10 +30,8 @@ function extractToken(body: OwnerLoginResponse): string | null {
   return (
     body.token ??
     body.accessToken ??
-    body.jwt ??
     body.data?.token ??
     body.data?.accessToken ??
-    body.data?.jwt ??
     null
   );
 }
@@ -71,19 +66,16 @@ export interface OwnerProfile {
   name?: string | null;
 }
 
-// Permissive raw type covering all supported /auth/me response envelopes.
+// Confirmed Spring Boot /auth/me shape: flat { id, email, name }.
+// { data: { id, email, name } } retained as a fallback for envelope wrapping.
 interface MeResponseRaw {
   id?: unknown;
   email?: unknown;
   name?: unknown;
-  owner?: Record<string, unknown>;
-  user?: Record<string, unknown>;
   data?: {
     id?: unknown;
     email?: unknown;
     name?: unknown;
-    owner?: Record<string, unknown>;
-    user?: Record<string, unknown>;
   };
 }
 
@@ -101,19 +93,8 @@ function isOwnerCandidate(
   );
 }
 
-// Tries each envelope location in precedence order and returns the first
-// valid OwnerProfile found. Explicitly picks only safe fields so no
-// additional backend fields (e.g. passwordHash) leak into the return value
-// regardless of what the backend sends.
 function extractOwnerProfile(body: MeResponseRaw): OwnerProfile | null {
-  const candidates: unknown[] = [
-    body,
-    body.owner,
-    body.user,
-    body.data,
-    body.data?.owner,
-    body.data?.user,
-  ];
+  const candidates: unknown[] = [body, body.data];
   for (const candidate of candidates) {
     if (isOwnerCandidate(candidate)) {
       return {
@@ -128,10 +109,6 @@ function extractOwnerProfile(body: MeResponseRaw): OwnerProfile | null {
 
 // GET /auth/me. Requires an owner token — uses ownerApiFetch so 401 triggers
 // auto-logout automatically.
-//
-// TODO(spring-boot): confirm the exact path after backend migration.
-// Likely candidates: /auth/me  /api/auth/me  /owner/me
-// Update the url below once the path is pinned.
 export async function getCurrentOwner(): Promise<OwnerProfile> {
   const body = await ownerApiFetch<MeResponseRaw>({
     method: "GET",
