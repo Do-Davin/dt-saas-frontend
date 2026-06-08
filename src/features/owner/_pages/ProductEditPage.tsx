@@ -21,6 +21,10 @@ import { useCategories } from "../_hooks/useCategories";
 import { updateProduct, deleteProduct } from "../_api/products";
 import { ProductFormFields } from "../_components/ProductForm";
 import { ProductImageManager } from "../_components/ProductImageManager";
+import {
+  CrudBackButton,
+  OwnerCrudTransition,
+} from "../_components/OwnerCrudTransition";
 import { validateProductForm, hasErrors, parseMoney } from "../_utils/productForm";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Product, PricingType, UnitOfMeasure } from "../_api/products";
@@ -214,72 +218,74 @@ function ProductEditorForm({
 
   return (
     <>
-      <div className="max-w-lg space-y-6">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Edit product
-          </h2>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/owner/products">Back</Link>
-          </Button>
-        </header>
+      <OwnerCrudTransition>
+        <>
+          <div className="max-w-lg space-y-6">
+            <CrudBackButton to="/owner/products" />
 
+            <header>
+              <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+                Edit product
+              </h2>
+            </header>
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
+            {submitStatus.status === "error" ? (
+              <div
+                role="alert"
+                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              >
+                {submitStatus.message}
+              </div>
+            ) : null}
+
+            {deleteError ? (
+              <div
+                role="alert"
+                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              >
+                {deleteError}
+              </div>
+            ) : null}
+
+            <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+              <ProductFormFields
+                values={values}
+                errors={errors}
+                disabled={isSubmitting || isDeleting}
+                branches={branches}
+                categories={categories}
+                onChange={handleChange}
+              />
+              <div className="mt-6 flex items-center justify-between gap-3">
+                <div className="flex gap-3">
+                  <Button type="submit" disabled={isSubmitting || isDeleting}>
+                    {isSubmitting ? "Saving…" : "Save changes"}
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/owner/products">Cancel</Link>
+                  </Button>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                  disabled={isSubmitting || isDeleting}
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </form>
           </div>
-        ) : null}
 
-        {deleteError ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {deleteError}
-          </div>
-        ) : null}
+          <Separator className="my-8 max-w-lg" />
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <ProductFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting || isDeleting}
-            branches={branches}
-            categories={categories}
-            onChange={handleChange}
+          <ProductImageManager
+            businessId={businessId}
+            productId={product.id}
           />
-          <div className="mt-6 flex items-center justify-between gap-3">
-            <div className="flex gap-3">
-              <Button type="submit" disabled={isSubmitting || isDeleting}>
-                {isSubmitting ? "Saving…" : "Save changes"}
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/owner/products">Cancel</Link>
-              </Button>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className="text-destructive hover:text-destructive"
-              disabled={isSubmitting || isDeleting}
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              Delete
-            </Button>
-          </div>
-        </form>
-      </div>
-
-      <Separator className="my-8 max-w-lg" />
-
-      <ProductImageManager
-        businessId={businessId}
-        productId={product.id}
-      />
+        </>
+      </OwnerCrudTransition>
 
       <AlertDialog
         open={showDeleteDialog}

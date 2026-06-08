@@ -7,6 +7,10 @@ import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { createBranch } from "../_api/branches";
 import { BranchFormFields } from "../_components/BranchForm";
 import {
+  CrudBackButton,
+  OwnerCrudTransition,
+} from "../_components/OwnerCrudTransition";
+import {
   validateBranchForm,
   hasErrors,
   EMPTY_BRANCH_FORM,
@@ -77,41 +81,42 @@ export function BranchNewPage() {
   const isSubmitting = submitStatus.status === "submitting";
 
   return (
-    <div className="max-w-md space-y-6">
-      <header className="flex items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-          New branch
-        </h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/owner/branches">Cancel</Link>
-        </Button>
-      </header>
+    <OwnerCrudTransition>
+      <div className="max-w-md space-y-6">
+        <CrudBackButton to="/owner/branches" />
 
-      {submitStatus.status === "error" ? (
-        <div
-          role="alert"
-          className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {submitStatus.message}
-        </div>
-      ) : null}
+        <header>
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+            New branch
+          </h2>
+        </header>
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <BranchFormFields
-          values={values}
-          errors={errors}
-          disabled={isSubmitting}
-          onChange={handleChange}
-        />
-        <div className="mt-6 flex gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating…" : "Create branch"}
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/owner/branches">Cancel</Link>
-          </Button>
-        </div>
-      </form>
-    </div>
+        {submitStatus.status === "error" ? (
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
+            {submitStatus.message}
+          </div>
+        ) : null}
+
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+          <BranchFormFields
+            values={values}
+            errors={errors}
+            disabled={isSubmitting}
+            onChange={handleChange}
+          />
+          <div className="mt-6 flex gap-3">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating…" : "Create branch"}
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/owner/branches">Cancel</Link>
+            </Button>
+          </div>
+        </form>
+      </div>
+    </OwnerCrudTransition>
   );
 }

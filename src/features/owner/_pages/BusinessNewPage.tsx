@@ -7,6 +7,10 @@ import { setCurrentBusinessId } from "../_store/currentBusiness";
 import { createBusiness } from "../_api/businesses";
 import { BusinessFormFields } from "../_components/BusinessForm";
 import {
+  CrudBackButton,
+  OwnerCrudTransition,
+} from "../_components/OwnerCrudTransition";
+import {
   validateBusinessForm,
   hasErrors,
   EMPTY_BUSINESS_FORM,
@@ -77,41 +81,42 @@ export function BusinessNewPage() {
   const isSubmitting = submitStatus.status === "submitting";
 
   return (
-    <div className="max-w-md space-y-6">
-      <header className="flex items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-          New business
-        </h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/owner/businesses">Cancel</Link>
-        </Button>
-      </header>
+    <OwnerCrudTransition>
+      <div className="max-w-md space-y-6">
+        <CrudBackButton to="/owner/businesses" />
 
-      {submitStatus.status === "error" ? (
-        <div
-          role="alert"
-          className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {submitStatus.message}
-        </div>
-      ) : null}
+        <header>
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+            New business
+          </h2>
+        </header>
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <BusinessFormFields
-          values={values}
-          errors={errors}
-          disabled={isSubmitting}
-          onChange={handleChange}
-        />
-        <div className="mt-6 flex gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating…" : "Create business"}
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/owner/businesses">Cancel</Link>
-          </Button>
-        </div>
-      </form>
-    </div>
+        {submitStatus.status === "error" ? (
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
+            {submitStatus.message}
+          </div>
+        ) : null}
+
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+          <BusinessFormFields
+            values={values}
+            errors={errors}
+            disabled={isSubmitting}
+            onChange={handleChange}
+          />
+          <div className="mt-6 flex gap-3">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating…" : "Create business"}
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/owner/businesses">Cancel</Link>
+            </Button>
+          </div>
+        </form>
+      </div>
+    </OwnerCrudTransition>
   );
 }

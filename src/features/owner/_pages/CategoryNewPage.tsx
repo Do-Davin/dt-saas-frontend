@@ -8,6 +8,10 @@ import { useBranches } from "../_hooks/useBranches";
 import { createCategory } from "../_api/categories";
 import { CategoryFormFields } from "../_components/CategoryForm";
 import {
+  CrudBackButton,
+  OwnerCrudTransition,
+} from "../_components/OwnerCrudTransition";
+import {
   validateCategoryForm,
   hasErrors,
   EMPTY_CATEGORY_FORM,
@@ -83,42 +87,43 @@ export function CategoryNewPage() {
   const isSubmitting = submitStatus.status === "submitting";
 
   return (
-    <div className="max-w-md space-y-6">
-      <header className="flex items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-          New category
-        </h2>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/owner/categories">Cancel</Link>
-        </Button>
-      </header>
+    <OwnerCrudTransition>
+      <div className="max-w-md space-y-6">
+        <CrudBackButton to="/owner/categories" />
 
-      {submitStatus.status === "error" ? (
-        <div
-          role="alert"
-          className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {submitStatus.message}
-        </div>
-      ) : null}
+        <header>
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+            New category
+          </h2>
+        </header>
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <CategoryFormFields
-          values={values}
-          errors={errors}
-          disabled={isSubmitting}
-          branches={branches}
-          onChange={handleChange}
-        />
-        <div className="mt-6 flex gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating…" : "Create category"}
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/owner/categories">Cancel</Link>
-          </Button>
-        </div>
-      </form>
-    </div>
+        {submitStatus.status === "error" ? (
+          <div
+            role="alert"
+            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
+            {submitStatus.message}
+          </div>
+        ) : null}
+
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+          <CategoryFormFields
+            values={values}
+            errors={errors}
+            disabled={isSubmitting}
+            branches={branches}
+            onChange={handleChange}
+          />
+          <div className="mt-6 flex gap-3">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating…" : "Create category"}
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/owner/categories">Cancel</Link>
+            </Button>
+          </div>
+        </form>
+      </div>
+    </OwnerCrudTransition>
   );
 }

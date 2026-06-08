@@ -16,6 +16,10 @@ import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusiness } from "../_hooks/useBusiness";
 import { updateBusiness, deleteBusiness } from "../_api/businesses";
 import { BusinessFormFields } from "../_components/BusinessForm";
+import {
+  CrudBackButton,
+  OwnerCrudTransition,
+} from "../_components/OwnerCrudTransition";
 import { validateBusinessForm, hasErrors } from "../_utils/businessForm";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { OwnerBusiness } from "../_api/businesses";
@@ -151,62 +155,63 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
 
   return (
     <>
-      <div className="max-w-md space-y-6">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Edit business
-          </h2>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/owner/businesses">Back</Link>
-          </Button>
-        </header>
+      <OwnerCrudTransition>
+        <div className="max-w-md space-y-6">
+          <CrudBackButton to="/owner/businesses" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+          <header>
+            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+              Edit business
+            </h2>
+          </header>
 
-        {deleteError ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {deleteError}
-          </div>
-        ) : null}
+          {submitStatus.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {submitStatus.message}
+            </div>
+          ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <BusinessFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting || isDeleting}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex items-center justify-between gap-3">
-            <div className="flex gap-3">
-              <Button type="submit" disabled={isSubmitting || isDeleting}>
-                {isSubmitting ? "Saving…" : "Save changes"}
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/owner/businesses">Cancel</Link>
+          {deleteError ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {deleteError}
+            </div>
+          ) : null}
+
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <BusinessFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting || isDeleting}
+              onChange={handleChange}
+            />
+            <div className="mt-6 flex items-center justify-between gap-3">
+              <div className="flex gap-3">
+                <Button type="submit" disabled={isSubmitting || isDeleting}>
+                  {isSubmitting ? "Saving…" : "Save changes"}
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/owner/businesses">Cancel</Link>
+                </Button>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                disabled={isSubmitting || isDeleting}
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                Delete
               </Button>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className="text-destructive hover:text-destructive"
-              disabled={isSubmitting || isDeleting}
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              Delete
-            </Button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      </OwnerCrudTransition>
 
       <AlertDialog
         open={showDeleteDialog}
