@@ -1,12 +1,5 @@
 // Owner businesses API adapter.
 // Public catalog code must not import this file.
-//
-// TODO(spring-boot): confirm the GET /businesses path after backend migration.
-// Likely candidates: /businesses  /api/businesses  /owner/businesses
-// Update the url in listOwnerBusinesses() once the path is pinned.
-//
-// TODO(spring-boot): confirm the response envelope. normalizeListResponse
-// handles the six most common shapes — update if the backend wraps differently.
 
 import { ownerApiFetch } from "./ownerApiFetch";
 
@@ -15,8 +8,9 @@ import { ownerApiFetch } from "./ownerApiFetch";
 export interface OwnerBusiness {
   id: string;
   name: string;
+  nameKm?: string | null;
   slug?: string | null;
-  businessType?: string | null;
+  type?: string | null;
   catalogMode?: string | null;
 }
 
@@ -26,17 +20,17 @@ export interface OwnerBusiness {
 interface BusinessRaw {
   id?: unknown;
   name?: unknown;
+  nameKm?: unknown;
   slug?: unknown;
-  businessType?: unknown;
+  type?: unknown;
   catalogMode?: unknown;
 }
 
 interface BusinessesResponseRaw {
-  data?:
-    | BusinessRaw[]
-    | { items?: BusinessRaw[]; businesses?: BusinessRaw[] };
+  data?: BusinessRaw[] | { items?: BusinessRaw[] };
   items?: BusinessRaw[];
   businesses?: BusinessRaw[];
+  content?: BusinessRaw[];
 }
 
 // Returns true only when the candidate has the minimum required fields.
@@ -56,9 +50,9 @@ function toOwnerBusiness(raw: BusinessRaw): OwnerBusiness {
   return {
     id: raw.id as string,
     name: raw.name as string,
+    nameKm: typeof raw.nameKm === "string" ? raw.nameKm : null,
     slug: typeof raw.slug === "string" ? raw.slug : null,
-    businessType:
-      typeof raw.businessType === "string" ? raw.businessType : null,
+    type: typeof raw.type === "string" ? raw.type : null,
     catalogMode:
       typeof raw.catalogMode === "string" ? raw.catalogMode : null,
   };
@@ -66,9 +60,7 @@ function toOwnerBusiness(raw: BusinessRaw): OwnerBusiness {
 
 // Tries each envelope location in order. Returns the first array whose
 // elements pass the minimum-shape check.
-function normalizeListResponse(
-  body: unknown
-): OwnerBusiness[] | null {
+function normalizeListResponse(body: unknown): OwnerBusiness[] | null {
   // Bare array
   if (Array.isArray(body)) {
     return body.filter(isBusinessCandidate).map(toOwnerBusiness);
@@ -76,6 +68,11 @@ function normalizeListResponse(
 
   if (body === null || typeof body !== "object") return null;
   const r = body as BusinessesResponseRaw;
+
+  // Spring Boot Page<T> — { content: [] }
+  if (Array.isArray(r.content)) {
+    return r.content.filter(isBusinessCandidate).map(toOwnerBusiness);
+  }
 
   // { data: [] }
   if (Array.isArray(r.data)) {
@@ -93,18 +90,10 @@ function normalizeListResponse(
   }
 
   // { data: { items: [] } }
-  if (
-    r.data !== null &&
-    typeof r.data === "object" &&
-    !Array.isArray(r.data)
-  ) {
-    const nested = r.data as { items?: BusinessRaw[]; businesses?: BusinessRaw[] };
+  if (r.data !== null && typeof r.data === "object" && !Array.isArray(r.data)) {
+    const nested = r.data as { items?: BusinessRaw[] };
     if (Array.isArray(nested.items)) {
       return nested.items.filter(isBusinessCandidate).map(toOwnerBusiness);
-    }
-    // { data: { businesses: [] } }
-    if (Array.isArray(nested.businesses)) {
-      return nested.businesses.filter(isBusinessCandidate).map(toOwnerBusiness);
     }
   }
 

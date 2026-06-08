@@ -169,7 +169,7 @@ function DetailContent({
           <ul className="mt-3 divide-y">
             {request.items.map((item, idx) => (
               <li
-                key={item.id ?? `${idx}-${item.productId ?? item.name ?? "item"}`}
+                key={item.id ?? `${idx}-${item.productId ?? item.productNameSnapshot ?? "item"}`}
                 className="py-3 first:pt-0 last:pb-0"
               >
                 <ItemRow item={item} />
@@ -204,11 +204,10 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
 }
 
 function ItemRow({ item }: { item: CustomerRequestDetailItem }) {
-  const name = item.name ?? "Item";
+  const name = item.productNameSnapshot ?? "Item";
   const qty = item.quantity ?? 1;
-  const unit = item.unitPriceSnapshot;
-  const total = item.totalPriceSnapshot;
-  const hasPrice = typeof unit === "number" || typeof total === "number";
+  const price = item.salesPriceSnapshot;
+  const hasPrice = typeof price === "number";
 
   return (
     <div className="flex items-start justify-between gap-3">
@@ -219,8 +218,8 @@ function ItemRow({ item }: { item: CustomerRequestDetailItem }) {
             <span className="text-muted-foreground"> ×{qty}</span>
           ) : null}
         </div>
-        {item.nameKm ? (
-          <div className="text-xs text-muted-foreground">{item.nameKm}</div>
+        {item.pricingTypeSnapshot ? (
+          <div className="text-xs text-muted-foreground">{item.pricingTypeSnapshot}</div>
         ) : null}
         {item.note ? (
           <div className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">
@@ -230,14 +229,7 @@ function ItemRow({ item }: { item: CustomerRequestDetailItem }) {
       </div>
       {hasPrice ? (
         <div className="shrink-0 text-right text-sm">
-          {typeof total === "number" ? (
-            <div className="font-medium">{formatPrice(total)}</div>
-          ) : null}
-          {typeof unit === "number" ? (
-            <div className="text-xs text-muted-foreground">
-              {formatPrice(unit)} each
-            </div>
-          ) : null}
+          <div className="font-medium">{formatPrice(price)}</div>
         </div>
       ) : null}
     </div>

@@ -10,7 +10,7 @@ import axios, {
   type AxiosRequestConfig,
 } from "axios";
 
-const DEFAULT_BASE_URL = "http://localhost:3000/api";
+const DEFAULT_BASE_URL = "http://localhost:8080/api";
 
 function getBaseUrl(): string {
   const fromEnv = import.meta.env.VITE_API_BASE_URL?.trim();

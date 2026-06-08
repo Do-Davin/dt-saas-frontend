@@ -49,11 +49,10 @@ export interface CustomerRequestListItem {
 export interface CustomerRequestDetailItem {
   id?: string;
   productId?: string;
-  name?: string;
-  nameKm?: string;
+  productNameSnapshot?: string;
+  salesPriceSnapshot?: number;
+  pricingTypeSnapshot?: string;
   quantity?: number;
-  unitPriceSnapshot?: number;
-  totalPriceSnapshot?: number;
   note?: string;
 }
 

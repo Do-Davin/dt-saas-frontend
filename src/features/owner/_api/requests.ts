@@ -2,18 +2,13 @@
 // Public catalog code MUST NOT import from this file — the owner JWT must
 // never be attached to public catalog calls (see docs/frontend-auth-api-foundation.md).
 //
-// TODO(spring-boot): confirm these endpoint paths after backend migration:
+// Confirmed Spring Boot endpoint paths:
 //   GET   /businesses/:id/requests
 //   GET   /businesses/:id/requests/:requestId
 //   PATCH /businesses/:id/requests/:requestId/status  — body: { status }
 //
-// TODO(spring-boot): confirm PATCH /status response shape. NestJS returned
-// 200 + body; Spring Boot commonly returns 204 (no body). The empty-body
-// fallback in updateOwnerRequestStatus handles both cases already.
-//
-// TODO(spring-boot): confirm list-response wrapper. normalizeListResponse
-// accepts bare array, { data: [] }, { items: [] }, { requests: [] } to stay
-// resilient until the shape is pinned.
+// PATCH /status may return 200 + body or 204 (no body). The empty-body
+// fallback in updateOwnerRequestStatus handles both cases.
 
 import { ApiError } from "@/lib/api/client";
 import { ownerApiFetch } from "./ownerApiFetch";
@@ -29,12 +24,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return proto === Object.prototype || proto === null;
 }
 
-// Accept several likely list-response shapes so a minor Spring Boot
-// envelope change cannot crash the page.
+// Accept bare array or { content | data | items } wrapper so a minor Spring
+// Boot envelope change cannot crash the page.
 function normalizeListResponse(data: unknown): CustomerRequestListItem[] {
   if (Array.isArray(data)) return data as CustomerRequestListItem[];
   if (isPlainObject(data)) {
-    for (const key of ["data", "items", "requests"] as const) {
+    for (const key of ["content", "data", "items", "requests"] as const) {
       const candidate = data[key];
       if (Array.isArray(candidate)) {
         return candidate as CustomerRequestListItem[];
@@ -54,11 +49,11 @@ export async function listOwnerRequests(
   return normalizeListResponse(data);
 }
 
-// Accept bare object or { data | request | item } wrapper. Unexpected shape
+// Accept bare object or { data | request } wrapper. Unexpected shape
 // surfaces as a typed ApiError so callers keep their single error type.
 function normalizeDetailResponse(data: unknown): CustomerRequestDetail {
   if (isPlainObject(data)) {
-    for (const key of ["data", "request", "item"] as const) {
+    for (const key of ["data", "request"] as const) {
       const inner = data[key];
       if (isPlainObject(inner)) {
         return inner as unknown as CustomerRequestDetail;
