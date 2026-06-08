@@ -4,29 +4,31 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
-import { createBranch } from "../_api/branches";
-import { BranchFormFields } from "../_components/BranchForm";
+import { useBranches } from "../_hooks/useBranches";
+import { createCategory } from "../_api/categories";
+import { CategoryFormFields } from "../_components/CategoryForm";
 import {
-  validateBranchForm,
+  validateCategoryForm,
   hasErrors,
-  EMPTY_BRANCH_FORM,
-} from "../_utils/branchForm";
+  EMPTY_CATEGORY_FORM,
+} from "../_utils/categoryForm";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
-import type { BranchFormValues, BranchFormErrors } from "../_utils/branchForm";
+import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
 
 type SubmitStatus =
   | { status: "idle" }
   | { status: "submitting" }
   | { status: "error"; message: string };
 
-export function BranchNewPage() {
+export function CategoryNewPage() {
   const businessId = useCurrentBusinessId();
   const { title: noBusinessTitle, description: noBusinessDesc } =
     useBusinessContextMessage();
+  const { state: branchState } = useBranches(businessId);
   const navigate = useNavigate();
 
-  const [values, setValues] = useState<BranchFormValues>(EMPTY_BRANCH_FORM);
-  const [errors, setErrors] = useState<BranchFormErrors>({});
+  const [values, setValues] = useState<CategoryFormValues>(EMPTY_CATEGORY_FORM);
+  const [errors, setErrors] = useState<CategoryFormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({
     status: "idle",
   });
@@ -37,9 +39,14 @@ export function BranchNewPage() {
     );
   }
 
-  function handleChange<K extends keyof BranchFormValues>(
+  const branches =
+    branchState.status === "ready"
+      ? branchState.items.map((b) => ({ id: b.id, name: b.name }))
+      : [];
+
+  function handleChange<K extends keyof CategoryFormValues>(
     field: K,
-    value: BranchFormValues[K]
+    value: CategoryFormValues[K]
   ) {
     setValues((prev) => ({ ...prev, [field]: value }));
     if (field in errors) {
@@ -50,26 +57,25 @@ export function BranchNewPage() {
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     if (!businessId) return;
-    const next = validateBranchForm(values);
+    const next = validateCategoryForm(values);
     if (hasErrors(next)) {
       setErrors(next);
       return;
     }
     setSubmitStatus({ status: "submitting" });
     try {
-      await createBranch(businessId, {
+      await createCategory(businessId, {
         name: values.name.trim(),
         ...(values.nameKm.trim() ? { nameKm: values.nameKm.trim() } : {}),
-        ...(values.address.trim() ? { address: values.address.trim() } : {}),
-        ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
+        ...(values.branchId ? { branchId: values.branchId } : {}),
         isActive: values.isActive,
       });
-      navigate("/owner/branches", { replace: true });
+      navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
           ? err.message
-          : "Something went wrong while creating the branch.";
+          : "Something went wrong while creating the category.";
       setSubmitStatus({ status: "error", message });
     }
   }
@@ -80,10 +86,10 @@ export function BranchNewPage() {
     <div className="max-w-md space-y-6">
       <header className="flex items-center justify-between gap-3">
         <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-          New branch
+          New category
         </h2>
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/owner/branches">Cancel</Link>
+          <Link to="/owner/categories">Cancel</Link>
         </Button>
       </header>
 
@@ -97,18 +103,19 @@ export function BranchNewPage() {
       ) : null}
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <BranchFormFields
+        <CategoryFormFields
           values={values}
           errors={errors}
           disabled={isSubmitting}
+          branches={branches}
           onChange={handleChange}
         />
         <div className="mt-6 flex gap-3">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating…" : "Create branch"}
+            {isSubmitting ? "Creating…" : "Create category"}
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/owner/branches">Cancel</Link>
+            <Link to="/owner/categories">Cancel</Link>
           </Button>
         </div>
       </form>

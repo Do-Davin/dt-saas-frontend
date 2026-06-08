@@ -14,20 +14,23 @@ import {
 import { ApiError } from "@/lib/api/client";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
-import { useBranch } from "../_hooks/useBranch";
-import { updateBranch, deleteBranch } from "../_api/branches";
-import { BranchFormFields } from "../_components/BranchForm";
-import { validateBranchForm, hasErrors } from "../_utils/branchForm";
+import { useCategory } from "../_hooks/useCategory";
+import { useBranches } from "../_hooks/useBranches";
+import { updateCategory, deleteCategory } from "../_api/categories";
+import { CategoryFormFields } from "../_components/CategoryForm";
+import { validateCategoryForm, hasErrors } from "../_utils/categoryForm";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
-import type { Branch } from "../_api/branches";
-import type { BranchFormValues, BranchFormErrors } from "../_utils/branchForm";
+import type { Category } from "../_api/categories";
+import type { BranchOption } from "../_components/CategoryForm";
+import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
 
-export function BranchEditPage() {
-  const { branchId } = useParams<{ branchId: string }>();
+export function CategoryEditPage() {
+  const { categoryId } = useParams<{ categoryId: string }>();
   const businessId = useCurrentBusinessId();
   const { title: noBusinessTitle, description: noBusinessDesc } =
     useBusinessContextMessage();
-  const branchState = useBranch(businessId, branchId);
+  const categoryState = useCategory(businessId, categoryId);
+  const { state: branchState } = useBranches(businessId);
 
   if (!businessId) {
     return (
@@ -35,36 +38,41 @@ export function BranchEditPage() {
     );
   }
 
-  if (branchState.status === "idle" || branchState.status === "loading") {
-    return <OwnerStateBlock title="Loading branch…" />;
+  if (categoryState.status === "idle" || categoryState.status === "loading") {
+    return <OwnerStateBlock title="Loading category…" />;
   }
 
-  if (branchState.status === "error") {
+  if (categoryState.status === "error") {
     return (
       <OwnerStateBlock
         tone="error"
-        title="Could not load branch"
-        description={branchState.message}
+        title="Could not load category"
+        description={categoryState.message}
       />
     );
   }
 
+  const branches: BranchOption[] =
+    branchState.status === "ready"
+      ? branchState.items.map((b) => ({ id: b.id, name: b.name }))
+      : [];
+
   return (
-    <BranchEditorForm
-      key={branchState.branch.id}
-      branch={branchState.branch}
+    <CategoryEditorForm
+      key={categoryState.category.id}
+      category={categoryState.category}
       businessId={businessId}
+      branches={branches}
     />
   );
 }
 
-function branchToFormValues(branch: Branch): BranchFormValues {
+function categoryToFormValues(category: Category): CategoryFormValues {
   return {
-    name: branch.name,
-    nameKm: branch.nameKm ?? "",
-    address: branch.address ?? "",
-    phone: branch.phone ?? "",
-    isActive: branch.isActive,
+    name: category.name,
+    nameKm: category.nameKm ?? "",
+    branchId: category.branchId ?? "",
+    isActive: category.isActive,
   };
 }
 
@@ -73,18 +81,23 @@ type SubmitStatus =
   | { status: "submitting" }
   | { status: "error"; message: string };
 
-interface BranchEditorFormProps {
-  branch: Branch;
+interface CategoryEditorFormProps {
+  category: Category;
   businessId: string;
+  branches: BranchOption[];
 }
 
-function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
+function CategoryEditorForm({
+  category,
+  businessId,
+  branches,
+}: CategoryEditorFormProps) {
   const navigate = useNavigate();
 
-  const [values, setValues] = useState<BranchFormValues>(() =>
-    branchToFormValues(branch)
+  const [values, setValues] = useState<CategoryFormValues>(() =>
+    categoryToFormValues(category)
   );
-  const [errors, setErrors] = useState<BranchFormErrors>({});
+  const [errors, setErrors] = useState<CategoryFormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({
     status: "idle",
   });
@@ -92,9 +105,9 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  function handleChange<K extends keyof BranchFormValues>(
+  function handleChange<K extends keyof CategoryFormValues>(
     field: K,
-    value: BranchFormValues[K]
+    value: CategoryFormValues[K]
   ) {
     setValues((prev) => ({ ...prev, [field]: value }));
     if (field in errors) {
@@ -104,26 +117,25 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
 
   async function handleSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
-    const next = validateBranchForm(values);
+    const next = validateCategoryForm(values);
     if (hasErrors(next)) {
       setErrors(next);
       return;
     }
     setSubmitStatus({ status: "submitting" });
     try {
-      await updateBranch(businessId, branch.id, {
+      await updateCategory(businessId, category.id, {
         name: values.name.trim(),
         ...(values.nameKm.trim() ? { nameKm: values.nameKm.trim() } : {}),
-        ...(values.address.trim() ? { address: values.address.trim() } : {}),
-        ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
+        ...(values.branchId ? { branchId: values.branchId } : {}),
         isActive: values.isActive,
       });
-      navigate("/owner/branches", { replace: true });
+      navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
           ? err.message
-          : "Something went wrong while saving the branch.";
+          : "Something went wrong while saving the category.";
       setSubmitStatus({ status: "error", message });
     }
   }
@@ -132,13 +144,13 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
     setIsDeleting(true);
     setDeleteError(null);
     try {
-      await deleteBranch(businessId, branch.id);
-      navigate("/owner/branches", { replace: true });
+      await deleteCategory(businessId, category.id);
+      navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
           ? err.message
-          : "Something went wrong while deleting the branch.";
+          : "Something went wrong while deleting the category.";
       setDeleteError(message);
       setShowDeleteDialog(false);
     } finally {
@@ -153,10 +165,10 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
       <div className="max-w-md space-y-6">
         <header className="flex items-center justify-between gap-3">
           <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Edit branch
+            Edit category
           </h2>
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/owner/branches">Back</Link>
+            <Link to="/owner/categories">Back</Link>
           </Button>
         </header>
 
@@ -179,10 +191,11 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
         ) : null}
 
         <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <BranchFormFields
+          <CategoryFormFields
             values={values}
             errors={errors}
             disabled={isSubmitting || isDeleting}
+            branches={branches}
             onChange={handleChange}
           />
           <div className="mt-6 flex items-center justify-between gap-3">
@@ -194,7 +207,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
                 {isSubmitting ? "Saving…" : "Save changes"}
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/owner/branches">Cancel</Link>
+                <Link to="/owner/categories">Cancel</Link>
               </Button>
             </div>
             <Button
@@ -218,9 +231,9 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this branch?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{branch.name}</strong> will be permanently deleted. This
+              <strong>{category.name}</strong> will be permanently deleted. This
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -231,7 +244,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
               disabled={isDeleting}
               onClick={() => void handleConfirmDelete()}
             >
-              {isDeleting ? "Deleting…" : "Delete branch"}
+              {isDeleting ? "Deleting…" : "Delete category"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
