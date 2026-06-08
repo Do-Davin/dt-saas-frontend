@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +20,7 @@ import { useBranches } from "../_hooks/useBranches";
 import { useCategories } from "../_hooks/useCategories";
 import { updateProduct, deleteProduct } from "../_api/products";
 import { ProductFormFields } from "../_components/ProductForm";
+import { ProductImageManager } from "../_components/ProductImageManager";
 import { validateProductForm, hasErrors, parseMoney } from "../_utils/productForm";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Product, PricingType, UnitOfMeasure } from "../_api/products";
@@ -222,6 +224,7 @@ function ProductEditorForm({
           </Button>
         </header>
 
+
         {submitStatus.status === "error" ? (
           <div
             role="alert"
@@ -270,6 +273,13 @@ function ProductEditorForm({
           </div>
         </form>
       </div>
+
+      <Separator className="my-8 max-w-lg" />
+
+      <ProductImageManager
+        businessId={businessId}
+        productId={product.id}
+      />
 
       <AlertDialog
         open={showDeleteDialog}
