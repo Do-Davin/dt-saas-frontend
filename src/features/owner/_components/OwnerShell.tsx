@@ -116,6 +116,12 @@ export function OwnerShell() {
               >
                 Requests
               </Link>
+              <Link
+                to="/owner/branches"
+                className="rounded-md px-2.5 py-1.5 text-foreground hover:bg-accent hover:text-accent-foreground"
+              >
+                Branches
+              </Link>
             </nav>
 
             <Button variant="ghost" size="sm" onClick={handleLogout}>
