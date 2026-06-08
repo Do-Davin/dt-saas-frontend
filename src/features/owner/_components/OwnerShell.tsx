@@ -128,6 +128,12 @@ export function OwnerShell() {
               >
                 Categories
               </Link>
+              <Link
+                to="/owner/products"
+                className="rounded-md px-2.5 py-1.5 text-foreground hover:bg-accent hover:text-accent-foreground"
+              >
+                Products
+              </Link>
             </nav>
 
             <Button variant="ghost" size="sm" onClick={handleLogout}>
