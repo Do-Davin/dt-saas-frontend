@@ -28,7 +28,7 @@ export function CartDrawer() {
   return (
     <Sheet open={isCartOpen} onOpenChange={toggleCart}>
       <SheetContent className="flex flex-col overflow-hidden p-0">
-        <SheetHeader className="flex-row items-center justify-between border-b px-5 py-4">
+        <SheetHeader className="flex-row items-center justify-between border-b pl-5 pr-12 py-4">
           <div className="flex items-center gap-2">
             <SheetTitle className="text-base">{t.cartTitle}</SheetTitle>
             {count > 0 && (
