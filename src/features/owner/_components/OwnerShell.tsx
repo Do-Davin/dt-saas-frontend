@@ -9,7 +9,6 @@ import {
   TagIcon,
   PackageIcon,
   ChevronLeftIcon,
-  ChevronRightIcon,
   MenuIcon,
   LogOutIcon,
   ChevronDownIcon,
@@ -208,38 +207,47 @@ export function OwnerShell() {
         )}
       >
         {/* Brand area */}
-        <div
-          className={cn(
-            "flex h-14 shrink-0 items-center border-b",
-            sidebarCollapsed
-              ? "flex-col justify-center gap-1 py-2"
-              : "justify-between gap-2 px-3"
-          )}
-        >
-          <div
+        <div className="flex h-14 shrink-0 items-center overflow-hidden border-b px-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (sidebarCollapsed) setSidebarCollapsed(false);
+            }}
+            aria-label={sidebarCollapsed ? "Open sidebar" : "DT SaaS Dashboard"}
+            title={sidebarCollapsed ? "Open sidebar" : undefined}
+            tabIndex={sidebarCollapsed ? 0 : -1}
             className={cn(
-              "flex items-center gap-2 min-w-0",
-              sidebarCollapsed && "justify-center"
+              "flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              sidebarCollapsed
+                ? "cursor-pointer transition-colors hover:bg-muted hover:ring-1 hover:ring-border"
+                : "cursor-default"
             )}
           >
             <BrandMark />
-            {!sidebarCollapsed ? (
-              <span className="truncate text-sm font-semibold tracking-tight">
-                DT SaaS Dashboard
-              </span>
-            ) : null}
+          </button>
+
+          <div
+            className={cn(
+              "min-w-0 overflow-hidden transition-opacity duration-150",
+              sidebarCollapsed ? "w-0 opacity-0" : "ml-2 flex-1 opacity-100"
+            )}
+          >
+            <span className="block truncate whitespace-nowrap text-sm font-semibold tracking-tight">
+              DT SaaS Dashboard
+            </span>
           </div>
+
           <button
             type="button"
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {sidebarCollapsed ? (
-              <ChevronRightIcon className="size-3.5" />
-            ) : (
-              <ChevronLeftIcon className="size-3.5" />
+            onClick={() => setSidebarCollapsed(true)}
+            className={cn(
+              "ml-auto shrink-0 rounded-md p-1 text-muted-foreground transition-opacity hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              sidebarCollapsed && "invisible pointer-events-none opacity-0"
             )}
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar"
+          >
+            <ChevronLeftIcon className="size-3.5" />
           </button>
         </div>
 

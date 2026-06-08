@@ -74,8 +74,18 @@ interface ProductRaw {
   price?: unknown;
   salesPrice?: unknown;
   imageUrl?: unknown;
+  primaryImage?: unknown;
+  images?: unknown;
   isAvailable?: unknown;
   position?: unknown;
+}
+
+interface ProductImageRaw {
+  id?: unknown;
+  url?: unknown;
+  alt?: unknown;
+  position?: unknown;
+  isPrimary?: unknown;
 }
 
 interface CatalogShellRaw {
@@ -105,8 +115,31 @@ function asBoolean(v: unknown): boolean | undefined {
 
 function asStringArray(v: unknown): string[] | undefined {
   if (!Array.isArray(v)) return undefined;
-  const out = v.filter((x): x is string => typeof x === "string" && x.length > 0);
+  const out = v.filter(
+    (x): x is string => typeof x === "string" && x.length > 0
+  );
   return out.length > 0 ? out : undefined;
+}
+
+function asProductImage(v: unknown): ProductImageRaw | undefined {
+  return v !== null && typeof v === "object" ? (v as ProductImageRaw) : undefined;
+}
+
+function getProductImageUrl(raw: ProductRaw): string | undefined {
+  const primaryImageUrl = asString(asProductImage(raw.primaryImage)?.url);
+  if (primaryImageUrl) return primaryImageUrl;
+
+  const images = Array.isArray(raw.images)
+    ? raw.images
+        .map(asProductImage)
+        .filter((img): img is ProductImageRaw => !!img)
+    : [];
+  const primaryImage = images.find((img) => img.isPrimary === true);
+  return (
+    asString(primaryImage?.url) ??
+    asString(images[0]?.url) ??
+    asString(raw.imageUrl)
+  );
 }
 
 function toLocalizedText(
@@ -173,7 +206,7 @@ function toProduct(raw: ProductRaw): Product | null {
     name,
     description: toLocalizedText(raw.description, raw.descriptionKm),
     price,
-    imageUrl: asString(raw.imageUrl),
+    imageUrl: getProductImageUrl(raw),
     isAvailable: asBoolean(raw.isAvailable) ?? true,
     position: asNumber(raw.position) ?? 0,
   };

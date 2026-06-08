@@ -62,6 +62,36 @@ export function BranchFormFields({
 
       <div className="space-y-1">
         <label
+          htmlFor="branch-slug"
+          className="block text-sm font-medium text-foreground"
+        >
+          Slug <span aria-hidden className="text-destructive">*</span>
+        </label>
+        <Input
+          id="branch-slug"
+          value={values.slug}
+          onChange={(e) => onChange("slug", e.target.value)}
+          disabled={disabled}
+          placeholder="main-branch"
+          aria-required
+          aria-invalid={!!errors.slug}
+          aria-describedby={
+            errors.slug ? "branch-slug-error" : "branch-slug-help"
+          }
+        />
+        {errors.slug ? (
+          <p id="branch-slug-error" className="text-xs text-destructive">
+            {errors.slug}
+          </p>
+        ) : (
+          <p id="branch-slug-help" className="text-xs text-muted-foreground">
+            Used in URLs. Use lowercase letters, numbers, and hyphens only.
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-1">
+        <label
           htmlFor="branch-address"
           className="block text-sm font-medium text-foreground"
         >

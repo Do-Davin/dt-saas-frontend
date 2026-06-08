@@ -21,6 +21,7 @@ export interface Branch {
 export interface BranchInput {
   name: string;
   nameKm?: string;
+  slug: string;
   address?: string;
   phone?: string;
   isActive?: boolean;

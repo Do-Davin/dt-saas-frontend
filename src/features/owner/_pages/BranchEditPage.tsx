@@ -66,6 +66,7 @@ function branchToFormValues(branch: Branch): BranchFormValues {
   return {
     name: branch.name,
     nameKm: branch.nameKm ?? "",
+    slug: branch.slug ?? "",
     address: branch.address ?? "",
     phone: branch.phone ?? "",
     isActive: branch.isActive,
@@ -118,6 +119,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
       await updateBranch(businessId, branch.id, {
         name: values.name.trim(),
         ...(values.nameKm.trim() ? { nameKm: values.nameKm.trim() } : {}),
+        slug: values.slug.trim(),
         ...(values.address.trim() ? { address: values.address.trim() } : {}),
         ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
         isActive: values.isActive,

@@ -64,6 +64,7 @@ export function BranchNewPage() {
       await createBranch(businessId, {
         name: values.name.trim(),
         ...(values.nameKm.trim() ? { nameKm: values.nameKm.trim() } : {}),
+        slug: values.slug.trim(),
         ...(values.address.trim() ? { address: values.address.trim() } : {}),
         ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
         isActive: values.isActive,
