@@ -159,11 +159,19 @@ export function OwnerShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     void useOwnerSessionStore.getState().loadOwner();
     void useOwnerBusinessesStore.getState().loadBusinesses();
   }, []);
+
+  // Scroll main content back to top on every route change.
+  // Required because <main> uses overflow-y-auto (not window scroll), so the
+  // browser's native scroll restoration does not apply to it.
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+  }, [location.pathname]);
 
   // Close profile dropdown on outside pointer-down
   useEffect(() => {
@@ -274,7 +282,7 @@ export function OwnerShell() {
               ) : selectedBusiness ? (
                 <>
                   <span
-                    className="truncate max-w-[160px]"
+                    className="truncate max-w-40"
                     title={selectedBusiness.name}
                   >
                     {selectedBusiness.name}
@@ -349,7 +357,7 @@ export function OwnerShell() {
         </header>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
+        <main ref={mainRef} className="flex-1 overflow-y-auto">
           <div className="px-6 py-6">
             <Outlet />
           </div>
