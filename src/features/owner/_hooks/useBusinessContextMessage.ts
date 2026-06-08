@@ -27,7 +27,7 @@ export function useBusinessContextMessage(): BusinessContextMessage {
   if (businesses.length > 1 && !selectedBusinessId) {
     return {
       title: "No business selected yet.",
-      description: "Please select a business from the owner header.",
+      description: "Select a business to continue.",
     };
   }
   return { title: "No business selected yet." };

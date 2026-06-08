@@ -71,35 +71,29 @@ export function OwnerShell() {
                     businesses.length === 0 ? (
                       <span>No business yet</span>
                     ) : selectedBusiness ? (
-                      <span
-                        className="truncate max-w-32"
-                        title={selectedBusiness.name}
-                      >
-                        {selectedBusiness.name}
-                      </span>
+                      <>
+                        <span
+                          className="truncate max-w-32"
+                          title={selectedBusiness.name}
+                        >
+                          {selectedBusiness.name}
+                        </span>
+                        {businesses.length > 1 ? (
+                          <Link
+                            to="/owner/select-business"
+                            className="shrink-0 underline-offset-2 hover:underline"
+                          >
+                            Switch
+                          </Link>
+                        ) : null}
+                      </>
                     ) : businesses.length > 1 ? (
-                      <select
-                        className="text-xs rounded border border-input bg-background px-1.5 py-0.5 text-foreground cursor-pointer outline-none"
-                        value={selectedBusinessId ?? ""}
-                        onChange={(e) => {
-                          const id = e.target.value;
-                          if (id) {
-                            useOwnerBusinessesStore
-                              .getState()
-                              .selectBusiness(id);
-                          }
-                        }}
-                        aria-label="Select business"
+                      <Link
+                        to="/owner/select-business"
+                        className="underline-offset-2 hover:underline"
                       >
-                        <option value="" disabled>
-                          Select business
-                        </option>
-                        {businesses.map((b) => (
-                          <option key={b.id} value={b.id}>
-                            {b.name}
-                          </option>
-                        ))}
-                      </select>
+                        Select business
+                      </Link>
                     ) : null
                   ) : null}
                 </>

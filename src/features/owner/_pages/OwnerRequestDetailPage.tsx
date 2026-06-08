@@ -229,7 +229,7 @@ function ItemRow({ item }: { item: CustomerRequestDetailItem }) {
       </div>
       {hasPrice ? (
         <div className="shrink-0 text-right text-sm">
-          <div className="font-medium">{formatPrice(price)}</div>
+          <div className="font-medium">{formatMoney(price)}</div>
         </div>
       ) : null}
     </div>
@@ -243,9 +243,19 @@ function formatDateTime(value: string | undefined): string {
   return d.toLocaleString();
 }
 
-// Currency-less for now — the response type does not yet carry a currency
-// code. When currency lands on CustomerRequestDetail (or a current-business
-// hook exposes it), swap this for Intl.NumberFormat at the call sites.
-function formatPrice(value: number): string {
-  return value.toFixed(2);
+// Currency-less for now — CustomerRequestDetail does not yet carry a
+// currency code. When currency is added, pass it as the second argument
+// and the style will switch to a full currency format automatically.
+function formatMoney(value: number, currency?: string): string {
+  if (currency) {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(value);
+  }
+  return new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 }
