@@ -5,15 +5,14 @@ interface OwnerStateBlockProps {
   title: string;
   description?: ReactNode;
   tone?: "neutral" | "error";
+  icon?: ReactNode;
 }
 
-// Lightweight shared block for loading / empty / error / setup messaging on
-// the owner dashboard. Intentionally small — when more variants are needed
-// (icons, retry actions), promote rather than expand this in-place.
 export function OwnerStateBlock({
   title,
   description,
   tone = "neutral",
+  icon,
 }: OwnerStateBlockProps) {
   const isError = tone === "error";
   return (
@@ -27,6 +26,18 @@ export function OwnerStateBlock({
           : "border-border bg-card"
       )}
     >
+      {icon ? (
+        <div
+          className={cn(
+            "mx-auto mb-3 flex size-10 items-center justify-center rounded-full",
+            isError
+              ? "bg-destructive/10 text-destructive"
+              : "bg-primary/10 text-primary"
+          )}
+        >
+          {icon}
+        </div>
+      ) : null}
       <h3 className="text-base font-semibold tracking-tight text-foreground">
         {title}
       </h3>
