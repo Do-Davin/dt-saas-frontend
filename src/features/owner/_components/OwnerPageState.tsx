@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AlertCircle, Inbox, Loader2 } from "lucide-react";
 import { OwnerStateBlock } from "./OwnerStateBlock";
 
 interface OwnerPageStateProps {
@@ -12,6 +13,12 @@ const DEFAULT_TITLES: Record<OwnerPageStateProps["type"], string> = {
   loading: "Loading…",
   error: "Something went wrong",
   empty: "Nothing here yet",
+};
+
+const TYPE_ICON: Record<OwnerPageStateProps["type"], ReactNode> = {
+  loading: <Loader2 className="size-8 animate-spin text-muted-foreground" />,
+  error: <AlertCircle className="size-8 text-destructive" />,
+  empty: <Inbox className="size-8 text-muted-foreground" />,
 };
 
 export function OwnerPageState({
@@ -32,6 +39,8 @@ export function OwnerPageState({
   return (
     <OwnerStateBlock
       tone={type === "error" ? "error" : "neutral"}
+      variant={type === "empty" ? "dashed" : "solid"}
+      icon={TYPE_ICON[type]}
       title={title ?? DEFAULT_TITLES[type]}
       description={description}
     />
