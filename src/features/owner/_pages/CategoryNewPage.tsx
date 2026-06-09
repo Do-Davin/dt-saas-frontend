@@ -89,37 +89,39 @@ export function CategoryNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-md space-y-6">
+      <div className="max-w-md space-y-4">
         <CrudBackButton to="/owner/categories" />
 
         <OwnerPageHeader title="New category" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          {submitStatus.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {submitStatus.message}
+            </div>
+          ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <CategoryFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            branches={branches}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating…" : "Create category"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/owner/categories">Cancel</Link>
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <CategoryFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              branches={branches}
+              onChange={handleChange}
+            />
+            <div className="mt-6 flex gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating…" : "Create category"}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/owner/categories">Cancel</Link>
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </OwnerCrudTransition>
   );

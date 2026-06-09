@@ -84,36 +84,38 @@ export function BranchNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-md space-y-6">
+      <div className="max-w-md space-y-4">
         <CrudBackButton to="/owner/branches" />
 
         <OwnerPageHeader title="New branch" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          {submitStatus.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {submitStatus.message}
+            </div>
+          ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <BranchFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating…" : "Create branch"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/owner/branches">Cancel</Link>
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <BranchFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              onChange={handleChange}
+            />
+            <div className="mt-6 flex gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating…" : "Create branch"}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/owner/branches">Cancel</Link>
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </OwnerCrudTransition>
   );
