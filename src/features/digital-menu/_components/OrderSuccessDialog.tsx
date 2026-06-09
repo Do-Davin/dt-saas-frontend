@@ -1,22 +1,25 @@
-import { useParams, useNavigate } from "react-router";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useLanguageStore } from "../_store/languageStore";
 import { uiLabels } from "../_utils/uiLabels";
-import "./OrderSuccess.css";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
+import "../_pages/OrderSuccess.css";
 
-export function OrderSuccessPage() {
-  const { businessSlug = "" } = useParams<{ businessSlug: string }>();
-  const navigate = useNavigate();
+export function OrderSuccessDialog() {
+  const isOpen = useDigitalMenuUIStore((s) => s.isSuccessDialogOpen);
+  const close = useDigitalMenuUIStore((s) => s.closeSuccessDialog);
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
 
-  function handleContinue() {
-    navigate(`/menu/${encodeURIComponent(businessSlug)}`);
-  }
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
-      <div className="mx-auto flex w-full max-w-md flex-col items-center justify-center gap-6 rounded-2xl border bg-card p-8 shadow-sm">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+      <DialogContent
+        className="flex flex-col items-center justify-center gap-6 p-8 text-center"
+        showCloseButton={false}
+      >
         <div className="order-success-icon">
           <svg
             viewBox="0 0 80 80"
@@ -47,20 +50,20 @@ export function OrderSuccessPage() {
           <span className="order-success-dot order-success-dot-6" aria-hidden="true" />
         </div>
         <div className="order-success-text">
-          <h1 className="text-2xl font-bold text-foreground">
+          <h2 className="text-2xl font-extrabold text-foreground">
             {t.orderSuccessTitle}
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground font-bold">
             {t.orderSuccessDescription}
           </p>
         </div>
         <Button
           className="order-success-btn h-12 w-full text-base font-semibold"
-          onClick={handleContinue}
+          onClick={close}
         >
           {t.continueShopping}
         </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

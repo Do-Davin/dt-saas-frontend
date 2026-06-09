@@ -13,6 +13,10 @@ interface DigitalMenuUIState {
   isProductModalOpen: boolean;
   openProductModal: (product: Product) => void;
   closeProductModal: () => void;
+
+  isSuccessDialogOpen: boolean;
+  openSuccessDialog: () => void;
+  closeSuccessDialog: () => void;
 }
 
 export const useDigitalMenuUIStore = create<DigitalMenuUIState>()((set) => ({
@@ -29,4 +33,8 @@ export const useDigitalMenuUIStore = create<DigitalMenuUIState>()((set) => ({
     set({ selectedProduct: product, isProductModalOpen: true }),
   closeProductModal: () =>
     set({ isProductModalOpen: false, selectedProduct: null }),
+
+  isSuccessDialogOpen: false,
+  openSuccessDialog: () => set({ isSuccessDialogOpen: true }),
+  closeSuccessDialog: () => set({ isSuccessDialogOpen: false }),
 }));
