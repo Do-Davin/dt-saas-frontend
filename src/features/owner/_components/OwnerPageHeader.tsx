@@ -14,7 +14,7 @@ export function OwnerPageHeader({
   return (
     <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-primary">
           {title}
         </h2>
         {description ? (

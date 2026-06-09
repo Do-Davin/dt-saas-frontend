@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
+import { SaveIcon, ArrowLeftIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -157,25 +158,16 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
   return (
     <>
       <OwnerCrudTransition>
-        <div className="max-w-md space-y-4">
+        <div className="max-w-3xl space-y-4">
           <CrudBackButton to="/owner/businesses" />
 
           <OwnerPageHeader title="Edit business" />
 
-          <div className="rounded-lg border bg-card p-6 space-y-4">
-            {submitStatus.status === "error" ? (
-              <div
-                role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-              >
-                {submitStatus.message}
-              </div>
-            ) : null}
-
+          <div className="rounded-2xl border bg-card px-6 py-7 space-y-4">
             {deleteError ? (
               <div
                 role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+                className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
               >
                 {deleteError}
               </div>
@@ -187,23 +179,39 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
                 errors={errors}
                 disabled={isSubmitting || isDeleting}
                 onChange={handleChange}
+                submitError={submitStatus.status === "error" ? submitStatus.message : undefined}
               />
-              <div className="mt-6 flex items-center justify-between gap-3">
-                <div className="flex gap-3">
-                  <Button type="submit" disabled={isSubmitting || isDeleting}>
+
+              <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    disabled={isSubmitting || isDeleting}
+                    className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+                  >
+                    <SaveIcon className="size-4" />
                     {isSubmitting ? "Saving…" : "Save changes"}
                   </Button>
-                  <Button variant="outline" asChild>
-                    <Link to="/owner/businesses">Cancel</Link>
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
+                  >
+                    <Link to="/owner/businesses">
+                      <ArrowLeftIcon className="size-3.5" />
+                      Cancel
+                    </Link>
                   </Button>
                 </div>
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="text-destructive hover:text-destructive"
+                  variant="outline"
+                  className="rounded-xl border-2 border-destructive/50 text-destructive font-black gap-1.5 transition-all duration-200 ease-out hover:bg-destructive/5 hover:border-destructive hover:text-destructive hover:scale-[1.03]"
                   disabled={isSubmitting || isDeleting}
                   onClick={() => setShowDeleteDialog(true)}
                 >
+                  <Trash2Icon className="size-3.5" />
                   Delete
                 </Button>
               </div>
