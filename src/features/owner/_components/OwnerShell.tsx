@@ -377,7 +377,7 @@ export function OwnerShell() {
         </header>
 
         {/* Main content */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto">
+        <main ref={mainRef} className="flex-1 overflow-y-auto bg-[#F9FAFB]">
           <div className="px-4 py-5 sm:px-6 sm:py-6">
             <Outlet />
           </div>

@@ -106,7 +106,7 @@ export function CategoryListPage() {
             {state.items.map((cat) => (
               <li
                 key={cat.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-colors hover:bg-muted/40"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
                 <div className="min-w-0">
                   <span className="block truncate font-medium">{cat.name}</span>

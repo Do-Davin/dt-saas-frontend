@@ -67,7 +67,7 @@ export function OwnerRequestListPage() {
       />
       <ul className="space-y-2">
         {requests.items.map((req) => (
-          <li key={req.id} className="rounded-lg border bg-card p-4 transition-colors hover:bg-muted/40">
+          <li key={req.id} className="rounded-lg border bg-card p-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">

@@ -167,7 +167,7 @@ export function ProductListPage() {
             {productState.items.map((product) => (
               <li
                 key={product.id}
-                className="flex items-start justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-colors hover:bg-muted/40"
+                className="flex items-start justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
                 <div className="min-w-0 flex-1">
                   <span className="block truncate font-medium">

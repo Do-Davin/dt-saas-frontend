@@ -62,7 +62,7 @@ export function OwnerHomePage() {
           <Link
             key={to}
             to={to}
-            className="group rounded-lg border bg-card p-5 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="group rounded-lg border bg-card p-5 transition-all duration-200 ease-out hover:bg-accent/50 hover:-translate-y-0.5 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <div className="mb-3 flex items-center gap-2.5">
               <Icon className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
