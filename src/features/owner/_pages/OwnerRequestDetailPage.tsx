@@ -36,7 +36,7 @@ export function OwnerRequestDetailPage() {
       <div>
         <Button variant="ghost" size="sm" asChild className="-ml-2">
           <Link to="/owner/requests" aria-label="Back to requests list">
-            <ArrowLeft />
+            <ArrowLeft className="size-4" />
             Back to requests
           </Link>
         </Button>
@@ -100,7 +100,7 @@ function DetailContent({
               <RequestStatusBadge status={request.status} />
             </div>
             <div className="mt-1 text-xs text-muted-foreground">
-              ID: <code className="font-mono">{request.id}</code>
+              ID: <code className="truncate font-mono">{request.id}</code>
             </div>
           </div>
           <dl className="text-right text-sm space-y-1">
@@ -173,7 +173,7 @@ function DetailContent({
       ) : null}
 
       <section className="rounded-lg border bg-card p-4 sm:p-6">
-        <h3 className="text-sm font-semibold tracking-tight">Status actions</h3>
+        <h3 className="text-sm font-semibold tracking-tight">Update status</h3>
         <div className="mt-3">
           <RequestStatusActions
             currentStatus={request.status}
