@@ -18,7 +18,9 @@ import { useBranches } from "../_hooks/useBranches";
 import { useCategories } from "../_hooks/useCategories";
 import { useProducts } from "../_hooks/useProducts";
 import { deleteProduct } from "../_api/products";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type { Product } from "../_api/products";
 import type { Category } from "../_api/categories";
 
@@ -50,7 +52,7 @@ export function ProductListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -85,15 +87,15 @@ export function ProductListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Products
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/products/new">New product</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Products"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/products/new">New product</Link>
+            </Button>
+          }
+        />
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
@@ -141,17 +143,18 @@ export function ProductListPage() {
 
         {productState.status === "loading" ||
         productState.status === "idle" ? (
-          <OwnerStateBlock title="Loading products…" />
+          <OwnerPageState type="loading" title="Loading products…" />
         ) : productState.status === "error" ? (
-          <OwnerStateBlock
-            tone="error"
+          <OwnerPageState
+            type="error"
             title="Could not load products"
-            description={productState.message}
+            message={productState.message}
           />
         ) : productState.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No products yet"
-            description="Add a product to get started."
+            message="Add a product to get started."
           />
         ) : (
           <ul className="space-y-2">
@@ -210,7 +213,7 @@ export function ProductListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

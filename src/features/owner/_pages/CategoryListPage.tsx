@@ -15,7 +15,9 @@ import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useCategories } from "../_hooks/useCategories";
 import { deleteCategory } from "../_api/categories";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { ApiError } from "@/lib/api/client";
 import type { Category } from "../_api/categories";
 
@@ -31,20 +33,20 @@ export function CategoryListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (state.status === "loading" || state.status === "idle") {
-    return <OwnerStateBlock title="Loading categories…" />;
+    return <OwnerPageState type="loading" title="Loading categories…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load categories"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -70,15 +72,15 @@ export function CategoryListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Categories
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/categories/new">New category</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Categories"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/categories/new">New category</Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -90,9 +92,10 @@ export function CategoryListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No categories yet"
-            description="Add a category to get started."
+            message="Add a category to get started."
           />
         ) : (
           <ul className="space-y-2">
@@ -146,7 +149,7 @@ export function CategoryListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

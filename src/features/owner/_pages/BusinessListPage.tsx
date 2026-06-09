@@ -15,7 +15,9 @@ import { ApiError } from "@/lib/api/client";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusinesses } from "../_hooks/useBusinesses";
 import { deleteBusiness } from "../_api/businesses";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type { OwnerBusiness } from "../_api/businesses";
 
 export function BusinessListPage() {
@@ -31,15 +33,15 @@ export function BusinessListPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (state.status === "loading") {
-    return <OwnerStateBlock title="Loading businesses…" />;
+    return <OwnerPageState type="loading" title="Loading businesses…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load businesses"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -71,15 +73,15 @@ export function BusinessListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Businesses
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/businesses/new">New business</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Businesses"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/businesses/new">New business</Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -91,9 +93,10 @@ export function BusinessListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No businesses yet"
-            description="Create a business to get started."
+            message="Create a business to get started."
           />
         ) : (
           <ul className="space-y-2">
@@ -153,7 +156,7 @@ export function BusinessListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}
