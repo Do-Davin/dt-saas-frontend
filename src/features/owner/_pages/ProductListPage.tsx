@@ -65,7 +65,7 @@ export function ProductListPage() {
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   const SELECT_CLASS =
-    "flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+    "w-full sm:w-auto flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
   async function handleConfirmDelete() {
     if (!pendingDelete || !businessId) return;
@@ -101,40 +101,42 @@ export function ProductListPage() {
           }
         />
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {branches.length > 0 && (
-            <select
-              aria-label="Filter by branch"
-              className={SELECT_CLASS}
-              value={filterBranchId}
-              onChange={(e) => setFilterBranchId(e.target.value)}
-            >
-              <option value="">All branches</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          )}
+        {/* Filters — only rendered when at least one filter has options */}
+        {(branches.length > 0 || categories.length > 0) && (
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            {branches.length > 0 && (
+              <select
+                aria-label="Filter by branch"
+                className={SELECT_CLASS}
+                value={filterBranchId}
+                onChange={(e) => setFilterBranchId(e.target.value)}
+              >
+                <option value="">All branches</option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
-          {categories.length > 0 && (
-            <select
-              aria-label="Filter by category"
-              className={SELECT_CLASS}
-              value={filterCategoryId}
-              onChange={(e) => setFilterCategoryId(e.target.value)}
-            >
-              <option value="">All categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+            {categories.length > 0 && (
+              <select
+                aria-label="Filter by category"
+                className={SELECT_CLASS}
+                value={filterCategoryId}
+                onChange={(e) => setFilterCategoryId(e.target.value)}
+              >
+                <option value="">All categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
 
         {deleteError ? (
           <div
