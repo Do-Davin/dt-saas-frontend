@@ -112,7 +112,7 @@ export function BusinessListPage() {
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="block truncate font-medium">
+                    <span className="block min-w-0 truncate font-medium">
                       {business.name}
                     </span>
                     {business.id === selectedBusinessId ? (

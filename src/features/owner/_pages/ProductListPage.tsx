@@ -194,7 +194,7 @@ export function ProductListPage() {
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
                   <ProductPrice product={product} />
                   <StatusChips product={product} />
-                  <div className="flex items-center gap-1.5 mt-1">
+                  <div className="flex items-center gap-1.5">
                     <Button variant="outline" size="sm" asChild>
                       <Link
                         to={`/owner/products/${encodeURIComponent(product.id)}`}
