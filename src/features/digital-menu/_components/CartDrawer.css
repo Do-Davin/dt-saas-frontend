@@ -1,0 +1,15 @@
+.order-submit-spinner {
+  animation: spin-smooth 0.8s linear infinite;
+}
+
+@keyframes spin-smooth {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-submit-spinner {
+    animation-duration: 1.5s;
+  }
+}

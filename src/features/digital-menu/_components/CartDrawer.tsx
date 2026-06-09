@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams } from "react-router";
+import { useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import {
   Sheet,
@@ -17,6 +17,7 @@ import { useLanguageStore } from "../_store/languageStore";
 import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
 import { createCatalogRequest } from "../_api/requests";
+import "./CartDrawer.css";
 
 type DrawerView = "cart" | "checkout";
 
@@ -30,6 +31,7 @@ const TEXTAREA_CLASS =
 
 export function CartDrawer() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
+  const navigate = useNavigate();
   const cart = useMenuStore((s) => s.cart);
   const isCartOpen = useMenuStore((s) => s.isCartOpen);
   const toggleCart = useMenuStore((s) => s.toggleCart);
@@ -48,11 +50,8 @@ export function CartDrawer() {
   const [customerNote, setCustomerNote] = useState("");
   const [nameError, setNameError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const isSubmittingRef = useRef(false);
 
-  // Resets checkout form state and returns to the cart view. Called both
-  // from the Back button and from the Sheet's onOpenChange (user-initiated
-  // close). Also called manually after a successful submit because Radix
-  // does NOT fire onOpenChange for programmatic prop changes.
   function resetForm() {
     setView("cart");
     setSubmitStatus({ status: "idle" });
@@ -61,23 +60,25 @@ export function CartDrawer() {
     setCustomerNote("");
     setNameError("");
     setPhoneError("");
+    isSubmittingRef.current = false;
   }
 
-  // Only fired for user-initiated close events (backdrop click, Escape).
-  // Programmatic closes (toggleCart() calls) do NOT trigger this.
   function handleOpenChange(open: boolean) {
     if (!open) resetForm();
     toggleCart();
   }
 
   async function handleSubmit() {
+    if (isSubmittingRef.current) return;
+
     const nextNameError = customerName.trim() ? "" : t.validationNameRequired;
     const nextPhoneError = customerPhone.trim() ? "" : t.validationPhoneRequired;
     setNameError(nextNameError);
     setPhoneError(nextPhoneError);
     if (nextNameError || nextPhoneError) return;
-
+    isSubmittingRef.current = true;
     setSubmitStatus({ status: "submitting" });
+
     try {
       await createCatalogRequest(businessSlug, {
         type: "ORDER",
@@ -86,13 +87,16 @@ export function CartDrawer() {
         customerNote: customerNote.trim() || undefined,
         items: cart.map((c) => ({ productId: c.item.id, quantity: c.quantity })),
       });
-      resetForm();
+
       clearCart();
+      resetForm();
       toggleCart();
+      navigate(`/menu/${encodeURIComponent(businessSlug)}/success`);
     } catch (err) {
       const message =
         err instanceof ApiError ? err.message : t.genericRequestError;
       setSubmitStatus({ status: "error", message });
+      isSubmittingRef.current = false;
     }
   }
 
@@ -135,6 +139,7 @@ export function CartDrawer() {
         </SheetHeader>
 
         {view === "cart" ? (
+          /* ── Cart View ───────────────────────────────────────────────── */
           cart.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -225,6 +230,7 @@ export function CartDrawer() {
             </>
           )
         ) : (
+          /* ── Checkout View ───────────────────────────────────────────── */
           <>
             <ScrollArea className="min-h-0 flex-1">
               <div className="space-y-4 px-5 py-4">
@@ -301,12 +307,52 @@ export function CartDrawer() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? t.sending : t.cartPlaceOrder}
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <LoadingSpinner />
+                    {t.sending}
+                  </span>
+                ) : (
+                  t.cartPlaceOrder
+                )}
               </Button>
             </SheetFooter>
           </>
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <svg
+      className="order-submit-spinner h-4 w-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="50"
+        strokeDashoffset="15"
+        opacity="0.4"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="50"
+        strokeDashoffset="40"
+      />
+    </svg>
   );
 }
