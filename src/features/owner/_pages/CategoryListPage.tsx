@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -77,7 +78,10 @@ export function CategoryListPage() {
           title="Categories"
           actions={
             <Button asChild size="sm">
-              <Link to="/owner/categories/new">New category</Link>
+              <Link to="/owner/categories/new">
+                <PlusIcon className="size-3.5" />
+                New category
+              </Link>
             </Button>
           }
         />
