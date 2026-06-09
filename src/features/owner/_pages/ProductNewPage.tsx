@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { PlusCircleIcon, ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
@@ -122,21 +123,12 @@ export function ProductNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-lg space-y-4">
+      <div className="max-w-5xl space-y-4">
         <CrudBackButton to="/owner/products" />
 
         <OwnerPageHeader title="New product" />
 
-        <div className="rounded-lg border bg-card p-6 space-y-4">
-          {submitStatus.status === "error" ? (
-            <div
-              role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-            >
-              {submitStatus.message}
-            </div>
-          ) : null}
-
+        <div className="rounded-2xl border bg-card px-6 py-7 space-y-4">
           <form onSubmit={(e) => void handleSubmit(e)} noValidate>
             <ProductFormFields
               values={values}
@@ -145,13 +137,28 @@ export function ProductNewPage() {
               branches={branches}
               categories={categories}
               onChange={handleChange}
+              submitError={submitStatus.status === "error" ? submitStatus.message : undefined}
             />
-            <div className="mt-6 flex gap-3">
-              <Button type="submit" disabled={isSubmitting}>
+
+            <div className="mt-7 flex justify-center gap-3">
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={isSubmitting}
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+              >
+                <PlusCircleIcon className="size-4" />
                 {isSubmitting ? "Creating…" : "Create product"}
               </Button>
-              <Button variant="outline" asChild>
-                <Link to="/owner/products">Cancel</Link>
+              <Button
+                variant="outline"
+                asChild
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
+              >
+                <Link to="/owner/products">
+                  <ArrowLeftIcon className="size-3.5" />
+                  Cancel
+                </Link>
               </Button>
             </div>
           </form>
