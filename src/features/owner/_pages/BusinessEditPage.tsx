@@ -158,7 +158,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
   return (
     <>
       <OwnerCrudTransition>
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-5xl space-y-4">
           <CrudBackButton to="/owner/businesses" />
 
           <OwnerPageHeader title="Edit business" />
