@@ -10,12 +10,13 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import {
   validateBranchForm,
   hasErrors,
   EMPTY_BRANCH_FORM,
 } from "../_utils/branchForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { BranchFormValues, BranchFormErrors } from "../_utils/branchForm";
 
 type SubmitStatus =
@@ -37,7 +38,7 @@ export function BranchNewPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -86,11 +87,7 @@ export function BranchNewPage() {
       <div className="max-w-md space-y-6">
         <CrudBackButton to="/owner/branches" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New branch
-          </h2>
-        </header>
+        <OwnerPageHeader title="New branch" />
 
         {submitStatus.status === "error" ? (
           <div

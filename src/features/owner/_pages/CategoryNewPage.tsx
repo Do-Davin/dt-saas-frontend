@@ -11,12 +11,13 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import {
   validateCategoryForm,
   hasErrors,
   EMPTY_CATEGORY_FORM,
 } from "../_utils/categoryForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
 
 type SubmitStatus =
@@ -39,7 +40,7 @@ export function CategoryNewPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -91,11 +92,7 @@ export function CategoryNewPage() {
       <div className="max-w-md space-y-6">
         <CrudBackButton to="/owner/categories" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New category
-          </h2>
-        </header>
+        <OwnerPageHeader title="New category" />
 
         {submitStatus.status === "error" ? (
           <div

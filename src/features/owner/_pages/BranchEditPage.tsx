@@ -21,8 +21,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateBranchForm, hasErrors } from "../_utils/branchForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Branch } from "../_api/branches";
 import type { BranchFormValues, BranchFormErrors } from "../_utils/branchForm";
 
@@ -35,20 +36,20 @@ export function BranchEditPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (branchState.status === "idle" || branchState.status === "loading") {
-    return <OwnerStateBlock title="Loading branch…" />;
+    return <OwnerPageState type="loading" title="Loading branch…" />;
   }
 
   if (branchState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load branch"
-        description={branchState.message}
+        message={branchState.message}
       />
     );
   }
@@ -160,11 +161,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
         <div className="max-w-md space-y-6">
           <CrudBackButton to="/owner/branches" />
 
-          <header>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-              Edit branch
-            </h2>
-          </header>
+          <OwnerPageHeader title="Edit branch" />
 
           {submitStatus.status === "error" ? (
             <div

@@ -20,8 +20,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateBusinessForm, hasErrors } from "../_utils/businessForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { OwnerBusiness } from "../_api/businesses";
 import type { BusinessFormValues, BusinessFormErrors } from "../_utils/businessForm";
 
@@ -30,15 +31,15 @@ export function BusinessEditPage() {
   const businessState = useBusiness(businessId);
 
   if (businessState.status === "idle" || businessState.status === "loading") {
-    return <OwnerStateBlock title="Loading business…" />;
+    return <OwnerPageState type="loading" title="Loading business…" />;
   }
 
   if (businessState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load business"
-        description={businessState.message}
+        message={businessState.message}
       />
     );
   }
@@ -159,11 +160,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
         <div className="max-w-md space-y-6">
           <CrudBackButton to="/owner/businesses" />
 
-          <header>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-              Edit business
-            </h2>
-          </header>
+          <OwnerPageHeader title="Edit business" />
 
           {submitStatus.status === "error" ? (
             <div

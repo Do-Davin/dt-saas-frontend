@@ -22,8 +22,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateCategoryForm, hasErrors } from "../_utils/categoryForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Category } from "../_api/categories";
 import type { BranchOption } from "../_components/CategoryForm";
 import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
@@ -38,20 +39,20 @@ export function CategoryEditPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (categoryState.status === "idle" || categoryState.status === "loading") {
-    return <OwnerStateBlock title="Loading category…" />;
+    return <OwnerPageState type="loading" title="Loading category…" />;
   }
 
   if (categoryState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load category"
-        description={categoryState.message}
+        message={categoryState.message}
       />
     );
   }
@@ -170,11 +171,7 @@ function CategoryEditorForm({
         <div className="max-w-md space-y-6">
           <CrudBackButton to="/owner/categories" />
 
-          <header>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-              Edit category
-            </h2>
-          </header>
+          <OwnerPageHeader title="Edit category" />
 
           {submitStatus.status === "error" ? (
             <div

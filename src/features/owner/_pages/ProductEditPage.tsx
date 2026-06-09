@@ -25,8 +25,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateProductForm, hasErrors, parseMoney } from "../_utils/productForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Product, PricingType, UnitOfMeasure } from "../_api/products";
 import type {
   BranchOption,
@@ -46,20 +47,20 @@ export function ProductEditPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (productState.status === "idle" || productState.status === "loading") {
-    return <OwnerStateBlock title="Loading product…" />;
+    return <OwnerPageState type="loading" title="Loading product…" />;
   }
 
   if (productState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load product"
-        description={productState.message}
+        message={productState.message}
       />
     );
   }
@@ -223,11 +224,7 @@ function ProductEditorForm({
           <div className="max-w-lg space-y-6">
             <CrudBackButton to="/owner/products" />
 
-            <header>
-              <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-                Edit product
-              </h2>
-            </header>
+            <OwnerPageHeader title="Edit product" />
 
             {submitStatus.status === "error" ? (
               <div

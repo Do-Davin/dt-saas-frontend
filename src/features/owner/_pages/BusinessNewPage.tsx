@@ -10,6 +10,7 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
 import {
   validateBusinessForm,
   hasErrors,
@@ -85,11 +86,7 @@ export function BusinessNewPage() {
       <div className="max-w-md space-y-6">
         <CrudBackButton to="/owner/businesses" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New business
-          </h2>
-        </header>
+        <OwnerPageHeader title="New business" />
 
         {submitStatus.status === "error" ? (
           <div

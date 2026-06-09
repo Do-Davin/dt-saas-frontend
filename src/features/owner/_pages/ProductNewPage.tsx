@@ -12,13 +12,14 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import {
   validateProductForm,
   hasErrors,
   parseMoney,
   EMPTY_PRODUCT_FORM,
 } from "../_utils/productForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { ProductFormValues, ProductFormErrors } from "../_utils/productForm";
 import type { PricingType, UnitOfMeasure } from "../_api/products";
 
@@ -43,7 +44,7 @@ export function ProductNewPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -124,11 +125,7 @@ export function ProductNewPage() {
       <div className="max-w-lg space-y-6">
         <CrudBackButton to="/owner/products" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New product
-          </h2>
-        </header>
+        <OwnerPageHeader title="New product" />
 
         {submitStatus.status === "error" ? (
           <div
