@@ -126,5 +126,5 @@ function summarizeItems(items: CustomerRequestItemSummary[]): string {
 function formatCreatedAt(value: string): string {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleString();
+  return d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
 }
