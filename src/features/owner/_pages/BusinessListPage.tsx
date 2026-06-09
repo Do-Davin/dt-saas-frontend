@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { ApiError } from "@/lib/api/client";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusinesses } from "../_hooks/useBusinesses";
@@ -103,7 +104,7 @@ export function BusinessListPage() {
             {state.items.map((business) => (
               <li
                 key={business.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-colors hover:bg-muted/40"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -111,9 +112,7 @@ export function BusinessListPage() {
                       {business.name}
                     </span>
                     {business.id === selectedBusinessId ? (
-                      <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground">
-                        Selected
-                      </span>
+                      <Badge className="shrink-0">Selected</Badge>
                     ) : null}
                   </div>
                   {business.nameKm ? (

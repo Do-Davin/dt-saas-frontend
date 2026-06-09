@@ -102,7 +102,7 @@ export function CategoryListPage() {
             {state.items.map((cat) => (
               <li
                 key={cat.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-colors hover:bg-muted/40"
               >
                 <div className="min-w-0">
                   <span className="block truncate font-medium">{cat.name}</span>
@@ -120,8 +120,8 @@ export function CategoryListPage() {
                   <span
                     className={
                       cat.isActive
-                        ? "text-xs font-medium text-green-700"
-                        : "text-xs font-medium text-muted-foreground"
+                        ? "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                        : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                     }
                   >
                     {cat.isActive ? "Active" : "Inactive"}
