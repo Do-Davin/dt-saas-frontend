@@ -12,13 +12,14 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import {
   validateProductForm,
   hasErrors,
   parseMoney,
   EMPTY_PRODUCT_FORM,
 } from "../_utils/productForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { ProductFormValues, ProductFormErrors } from "../_utils/productForm";
 import type { PricingType, UnitOfMeasure } from "../_api/products";
 
@@ -43,7 +44,7 @@ export function ProductNewPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -121,42 +122,40 @@ export function ProductNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-lg space-y-6">
+      <div className="max-w-lg space-y-4">
         <CrudBackButton to="/owner/products" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New product
-          </h2>
-        </header>
+        <OwnerPageHeader title="New product" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          {submitStatus.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {submitStatus.message}
+            </div>
+          ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <ProductFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            branches={branches}
-            categories={categories}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating…" : "Create product"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/owner/products">Cancel</Link>
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <ProductFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              branches={branches}
+              categories={categories}
+              onChange={handleChange}
+            />
+            <div className="mt-6 flex gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating…" : "Create product"}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/owner/products">Cancel</Link>
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </OwnerCrudTransition>
   );

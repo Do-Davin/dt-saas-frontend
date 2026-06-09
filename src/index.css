@@ -2,7 +2,7 @@
 
 /*
   ─── DT SaaS brand theme ────────────────────────────────────────────────────
-  Primary  : #0F4269  →  hsl(206, 75%, 24%)
+  Primary  : #8C5A3C  →  hsl(22, 40%, 39%)
   Background: #F9F9F9 →  hsl(0, 0%, 97.6%)
   Fonts    : Oxygen (English) → Noto Sans Khmer (Khmer) → system-ui
   ────────────────────────────────────────────────────────────────────────────
@@ -51,19 +51,19 @@
     --popover:             0 0% 100%;
     --popover-foreground:  210 15% 10%;
 
-    /* Primary: DT SaaS brand blue #0F4269                                   */
-    --primary:             206 75% 24%;
-    --primary-foreground:  0 0% 100%;    /* white on brand blue               */
+    /* Primary: DT SaaS brand brown #8C5A3C                                   */
+    --primary:             22 40% 39%;
+    --primary-foreground:  0 0% 100%;    /* white on brand brown              */
 
-    /* Secondary / accent: a very light brand-blue tint                       */
-    --secondary:           207 30% 95%;
-    --secondary-foreground: 206 75% 24%;
+    /* Secondary / accent: a very light warm-brown tint                       */
+    --secondary:           22 30% 95%;
+    --secondary-foreground: 22 40% 39%;
 
-    --muted:               207 20% 93%;
-    --muted-foreground:    210 10% 46%;
+    --muted:               30 15% 93%;
+    --muted-foreground:    25 10% 46%;
 
-    --accent:              207 30% 95%;
-    --accent-foreground:   206 75% 24%;
+    --accent:              22 30% 95%;
+    --accent-foreground:   22 40% 39%;
 
     --destructive:         0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -73,7 +73,7 @@
     --input:               210 15% 88%;
 
     /* Ring matches primary so focus outlines use the brand colour            */
-    --ring:                206 75% 24%;
+    --ring:                22 40% 39%;
 
     --radius-base:         0.5rem;
   }
@@ -88,17 +88,17 @@
     --popover:             210 25% 11%;
     --popover-foreground:  0 0% 98%;
 
-    /* Brand blue lightened for dark-mode contrast                            */
-    --primary:             206 65% 58%;
-    --primary-foreground:  210 30% 8%;
+    /* Brand brown lightened for dark-mode contrast                           */
+    --primary:             22 55% 65%;
+    --primary-foreground:  22 30% 10%;
 
-    --secondary:           210 20% 18%;
+    --secondary:           22 15% 18%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted:               210 20% 18%;
-    --muted-foreground:    210 10% 60%;
+    --muted:               22 12% 18%;
+    --muted-foreground:    25 10% 60%;
 
-    --accent:              210 20% 18%;
+    --accent:              22 15% 18%;
     --accent-foreground:   0 0% 98%;
 
     --destructive:         0 62.8% 30.6%;
@@ -106,7 +106,7 @@
 
     --border:              210 15% 22%;
     --input:               210 15% 22%;
-    --ring:                206 65% 58%;
+    --ring:                22 55% 65%;
   }
 
   * {

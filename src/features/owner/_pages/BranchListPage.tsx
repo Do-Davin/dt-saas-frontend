@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,7 +16,9 @@ import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
 import { deleteBranch } from "../_api/branches";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { ApiError } from "@/lib/api/client";
 import type { Branch } from "../_api/branches";
 
@@ -31,20 +34,20 @@ export function BranchListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (state.status === "loading" || state.status === "idle") {
-    return <OwnerStateBlock title="Loading branches…" />;
+    return <OwnerPageState type="loading" title="Loading branches…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load branches"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -70,15 +73,18 @@ export function BranchListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Branches
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/branches/new">New branch</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Branches"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/branches/new">
+                <PlusIcon className="size-3.5" />
+                New branch
+              </Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -90,16 +96,17 @@ export function BranchListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No branches yet"
-            description="Add a branch to get started."
+            message="Add a branch to get started."
           />
         ) : (
           <ul className="space-y-2">
             {state.items.map((branch) => (
               <li
                 key={branch.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
                 <div className="min-w-0">
                   <span className="block truncate font-medium">
@@ -120,8 +127,8 @@ export function BranchListPage() {
                   <span
                     className={
                       branch.isActive
-                        ? "text-xs font-medium text-green-700"
-                        : "text-xs font-medium text-muted-foreground"
+                        ? "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                        : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                     }
                   >
                     {branch.isActive ? "Active" : "Inactive"}
@@ -149,7 +156,7 @@ export function BranchListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

@@ -11,12 +11,13 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import {
   validateCategoryForm,
   hasErrors,
   EMPTY_CATEGORY_FORM,
 } from "../_utils/categoryForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
 
 type SubmitStatus =
@@ -39,7 +40,7 @@ export function CategoryNewPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -88,41 +89,39 @@ export function CategoryNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-md space-y-6">
+      <div className="max-w-md space-y-4">
         <CrudBackButton to="/owner/categories" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New category
-          </h2>
-        </header>
+        <OwnerPageHeader title="New category" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          {submitStatus.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {submitStatus.message}
+            </div>
+          ) : null}
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <CategoryFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            branches={branches}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating…" : "Create category"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/owner/categories">Cancel</Link>
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <CategoryFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              branches={branches}
+              onChange={handleChange}
+            />
+            <div className="mt-6 flex gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating…" : "Create category"}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/owner/categories">Cancel</Link>
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </OwnerCrudTransition>
   );

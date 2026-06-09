@@ -9,6 +9,7 @@ import {
   TagIcon,
   PackageIcon,
   ChevronLeftIcon,
+  ChevronRightIcon,
   MenuIcon,
   LogOutIcon,
   ChevronDownIcon,
@@ -217,13 +218,24 @@ export function OwnerShell() {
             title={sidebarCollapsed ? "Open sidebar" : undefined}
             tabIndex={sidebarCollapsed ? 0 : -1}
             className={cn(
-              "flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "relative flex size-10 shrink-0 items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               sidebarCollapsed
-                ? "cursor-pointer transition-colors hover:bg-muted hover:ring-1 hover:ring-border"
+                ? "group cursor-pointer transition-colors hover:bg-muted hover:ring-1 hover:ring-border"
                 : "cursor-default"
             )}
           >
-            <BrandMark />
+            {sidebarCollapsed ? (
+              <>
+                <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-hover:opacity-0">
+                  <BrandMark />
+                </span>
+                <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                  <ChevronRightIcon className="size-4 text-foreground" />
+                </span>
+              </>
+            ) : (
+              <BrandMark />
+            )}
           </button>
 
           <div
@@ -365,8 +377,8 @@ export function OwnerShell() {
         </header>
 
         {/* Main content */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto">
-          <div className="px-6 py-6">
+        <main ref={mainRef} className="flex-1 overflow-y-auto bg-[#F9FAFB]">
+          <div className="px-4 py-5 sm:px-6 sm:py-6">
             <Outlet />
           </div>
         </main>

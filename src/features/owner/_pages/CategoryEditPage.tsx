@@ -22,8 +22,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateCategoryForm, hasErrors } from "../_utils/categoryForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Category } from "../_api/categories";
 import type { BranchOption } from "../_components/CategoryForm";
 import type { CategoryFormValues, CategoryFormErrors } from "../_utils/categoryForm";
@@ -38,20 +39,20 @@ export function CategoryEditPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (categoryState.status === "idle" || categoryState.status === "loading") {
-    return <OwnerStateBlock title="Loading category…" />;
+    return <OwnerPageState type="loading" title="Loading category…" />;
   }
 
   if (categoryState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load category"
-        description={categoryState.message}
+        message={categoryState.message}
       />
     );
   }
@@ -167,61 +168,59 @@ function CategoryEditorForm({
   return (
     <>
       <OwnerCrudTransition>
-        <div className="max-w-md space-y-6">
+        <div className="max-w-md space-y-4">
           <CrudBackButton to="/owner/categories" />
 
-          <header>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-              Edit category
-            </h2>
-          </header>
+          <OwnerPageHeader title="Edit category" />
 
-          {submitStatus.status === "error" ? (
-            <div
-              role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-            >
-              {submitStatus.message}
-            </div>
-          ) : null}
+          <div className="rounded-lg border bg-card p-6 space-y-4">
+            {submitStatus.status === "error" ? (
+              <div
+                role="alert"
+                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              >
+                {submitStatus.message}
+              </div>
+            ) : null}
 
-          {deleteError ? (
-            <div
-              role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-            >
-              {deleteError}
-            </div>
-          ) : null}
+            {deleteError ? (
+              <div
+                role="alert"
+                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              >
+                {deleteError}
+              </div>
+            ) : null}
 
-          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-            <CategoryFormFields
-              values={values}
-              errors={errors}
-              disabled={isSubmitting || isDeleting}
-              branches={branches}
-              onChange={handleChange}
-            />
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <div className="flex gap-3">
-                <Button type="submit" disabled={isSubmitting || isDeleting}>
-                  {isSubmitting ? "Saving…" : "Save changes"}
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link to="/owner/categories">Cancel</Link>
+            <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+              <CategoryFormFields
+                values={values}
+                errors={errors}
+                disabled={isSubmitting || isDeleting}
+                branches={branches}
+                onChange={handleChange}
+              />
+              <div className="mt-6 flex items-center justify-between gap-3">
+                <div className="flex gap-3">
+                  <Button type="submit" disabled={isSubmitting || isDeleting}>
+                    {isSubmitting ? "Saving…" : "Save changes"}
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/owner/categories">Cancel</Link>
+                  </Button>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                  disabled={isSubmitting || isDeleting}
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  Delete
                 </Button>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-destructive hover:text-destructive"
-                disabled={isSubmitting || isDeleting}
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                Delete
-              </Button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </OwnerCrudTransition>
 

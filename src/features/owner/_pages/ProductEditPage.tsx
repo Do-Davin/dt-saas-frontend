@@ -25,8 +25,9 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { validateProductForm, hasErrors, parseMoney } from "../_utils/productForm";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import type { Product, PricingType, UnitOfMeasure } from "../_api/products";
 import type {
   BranchOption,
@@ -46,20 +47,20 @@ export function ProductEditPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (productState.status === "idle" || productState.status === "loading") {
-    return <OwnerStateBlock title="Loading product…" />;
+    return <OwnerPageState type="loading" title="Loading product…" />;
   }
 
   if (productState.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load product"
-        description={productState.message}
+        message={productState.message}
       />
     );
   }
@@ -220,62 +221,60 @@ function ProductEditorForm({
     <>
       <OwnerCrudTransition>
         <>
-          <div className="max-w-lg space-y-6">
+          <div className="max-w-lg space-y-4">
             <CrudBackButton to="/owner/products" />
 
-            <header>
-              <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-                Edit product
-              </h2>
-            </header>
+            <OwnerPageHeader title="Edit product" />
 
-            {submitStatus.status === "error" ? (
-              <div
-                role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-              >
-                {submitStatus.message}
-              </div>
-            ) : null}
+            <div className="rounded-lg border bg-card p-6 space-y-4">
+              {submitStatus.status === "error" ? (
+                <div
+                  role="alert"
+                  className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+                >
+                  {submitStatus.message}
+                </div>
+              ) : null}
 
-            {deleteError ? (
-              <div
-                role="alert"
-                className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-              >
-                {deleteError}
-              </div>
-            ) : null}
+              {deleteError ? (
+                <div
+                  role="alert"
+                  className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+                >
+                  {deleteError}
+                </div>
+              ) : null}
 
-            <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-              <ProductFormFields
-                values={values}
-                errors={errors}
-                disabled={isSubmitting || isDeleting}
-                branches={branches}
-                categories={categories}
-                onChange={handleChange}
-              />
-              <div className="mt-6 flex items-center justify-between gap-3">
-                <div className="flex gap-3">
-                  <Button type="submit" disabled={isSubmitting || isDeleting}>
-                    {isSubmitting ? "Saving…" : "Save changes"}
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link to="/owner/products">Cancel</Link>
+              <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+                <ProductFormFields
+                  values={values}
+                  errors={errors}
+                  disabled={isSubmitting || isDeleting}
+                  branches={branches}
+                  categories={categories}
+                  onChange={handleChange}
+                />
+                <div className="mt-6 flex items-center justify-between gap-3">
+                  <div className="flex gap-3">
+                    <Button type="submit" disabled={isSubmitting || isDeleting}>
+                      {isSubmitting ? "Saving…" : "Save changes"}
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link to="/owner/products">Cancel</Link>
+                    </Button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive"
+                    disabled={isSubmitting || isDeleting}
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    Delete
                   </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-destructive hover:text-destructive"
-                  disabled={isSubmitting || isDeleting}
-                  onClick={() => setShowDeleteDialog(true)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
 
           <Separator className="my-8 max-w-lg" />
