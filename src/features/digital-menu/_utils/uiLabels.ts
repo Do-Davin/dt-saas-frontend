@@ -34,6 +34,11 @@ export type UILabels = {
   validationPhoneRequired: string;
   validationQuantityMin: string;
   genericRequestError: string;
+
+  // Cart order success (Phase: order-success-ux)
+  orderSuccessTitle: string;
+  orderSuccessDescription: string;
+  continueShopping: string;
 };
 
 export const uiLabels: Record<Language, UILabels> = {
@@ -71,6 +76,11 @@ export const uiLabels: Record<Language, UILabels> = {
     validationPhoneRequired: "Please enter your phone number.",
     validationQuantityMin: "Quantity must be at least 1.",
     genericRequestError: "Could not send your request. Please try again.",
+
+    orderSuccessTitle: "Order placed!",
+    orderSuccessDescription:
+      "Your order has been sent. The business will prepare it shortly.",
+    continueShopping: "Continue Shopping",
   },
   kh: {
     allCategories: "ទាំងអស់",
@@ -106,5 +116,10 @@ export const uiLabels: Record<Language, UILabels> = {
     validationPhoneRequired: "សូមបញ្ចូលលេខទូរស័ព្ទរបស់អ្នក។",
     validationQuantityMin: "បរិមាណត្រូវមានយ៉ាងហោចណាស់ ១។",
     genericRequestError: "មិនអាចផ្ញើសំណើបានទេ។ សូមព្យាយាមម្ដងទៀត។",
+
+    orderSuccessTitle: "បានបញ្ជាទិញដោយជោគជ័យ!",
+    orderSuccessDescription:
+      "ការបញ្ជាទិញរបស់អ្នកត្រូវបានផ្ញើរួចរាល់។ ខាងហាងនឹងរៀបចំក្នុងពេលឆាប់ៗ។",
+    continueShopping: "បន្តមើលមុខម្ហូប",
   },
 };

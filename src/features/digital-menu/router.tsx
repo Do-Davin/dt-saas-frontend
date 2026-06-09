@@ -1,10 +1,8 @@
 import { Navigate, type RouteObject } from "react-router";
 import { DigitalMenuPage } from "./_pages/DigitalMenuPage";
 import { NotFoundPage } from "./_pages/NotFoundPage";
+import { OrderSuccessPage } from "./_pages/OrderSuccessPage";
 
-// Route objects for the public Catalog / Digital Menu feature.
-// Mounted by the top-level catalog app router in src/router.tsx.
-// This file must NOT create its own <RouterProvider>.
 export const digitalMenuRoutes: RouteObject[] = [
   {
     path: "/",
@@ -13,6 +11,10 @@ export const digitalMenuRoutes: RouteObject[] = [
   {
     path: "/menu",
     element: <Navigate to="/menu/dt-kitchen" replace />,
+  },
+  {
+    path: "/menu/:businessSlug/success",
+    element: <OrderSuccessPage />,
   },
   {
     path: "/menu/:businessSlug",
