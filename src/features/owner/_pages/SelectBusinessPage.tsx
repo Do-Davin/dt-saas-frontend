@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type { OwnerBusiness } from "../_api/businesses";
 
 // Page for owners with multiple businesses to choose which one to manage.
@@ -21,25 +23,21 @@ export function SelectBusinessPage() {
   }
 
   if (isLoading && businesses.length === 0) {
-    return <OwnerStateBlock title="Loading businesses…" />;
+    return <OwnerPageState type="loading" title="Loading businesses…" />;
   }
 
   if (businesses.length === 0) {
     return (
-      <OwnerStateBlock title="No business found for this owner yet." />
+      <OwnerPageState type="empty" title="No business found for this owner yet." />
     );
   }
 
   return (
-    <div className="max-w-sm space-y-4">
-      <header>
-        <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-          Select a business
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Choose which business to manage.
-        </p>
-      </header>
+    <OwnerPage className="max-w-sm">
+      <OwnerPageHeader
+        title="Select a business"
+        description="Choose which business to manage."
+      />
 
       <ul className="space-y-2">
         {businesses.map((b) => (
@@ -52,7 +50,7 @@ export function SelectBusinessPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </OwnerPage>
   );
 }
 

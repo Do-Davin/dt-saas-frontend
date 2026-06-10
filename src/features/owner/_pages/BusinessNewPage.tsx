@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
+import { PlusCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
@@ -11,6 +12,7 @@ import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
 import {
   validateBusinessForm,
   hasErrors,
@@ -60,7 +62,6 @@ export function BusinessNewPage() {
           ? { catalogMode: values.catalogMode.trim() }
           : {}),
       });
-      // Pre-select the new business then force store reload.
       setCurrentBusinessId(created.id);
       useOwnerBusinessesStore.setState({
         businesses: [],
@@ -85,40 +86,34 @@ export function BusinessNewPage() {
 
   return (
     <OwnerCrudTransition>
-      <div className="max-w-md space-y-6">
+      <div className="max-w-5xl space-y-4">
         <CrudBackButton to="/owner/businesses" />
 
-        <header>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            New business
-          </h2>
-        </header>
+        <OwnerPageHeader title="New business" />
 
-        {submitStatus.status === "error" ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {submitStatus.message}
-          </div>
-        ) : null}
+        <div className="rounded-2xl border bg-card px-6 py-7 space-y-4">
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <BusinessFormFields
+              values={values}
+              errors={errors}
+              disabled={isSubmitting}
+              onChange={handleChange}
+              submitError={submitStatus.status === "error" ? submitStatus.message : undefined}
+            />
 
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-          <BusinessFormFields
-            values={values}
-            errors={errors}
-            disabled={isSubmitting}
-            onChange={handleChange}
-          />
-          <div className="mt-6 flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating…" : "Create business"}
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/owner/businesses">Cancel</Link>
-            </Button>
-          </div>
-        </form>
+            <div className="mt-7 flex justify-center">
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={isSubmitting}
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+              >
+                <PlusCircleIcon className="size-4" />
+                {isSubmitting ? "Creating…" : "Create business"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </OwnerCrudTransition>
   );

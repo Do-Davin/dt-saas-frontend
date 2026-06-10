@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -19,7 +20,9 @@ import { useBranches } from "../_hooks/useBranches";
 import { useCategories } from "../_hooks/useCategories";
 import { useProducts } from "../_hooks/useProducts";
 import { deleteProduct } from "../_api/products";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type { Product } from "../_api/products";
 import type { Category } from "../_api/categories";
 
@@ -51,7 +54,7 @@ export function ProductListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
@@ -63,7 +66,7 @@ export function ProductListPage() {
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   const SELECT_CLASS =
-    "flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+    "w-full sm:w-auto flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
   async function handleConfirmDelete() {
     if (!pendingDelete || !businessId) return;
@@ -88,50 +91,55 @@ export function ProductListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Products
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/products/new">New product</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Products"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/products/new">
+                <PlusIcon className="size-3.5" />
+                New product
+              </Link>
+            </Button>
+          }
+        />
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {branches.length > 0 && (
-            <select
-              aria-label="Filter by branch"
-              className={SELECT_CLASS}
-              value={filterBranchId}
-              onChange={(e) => setFilterBranchId(e.target.value)}
-            >
-              <option value="">All branches</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          )}
+        {/* Filters — only rendered when at least one filter has options */}
+        {(branches.length > 0 || categories.length > 0) && (
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            {branches.length > 0 && (
+              <select
+                aria-label="Filter by branch"
+                className={SELECT_CLASS}
+                value={filterBranchId}
+                onChange={(e) => setFilterBranchId(e.target.value)}
+              >
+                <option value="">All branches</option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
-          {categories.length > 0 && (
-            <select
-              aria-label="Filter by category"
-              className={SELECT_CLASS}
-              value={filterCategoryId}
-              onChange={(e) => setFilterCategoryId(e.target.value)}
-            >
-              <option value="">All categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+            {categories.length > 0 && (
+              <select
+                aria-label="Filter by category"
+                className={SELECT_CLASS}
+                value={filterCategoryId}
+                onChange={(e) => setFilterCategoryId(e.target.value)}
+              >
+                <option value="">All categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
 
         {deleteError ? (
           <div
@@ -144,24 +152,25 @@ export function ProductListPage() {
 
         {productState.status === "loading" ||
           productState.status === "idle" ? (
-          <OwnerStateBlock title="Loading products…" />
+          <OwnerPageState type="loading" title="Loading products…" />
         ) : productState.status === "error" ? (
-          <OwnerStateBlock
-            tone="error"
+          <OwnerPageState
+            type="error"
             title="Could not load products"
-            description={productState.message}
+            message={productState.message}
           />
         ) : productState.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No products yet"
-            description="Add a product to get started."
+            message="Add a product to get started."
           />
         ) : (
           <ul className="space-y-2">
             {productState.items.map((product) => (
               <li
                 key={product.id}
-                className="flex items-start justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-start justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
                 <div className="min-w-0 flex-1">
                   <span className="block truncate font-medium">
@@ -188,7 +197,7 @@ export function ProductListPage() {
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
                   <ProductPrice product={product} />
                   <StatusChips product={product} />
-                  <div className="flex items-center gap-1.5 mt-1">
+                  <div className="flex items-center gap-1.5">
                     <Button variant="outline" size="sm" asChild>
                       <Link
                         to={`/owner/products/${encodeURIComponent(product.id)}`}
@@ -213,7 +222,7 @@ export function ProductListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

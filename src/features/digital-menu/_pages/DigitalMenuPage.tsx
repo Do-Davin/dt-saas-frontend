@@ -15,6 +15,7 @@ import { ProductGrid } from "../_components/ProductGrid";
 import { CartDrawer } from "../_components/CartDrawer";
 import { BottomCartButton } from "../_components/BottomCartButton";
 import { ProductDetailModal } from "../_components/ProductDetailModal";
+import { OrderSuccessDialog } from "../_components/OrderSuccessDialog";
 
 export function DigitalMenuPage() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
@@ -105,7 +106,7 @@ export function DigitalMenuPage() {
         (p.name.kh ?? "").toLowerCase().includes(trimmedQuery);
       const descHit = p.description
         ? p.description.en.toLowerCase().includes(trimmedQuery) ||
-          (p.description.kh ?? "").toLowerCase().includes(trimmedQuery)
+        (p.description.kh ?? "").toLowerCase().includes(trimmedQuery)
         : false;
       return nameHit || descHit;
     });
@@ -167,6 +168,7 @@ export function DigitalMenuPage() {
 
       <CartDrawer />
       <ProductDetailModal businessSlug={businessSlug} />
+      <OrderSuccessDialog />
       <BottomCartButton />
     </div>
   );

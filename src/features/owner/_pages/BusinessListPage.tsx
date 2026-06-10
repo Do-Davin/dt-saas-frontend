@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { Building2Icon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -11,12 +12,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusinesses } from "../_hooks/useBusinesses";
 import { deleteBusiness } from "../_api/businesses";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type { OwnerBusiness } from "../_api/businesses";
 
 export function BusinessListPage() {
@@ -32,15 +36,15 @@ export function BusinessListPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (state.status === "loading") {
-    return <OwnerStateBlock title="Loading businesses…" />;
+    return <OwnerPageState type="loading" title="Loading businesses…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load businesses"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -74,15 +78,23 @@ export function BusinessListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Businesses
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/businesses/new">New business</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Businesses"
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="rounded-xl border-2 border-primary text-primary font-black transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+            >
+              <Link to="/owner/businesses/new">
+                <Building2Icon className="size-4" />
+                New business
+              </Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -94,61 +106,66 @@ export function BusinessListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No businesses yet"
-            description="Create a business to get started."
+            message="Create a business to get started."
           />
         ) : (
           <ul className="space-y-2">
             {state.items.map((business) => (
               <li
                 key={business.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="block truncate font-medium">
-                      {business.name}
-                    </span>
-                    {business.id === selectedBusinessId ? (
-                      <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground">
-                        Selected
+                <div className="flex min-w-0 items-center gap-4">
+                  <Building2Icon className="size-10 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="block min-w-0 truncate text-base font-black text-primary">
+                        {business.name}
+                      </span>
+                      {business.id === selectedBusinessId ? (
+                        <Badge className="shrink-0">Selected</Badge>
+                      ) : null}
+                    </div>
+                    {business.slug ? (
+                      <span className="block truncate text-sm font-semibold text-zinc-500">
+                        {business.slug}
                       </span>
                     ) : null}
                   </div>
-                  {business.nameKm ? (
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {business.nameKm}
-                    </span>
-                  ) : null}
-                  {business.slug ? (
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {business.slug}
-                    </span>
-                  ) : null}
                 </div>
+
                 <div className="flex shrink-0 items-center gap-2">
                   {business.type ? (
                     <span className="text-xs text-muted-foreground">
                       {business.type}
                     </span>
                   ) : null}
-                  <Button variant="outline" size="sm" asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
+                  >
                     <Link
                       to={`/owner/businesses/${encodeURIComponent(business.id)}`}
                     >
+                      <PencilIcon className="size-3.5" />
                       Edit
                     </Link>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="text-destructive hover:text-destructive"
+                    className="gap-1.5 rounded-xl border-2 border-destructive/50 text-destructive font-black transition-all duration-200 ease-out hover:bg-destructive/5 hover:border-destructive hover:text-destructive hover:scale-[1.07]"
                     onClick={() => {
                       setDeleteError(null);
                       setPendingDelete(business);
                     }}
                   >
+                    <Trash2Icon className="size-3.5" />
                     Delete
                   </Button>
                 </div>
@@ -156,7 +173,7 @@ export function BusinessListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

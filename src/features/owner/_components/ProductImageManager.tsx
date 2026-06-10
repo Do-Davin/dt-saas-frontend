@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -125,84 +126,94 @@ export function ProductImageManager({
 
   return (
     <>
-      <section aria-labelledby="images-heading" className="max-w-lg space-y-4">
-        <h3
-          id="images-heading"
-          className="text-base font-semibold tracking-tight"
-        >
-          Images
-        </h3>
-
-        {deleteError ? (
-          <div
-            role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+      <section aria-labelledby="images-heading" className="max-w-lg">
+        <div className="rounded-lg border bg-card p-6 space-y-4">
+          <h3
+            id="images-heading"
+            className="text-sm font-medium text-foreground"
           >
-            {deleteError}
-          </div>
-        ) : null}
+            Images
+          </h3>
 
-        {state.status === "loading" ? (
-          <p className="text-sm text-muted-foreground">Loading images…</p>
-        ) : state.status === "error" ? (
-          <p className="text-sm text-destructive">{state.message}</p>
-        ) : state.images.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No images yet.</p>
-        ) : (
-          <ul className="grid grid-cols-3 gap-3">
-            {state.images.map((img) => (
-              <ImageCard
-                key={img.id}
-                image={img}
-                isSettingPrimary={settingPrimaryId === img.id}
-                onSetPrimary={() => void handleSetPrimary(img.id)}
-                onDelete={() => {
-                  setDeleteError(null);
-                  setPendingDeleteId(img.id);
-                }}
-              />
-            ))}
-          </ul>
-        )}
-
-        {/* Upload */}
-        <div className="space-y-2 border-t pt-4">
-          <label
-            htmlFor="image-upload"
-            className="block text-sm font-medium text-foreground"
-          >
-            Add image
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              key={fileInputKey}
-              id="image-upload"
-              type="file"
-              accept={ACCEPTED_ATTR}
-              onChange={handleFileSelect}
-              disabled={isUploading}
-              className="flex-1 text-sm text-foreground file:mr-3 file:rounded-md file:border file:border-input file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground hover:file:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            <Button
-              type="button"
-              size="sm"
-              disabled={!selectedFile || isUploading}
-              onClick={() => void handleUpload()}
+          {deleteError ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
-              {isUploading ? "Uploading…" : "Upload"}
-            </Button>
-          </div>
-          {fileError ? (
-            <p className="text-xs text-destructive">{fileError}</p>
+              {deleteError}
+            </div>
           ) : null}
-          {uploadStatus.status === "error" ? (
-            <p role="alert" className="text-xs text-destructive">
-              {uploadStatus.message}
+
+          {state.status === "loading" ? (
+            <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+              Loading images…
+            </div>
+          ) : state.status === "error" ? (
+            <div
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {state.message}
+            </div>
+          ) : state.images.length === 0 ? (
+            <p className="py-2 text-sm text-muted-foreground">No images yet.</p>
+          ) : (
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {state.images.map((img) => (
+                <ImageCard
+                  key={img.id}
+                  image={img}
+                  isSettingPrimary={settingPrimaryId === img.id}
+                  onSetPrimary={() => void handleSetPrimary(img.id)}
+                  onDelete={() => {
+                    setDeleteError(null);
+                    setPendingDeleteId(img.id);
+                  }}
+                />
+              ))}
+            </ul>
+          )}
+
+          {/* Upload */}
+          <div className="space-y-2 border-t pt-4">
+            <label
+              htmlFor="image-upload"
+              className="block text-sm font-medium text-foreground"
+            >
+              Add image
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                key={fileInputKey}
+                id="image-upload"
+                type="file"
+                accept={ACCEPTED_ATTR}
+                onChange={handleFileSelect}
+                disabled={isUploading}
+                className="flex-1 text-sm text-foreground file:mr-3 file:rounded-md file:border file:border-input file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground hover:file:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <Button
+                type="button"
+                size="sm"
+                disabled={!selectedFile || isUploading}
+                onClick={() => void handleUpload()}
+              >
+                {isUploading ? "Uploading…" : "Upload"}
+              </Button>
+            </div>
+            {fileError ? (
+              <p className="text-xs text-destructive">{fileError}</p>
+            ) : null}
+            {uploadStatus.status === "error" ? (
+              <p role="alert" className="text-xs text-destructive">
+                {uploadStatus.message}
+              </p>
+            ) : null}
+            <p className="text-xs text-muted-foreground">
+              Accepted formats: JPEG, PNG, WebP
             </p>
-          ) : null}
-          <p className="text-xs text-muted-foreground">
-            Accepted formats: JPEG, PNG, WebP
-          </p>
+          </div>
         </div>
       </section>
 

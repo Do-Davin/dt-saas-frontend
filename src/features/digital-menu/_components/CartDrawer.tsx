@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams } from "react-router";
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import {
   Sheet,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ApiError } from "@/lib/api/client";
 import { useMenuStore } from "../_store";
+import { useDigitalMenuUIStore } from "../_store/uiStore";
 import { useLanguageStore } from "../_store/languageStore";
 import { tText } from "../_utils/tText";
 import { uiLabels } from "../_utils/uiLabels";
@@ -31,7 +32,6 @@ const TEXTAREA_CLASS =
 
 export function CartDrawer() {
   const { businessSlug = "" } = useParams<{ businessSlug: string }>();
-  const navigate = useNavigate();
   const cart = useMenuStore((s) => s.cart);
   const isCartOpen = useMenuStore((s) => s.isCartOpen);
   const toggleCart = useMenuStore((s) => s.toggleCart);
@@ -42,6 +42,7 @@ export function CartDrawer() {
   const count = useMenuStore((s) => s.cartCount());
   const language = useLanguageStore((s) => s.language);
   const t = uiLabels[language];
+  const openSuccessDialog = useDigitalMenuUIStore((s) => s.openSuccessDialog);
 
   const [view, setView] = useState<DrawerView>("cart");
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({ status: "idle" });
@@ -91,7 +92,7 @@ export function CartDrawer() {
       clearCart();
       resetForm();
       toggleCart();
-      navigate(`/menu/${encodeURIComponent(businessSlug)}/success`);
+      openSuccessDialog();
     } catch (err) {
       const message =
         err instanceof ApiError ? err.message : t.genericRequestError;
