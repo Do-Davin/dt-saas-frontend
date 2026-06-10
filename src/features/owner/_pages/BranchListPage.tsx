@@ -20,6 +20,7 @@ import { OwnerPage } from "../_components/OwnerPage";
 import { OwnerPageHeader } from "../_components/OwnerPageHeader";
 import { OwnerPageState } from "../_components/OwnerPageState";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import type { Branch } from "../_api/branches";
 
 export function BranchListPage() {
@@ -58,6 +59,7 @@ export function BranchListPage() {
     setDeleteError(null);
     try {
       await deleteBranch(businessId, pendingDelete.id);
+      toast.success(`Branch "${pendingDelete.name}" deleted successfully`);
       setPendingDelete(null);
       refetch();
     } catch (err: unknown) {
@@ -66,6 +68,7 @@ export function BranchListPage() {
           ? err.message
           : "Something went wrong while deleting the branch.";
       setDeleteError(message);
+      toast.error(message);
     } finally {
       setIsDeleting(false);
     }
