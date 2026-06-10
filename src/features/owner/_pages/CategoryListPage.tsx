@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -109,10 +109,10 @@ export function CategoryListPage() {
             {state.items.map((cat) => (
               <li
                 key={cat.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
-                <div className="min-w-0">
-                  <span className="block truncate font-medium">{cat.name}</span>
+                <div className="min-w-0 flex-1 w-full">
+                  <span className="block truncate font-medium text-foreground">{cat.name}</span>
                   {cat.nameKm ? (
                     <span className="block truncate text-sm text-muted-foreground">
                       {cat.nameKm}
@@ -123,7 +123,7 @@ export function CategoryListPage() {
                     {cat.branchId ? <span>· Branch scoped</span> : null}
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0 border-border/40">
                   <span
                     className={
                       cat.isActive
@@ -133,24 +133,26 @@ export function CategoryListPage() {
                   >
                     {cat.isActive ? "Active" : "Inactive"}
                   </span>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link
-                      to={`/owner/categories/${encodeURIComponent(cat.id)}`}
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link
+                        to={`/owner/categories/${encodeURIComponent(cat.id)}`}
+                      >
+                        Edit
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => {
+                        setDeleteError(null);
+                        setPendingDelete(cat);
+                      }}
                     >
-                      Edit
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => {
-                      setDeleteError(null);
-                      setPendingDelete(cat);
-                    }}
-                  >
-                    Delete
-                  </Button>
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -164,20 +166,24 @@ export function CategoryListPage() {
           if (!open) setPendingDelete(null);
         }}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <strong>{pendingDelete?.name}</strong> will be permanently
-              deleted. This action cannot be undone.
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader align="center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive ring-8 ring-destructive/5 dark:bg-destructive/20 dark:ring-destructive/10 mb-4">
+              <Trash2Icon className="h-6 w-6" />
+            </div>
+            <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground mb-1">Delete this category?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground text-center">
+              Category <span className="font-semibold text-foreground">"{pendingDelete?.name}"</span> will be permanently deleted.
+              <span className="block mt-1 text-xs text-destructive/80 font-medium">This action cannot be undone.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex flex-row items-center justify-center gap-3 mt-4">
+            <AlertDialogCancel disabled={isDeleting} className="mt-0 sm:mt-0 flex-1">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
               disabled={isDeleting}
               onClick={() => void handleConfirmDelete()}
+              className="flex-1"
             >
               {isDeleting ? "Deleting…" : "Delete"}
             </AlertDialogAction>

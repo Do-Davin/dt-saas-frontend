@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import { Button } from "@/components/ui/button";
+import { Trash2Icon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -235,20 +236,24 @@ function CategoryEditorForm({
           if (!open) setShowDeleteDialog(false);
         }}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <strong>{category.name}</strong> will be permanently deleted. This
-              action cannot be undone.
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader align="center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive ring-8 ring-destructive/5 dark:bg-destructive/20 dark:ring-destructive/10 mb-4">
+              <Trash2Icon className="h-6 w-6" />
+            </div>
+            <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground mb-1">Delete this category?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground text-center">
+              Category <span className="font-semibold text-foreground">"{category.name}"</span> will be permanently deleted.
+              <span className="block mt-1 text-xs text-destructive/80 font-medium">This action cannot be undone.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex flex-row items-center justify-center gap-3 mt-4">
+            <AlertDialogCancel disabled={isDeleting} className="mt-0 sm:mt-0 flex-1">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              variant="destructive"
               disabled={isDeleting}
               onClick={() => void handleConfirmDelete()}
+              className="flex-1"
             >
               {isDeleting ? "Deleting…" : "Delete category"}
             </AlertDialogAction>
