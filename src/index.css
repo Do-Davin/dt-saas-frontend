@@ -54,18 +54,19 @@
     --popover-foreground: 210 15% 10%;
 
     /* Primary: DT SaaS brand brown #8C5A3C                                   */
-    --primary:             22 40% 39%;
-    --primary-foreground:  0 0% 100%;    /* white on brand brown              */
+    --primary: 22 40% 39%;
+    --primary-foreground: 0 0% 100%;
+    /* white on brand brown              */
 
     /* Secondary / accent: a very light warm-brown tint                       */
-    --secondary:           22 30% 95%;
+    --secondary: 22 30% 95%;
     --secondary-foreground: 22 40% 39%;
 
-    --muted:               30 15% 93%;
-    --muted-foreground:    25 10% 46%;
+    --muted: 30 15% 93%;
+    --muted-foreground: 25 10% 46%;
 
-    --accent:              22 30% 95%;
-    --accent-foreground:   22 40% 39%;
+    --accent: 22 30% 95%;
+    --accent-foreground: 22 40% 39%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -75,7 +76,7 @@
     --input: 210 15% 88%;
 
     /* Ring matches primary so focus outlines use the brand colour            */
-    --ring:                22 40% 39%;
+    --ring: 22 40% 39%;
 
     --radius-base: 0.5rem;
   }
@@ -91,24 +92,24 @@
     --popover-foreground: 0 0% 98%;
 
     /* Brand brown lightened for dark-mode contrast                           */
-    --primary:             22 55% 65%;
-    --primary-foreground:  22 30% 10%;
+    --primary: 22 55% 65%;
+    --primary-foreground: 22 30% 10%;
 
-    --secondary:           22 15% 18%;
+    --secondary: 22 15% 18%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted:               22 12% 18%;
-    --muted-foreground:    25 10% 60%;
+    --muted: 22 12% 18%;
+    --muted-foreground: 25 10% 60%;
 
-    --accent:              22 15% 18%;
-    --accent-foreground:   0 0% 98%;
+    --accent: 22 15% 18%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border:              210 15% 22%;
-    --input:               210 15% 22%;
-    --ring:                22 55% 65%;
+    --border: 210 15% 22%;
+    --input: 210 15% 22%;
+    --ring: 22 55% 65%;
   }
 
   * {
