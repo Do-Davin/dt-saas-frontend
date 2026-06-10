@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useProduct } from "../_hooks/useProduct";
@@ -186,6 +187,7 @@ function ProductEditorForm({
         isAvailable: values.isAvailable,
         isVisible: values.isVisible,
       });
+      toast.success(`Product "${values.name.trim()}" updated successfully`);
       navigate("/owner/products", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -193,6 +195,7 @@ function ProductEditorForm({
           ? err.message
           : "Something went wrong while saving the product.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 
@@ -201,6 +204,7 @@ function ProductEditorForm({
     setDeleteError(null);
     try {
       await deleteProduct(businessId, product.id);
+      toast.success(`Product "${product.name}" deleted successfully`);
       navigate("/owner/products", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -208,6 +212,7 @@ function ProductEditorForm({
           ? err.message
           : "Something went wrong while deleting the product.";
       setDeleteError(message);
+      toast.error(message);
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);

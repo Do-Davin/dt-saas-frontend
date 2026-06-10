@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusiness } from "../_hooks/useBusiness";
 import { updateBusiness, deleteBusiness } from "../_api/businesses";
@@ -115,6 +116,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
       // Reload the store so the shell header reflects the updated name.
       useOwnerBusinessesStore.getState().clearBusinesses();
       void useOwnerBusinessesStore.getState().loadBusinesses();
+      toast.success(`Business "${values.name.trim()}" updated successfully`);
       navigate("/owner/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -122,6 +124,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
           ? err.message
           : "Something went wrong while saving the business.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 
@@ -138,6 +141,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
         // clearBusinesses already cleared the selected ID; loadBusinesses will
         // auto-select if only one business remains.
       }
+      toast.success(`Business "${business.name}" deleted successfully`);
       navigate("/owner/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -145,6 +149,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
           ? err.message
           : "Something went wrong while deleting the business.";
       setDeleteError(message);
+      toast.error(message);
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);

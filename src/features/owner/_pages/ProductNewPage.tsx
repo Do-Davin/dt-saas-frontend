@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
@@ -107,6 +108,7 @@ export function ProductNewPage() {
         isAvailable: values.isAvailable,
         isVisible: values.isVisible,
       });
+      toast.success(`Product "${values.name.trim()}" created successfully`);
       navigate("/owner/products", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -114,6 +116,7 @@ export function ProductNewPage() {
           ? err.message
           : "Something went wrong while creating the product.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 

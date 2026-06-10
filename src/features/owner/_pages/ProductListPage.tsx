@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
@@ -70,6 +71,7 @@ export function ProductListPage() {
     setDeleteError(null);
     try {
       await deleteProduct(businessId, pendingDelete.id);
+      toast.success(`Product "${pendingDelete.name}" deleted successfully`);
       setPendingDelete(null);
       refetch();
     } catch (err: unknown) {
@@ -78,6 +80,7 @@ export function ProductListPage() {
           ? err.message
           : "Something went wrong while deleting the product.";
       setDeleteError(message);
+      toast.error(message);
     } finally {
       setIsDeleting(false);
     }
@@ -140,7 +143,7 @@ export function ProductListPage() {
         ) : null}
 
         {productState.status === "loading" ||
-        productState.status === "idle" ? (
+          productState.status === "idle" ? (
           <OwnerStateBlock title="Loading products…" />
         ) : productState.status === "error" ? (
           <OwnerStateBlock
@@ -171,7 +174,7 @@ export function ProductListPage() {
                   ) : null}
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
                     {product.categoryId &&
-                    categoryById.has(product.categoryId) ? (
+                      categoryById.has(product.categoryId) ? (
                       <span>{categoryById.get(product.categoryId)!.name}</span>
                     ) : null}
                     {product.label ? (

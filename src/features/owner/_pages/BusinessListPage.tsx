@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { useBusinesses } from "../_hooks/useBusinesses";
 import { deleteBusiness } from "../_api/businesses";
@@ -58,12 +59,14 @@ export function BusinessListPage() {
         useOwnerBusinessesStore.getState().clearBusinesses();
         void useOwnerBusinessesStore.getState().loadBusinesses();
       }
+      toast.success(`Business "${pendingDelete.name}" deleted successfully`);
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
           ? err.message
           : "Something went wrong while deleting the business.";
       setDeleteError(message);
+      toast.error(message);
     } finally {
       setIsDeleting(false);
     }

@@ -17,6 +17,7 @@ import { useCategories } from "../_hooks/useCategories";
 import { deleteCategory } from "../_api/categories";
 import { OwnerStateBlock } from "../_components/OwnerStateBlock";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import type { Category } from "../_api/categories";
 
 export function CategoryListPage() {
@@ -55,6 +56,7 @@ export function CategoryListPage() {
     setDeleteError(null);
     try {
       await deleteCategory(businessId, pendingDelete.id);
+      toast.success(`Category "${pendingDelete.name}" deleted successfully`);
       setPendingDelete(null);
       refetch();
     } catch (err: unknown) {
@@ -63,6 +65,7 @@ export function CategoryListPage() {
           ? err.message
           : "Something went wrong while deleting the category.";
       setDeleteError(message);
+      toast.error(message);
     } finally {
       setIsDeleting(false);
     }

@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranch } from "../_hooks/useBranch";
@@ -124,6 +125,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
         ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
         isActive: values.isActive,
       });
+      toast.success(`Branch "${values.name.trim()}" updated successfully`);
       navigate("/owner/branches", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -131,6 +133,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
           ? err.message
           : "Something went wrong while saving the branch.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 
@@ -139,6 +142,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
     setDeleteError(null);
     try {
       await deleteBranch(businessId, branch.id);
+      toast.success(`Branch "${branch.name}" deleted successfully`);
       navigate("/owner/branches", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -146,6 +150,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
           ? err.message
           : "Something went wrong while deleting the branch.";
       setDeleteError(message);
+      toast.error(message);
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);

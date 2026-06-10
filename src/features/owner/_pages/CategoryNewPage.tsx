@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
@@ -74,6 +75,7 @@ export function CategoryNewPage() {
         ...(values.branchId ? { branchId: values.branchId } : {}),
         isActive: values.isActive,
       });
+      toast.success(`Category "${values.name.trim()}" created successfully`);
       navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -81,6 +83,7 @@ export function CategoryNewPage() {
           ? err.message
           : "Something went wrong while creating the category.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 

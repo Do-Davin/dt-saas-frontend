@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useCategory } from "../_hooks/useCategory";
@@ -134,6 +135,7 @@ function CategoryEditorForm({
         ...(values.branchId ? { branchId: values.branchId } : {}),
         isActive: values.isActive,
       });
+      toast.success(`Category "${values.name.trim()}" updated successfully`);
       navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -141,6 +143,7 @@ function CategoryEditorForm({
           ? err.message
           : "Something went wrong while saving the category.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 
@@ -149,6 +152,7 @@ function CategoryEditorForm({
     setDeleteError(null);
     try {
       await deleteCategory(businessId, category.id);
+      toast.success(`Category "${category.name}" deleted successfully`);
       navigate("/owner/categories", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -156,6 +160,7 @@ function CategoryEditorForm({
           ? err.message
           : "Something went wrong while deleting the category.";
       setDeleteError(message);
+      toast.error(message);
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);

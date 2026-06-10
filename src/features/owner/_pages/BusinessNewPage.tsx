@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
+import { toast } from "@/components/ui/toast";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { setCurrentBusinessId } from "../_store/currentBusiness";
 import { createBusiness } from "../_api/businesses";
@@ -68,6 +69,7 @@ export function BusinessNewPage() {
         error: null,
       });
       void useOwnerBusinessesStore.getState().loadBusinesses();
+      toast.success(`Business "${created.name}" created successfully`);
       navigate("/owner/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
@@ -75,6 +77,7 @@ export function BusinessNewPage() {
           ? err.message
           : "Something went wrong while creating the business.";
       setSubmitStatus({ status: "error", message });
+      toast.error(message);
     }
   }
 
