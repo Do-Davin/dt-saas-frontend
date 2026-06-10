@@ -7,7 +7,8 @@ import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useOwnerRequestDetail } from "../_hooks/useOwnerRequestDetail";
 import { RequestStatusBadge } from "../_components/RequestStatusBadge";
 import { RequestStatusActions } from "../_components/RequestStatusActions";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type {
   CustomerRequestDetail,
   CustomerRequestDetailItem,
@@ -31,22 +32,30 @@ export function OwnerRequestDetailPage() {
     useOwnerRequestDetail(businessId, requestId);
 
   return (
-    <PageShell>
+    <OwnerPage>
+      <div>
+        <Button variant="ghost" size="sm" asChild className="-ml-2">
+          <Link to="/owner/requests" aria-label="Back to requests list">
+            <ArrowLeft className="size-4" />
+            Back to requests
+          </Link>
+        </Button>
+      </div>
       {!businessId ? (
-        <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+        <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
       ) : !requestId ? (
-        <OwnerStateBlock
-          tone="error"
+        <OwnerPageState
+          type="error"
           title="No request specified"
-          description="The URL is missing a request ID."
+          message="The URL is missing a request ID."
         />
       ) : state.status === "loading" || state.status === "idle" ? (
-        <OwnerStateBlock title="Loading request…" />
+        <OwnerPageState type="loading" title="Loading request…" />
       ) : state.status === "error" ? (
-        <OwnerStateBlock
-          tone="error"
+        <OwnerPageState
+          type="error"
           title="Could not load request"
-          description={state.message}
+          message={state.message}
         />
       ) : (
         <DetailContent
@@ -56,23 +65,7 @@ export function OwnerRequestDetailPage() {
           updateError={updateError}
         />
       )}
-    </PageShell>
-  );
-}
-
-function PageShell({ children }: { children: ReactNode }) {
-  return (
-    <div className="space-y-4">
-      <div>
-        <Button variant="ghost" size="sm" asChild className="-ml-2">
-          <Link to="/owner/requests" aria-label="Back to requests list">
-            <ArrowLeft />
-            Back to requests
-          </Link>
-        </Button>
-      </div>
-      {children}
-    </div>
+    </OwnerPage>
   );
 }
 
@@ -107,7 +100,7 @@ function DetailContent({
               <RequestStatusBadge status={request.status} />
             </div>
             <div className="mt-1 text-xs text-muted-foreground">
-              ID: <code className="font-mono">{request.id}</code>
+              ID: <code className="truncate font-mono">{request.id}</code>
             </div>
           </div>
           <dl className="text-right text-sm space-y-1">
@@ -180,7 +173,7 @@ function DetailContent({
       ) : null}
 
       <section className="rounded-lg border bg-card p-4 sm:p-6">
-        <h3 className="text-sm font-semibold tracking-tight">Status actions</h3>
+        <h3 className="text-sm font-semibold tracking-tight">Update status</h3>
         <div className="mt-3">
           <RequestStatusActions
             currentStatus={request.status}

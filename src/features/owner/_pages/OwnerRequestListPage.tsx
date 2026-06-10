@@ -4,7 +4,9 @@ import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useOwnerRequests } from "../_hooks/useOwnerRequests";
 import { RequestStatusBadge } from "../_components/RequestStatusBadge";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import type {
   CustomerRequestItemSummary,
   RequestType,
@@ -25,46 +27,47 @@ export function OwnerRequestListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (requests.status === "loading" || requests.status === "idle") {
-    return <OwnerStateBlock title="Loading requests…" />;
+    return <OwnerPageState type="loading" title="Loading requests…" />;
   }
 
   if (requests.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load requests"
-        description={requests.message}
+        message={requests.message}
       />
     );
   }
 
   if (requests.items.length === 0) {
     return (
-      <OwnerStateBlock
+      <OwnerPageState
+        type="empty"
         title="No customer requests yet"
-        description="New customer requests will appear here."
+        message="New customer requests will appear here."
       />
     );
   }
 
   return (
-    <div className="space-y-3">
-      <header className="flex items-baseline justify-between">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-          Customer requests
-        </h2>
-        <span className="text-xs text-muted-foreground">
-          {requests.items.length} total
-        </span>
-      </header>
+    <OwnerPage>
+      <OwnerPageHeader
+        title="Customer requests"
+        actions={
+          <span className="text-xs text-muted-foreground">
+            {requests.items.length} total
+          </span>
+        }
+      />
       <ul className="space-y-2">
         {requests.items.map((req) => (
-          <li key={req.id} className="rounded-lg border bg-card p-4">
+          <li key={req.id} className="rounded-lg border bg-card p-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -105,7 +108,7 @@ export function OwnerRequestListPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </OwnerPage>
   );
 }
 
@@ -123,5 +126,5 @@ function summarizeItems(items: CustomerRequestItemSummary[]): string {
 function formatCreatedAt(value: string): string {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleString();
+  return d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
 }

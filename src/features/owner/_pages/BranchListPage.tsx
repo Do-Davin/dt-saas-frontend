@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { GitBranchIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,7 +16,9 @@ import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
 import { deleteBranch } from "../_api/branches";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
 import type { Branch } from "../_api/branches";
@@ -32,20 +35,20 @@ export function BranchListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (state.status === "loading" || state.status === "idle") {
-    return <OwnerStateBlock title="Loading branches…" />;
+    return <OwnerPageState type="loading" title="Loading branches…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load branches"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -73,15 +76,23 @@ export function BranchListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Branches
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/branches/new">New branch</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Branches"
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="rounded-xl border-2 border-primary text-primary font-black transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+            >
+              <Link to="/owner/branches/new">
+                <GitBranchIcon className="size-4" />
+                New branch
+              </Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -93,58 +104,69 @@ export function BranchListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No branches yet"
-            description="Add a branch to get started."
+            message="Add a branch to get started."
           />
         ) : (
           <ul className="space-y-2">
             {state.items.map((branch) => (
               <li
                 key={branch.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
               >
-                <div className="min-w-0">
-                  <span className="block truncate font-medium">
-                    {branch.name}
-                  </span>
-                  {branch.nameKm ? (
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {branch.nameKm}
+                <div className="flex min-w-0 items-center gap-4">
+                  <GitBranchIcon className="size-10 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <span className="block min-w-0 truncate text-base font-black text-primary">
+                      {branch.name}
                     </span>
-                  ) : null}
-                  {branch.address ? (
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {branch.address}
-                    </span>
-                  ) : null}
+                    {branch.nameKm ? (
+                      <span className="block truncate text-sm font-semibold text-zinc-500">
+                        {branch.nameKm}
+                      </span>
+                    ) : null}
+                    {branch.address ? (
+                      <span className="block truncate text-sm font-semibold text-zinc-500">
+                        {branch.address}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span
                     className={
                       branch.isActive
-                        ? "text-xs font-medium text-green-700"
-                        : "text-xs font-medium text-muted-foreground"
+                        ? "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                        : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                     }
                   >
                     {branch.isActive ? "Active" : "Inactive"}
                   </span>
-                  <Button variant="outline" size="sm" asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
+                  >
                     <Link
                       to={`/owner/branches/${encodeURIComponent(branch.id)}`}
                     >
+                      <PencilIcon className="size-3.5" />
                       Edit
                     </Link>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="text-destructive hover:text-destructive"
+                    className="gap-1.5 rounded-xl border-2 border-destructive/50 text-destructive font-black transition-all duration-200 ease-out hover:bg-destructive/5 hover:border-destructive hover:text-destructive hover:scale-[1.07]"
                     onClick={() => {
                       setDeleteError(null);
                       setPendingDelete(branch);
                     }}
                   >
+                    <Trash2Icon className="size-3.5" />
                     Delete
                   </Button>
                 </div>
@@ -152,7 +174,7 @@ export function BranchListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,7 +16,9 @@ import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useCategories } from "../_hooks/useCategories";
 import { deleteCategory } from "../_api/categories";
-import { OwnerStateBlock } from "../_components/OwnerStateBlock";
+import { OwnerPage } from "../_components/OwnerPage";
+import { OwnerPageHeader } from "../_components/OwnerPageHeader";
+import { OwnerPageState } from "../_components/OwnerPageState";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
 import type { Category } from "../_api/categories";
@@ -32,20 +35,20 @@ export function CategoryListPage() {
 
   if (!businessId) {
     return (
-      <OwnerStateBlock title={noBusinessTitle} description={noBusinessDesc} />
+      <OwnerPageState type="empty" title={noBusinessTitle} message={noBusinessDesc} />
     );
   }
 
   if (state.status === "loading" || state.status === "idle") {
-    return <OwnerStateBlock title="Loading categories…" />;
+    return <OwnerPageState type="loading" title="Loading categories…" />;
   }
 
   if (state.status === "error") {
     return (
-      <OwnerStateBlock
-        tone="error"
+      <OwnerPageState
+        type="error"
         title="Could not load categories"
-        description={state.message}
+        message={state.message}
       />
     );
   }
@@ -73,15 +76,18 @@ export function CategoryListPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <header className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-            Categories
-          </h2>
-          <Button asChild size="sm">
-            <Link to="/owner/categories/new">New category</Link>
-          </Button>
-        </header>
+      <OwnerPage>
+        <OwnerPageHeader
+          title="Categories"
+          actions={
+            <Button asChild size="sm">
+              <Link to="/owner/categories/new">
+                <PlusIcon className="size-3.5" />
+                New category
+              </Link>
+            </Button>
+          }
+        />
 
         {deleteError ? (
           <div
@@ -93,16 +99,17 @@ export function CategoryListPage() {
         ) : null}
 
         {state.items.length === 0 ? (
-          <OwnerStateBlock
+          <OwnerPageState
+            type="empty"
             title="No categories yet"
-            description="Add a category to get started."
+            message="Add a category to get started."
           />
         ) : (
           <ul className="space-y-2">
             {state.items.map((cat) => (
               <li
                 key={cat.id}
-                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
               >
                 <div className="min-w-0">
                   <span className="block truncate font-medium">{cat.name}</span>
@@ -120,8 +127,8 @@ export function CategoryListPage() {
                   <span
                     className={
                       cat.isActive
-                        ? "text-xs font-medium text-green-700"
-                        : "text-xs font-medium text-muted-foreground"
+                        ? "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                        : "rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                     }
                   >
                     {cat.isActive ? "Active" : "Inactive"}
@@ -149,7 +156,7 @@ export function CategoryListPage() {
             ))}
           </ul>
         )}
-      </div>
+      </OwnerPage>
 
       <AlertDialog
         open={pendingDelete !== null}
