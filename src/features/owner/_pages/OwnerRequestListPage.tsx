@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { ClipboardListIcon, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
@@ -67,43 +68,49 @@ export function OwnerRequestListPage() {
       />
       <ul className="space-y-2">
         {requests.items.map((req) => (
-          <li key={req.id} className="rounded-lg border bg-card p-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]">
-            <div className="flex items-start justify-between gap-3">
+          <li
+            key={req.id}
+            className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
+          >
+            <div className="flex min-w-0 items-center gap-4">
+              <ClipboardListIcon className="size-10 shrink-0 text-muted-foreground" />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold">
+                  <span className="text-base font-black text-primary">
                     {TYPE_LABEL[req.type] ?? req.type}
                   </span>
                   <RequestStatusBadge status={req.status} />
                 </div>
-                <div className="mt-1 text-sm text-foreground">
+                <div className="mt-1 truncate text-sm font-semibold text-zinc-500">
                   {req.customerName ?? "Unknown customer"}
                   {req.customerPhone ? ` · ${req.customerPhone}` : ""}
                 </div>
                 {req.items && req.items.length > 0 ? (
-                  <div className="mt-1 text-xs text-muted-foreground truncate">
+                  <div className="mt-0.5 truncate text-xs font-semibold text-zinc-500">
                     {summarizeItems(req.items)}
                   </div>
                 ) : null}
               </div>
-              <div className="shrink-0 text-right">
-                <div className="text-xs text-muted-foreground">
-                  {formatCreatedAt(req.createdAt)}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="mt-2"
+            </div>
+
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              <span className="text-xs font-semibold text-zinc-500">
+                {formatCreatedAt(req.createdAt)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
+              >
+                <Link
+                  to={`/owner/requests/${encodeURIComponent(req.id)}`}
+                  aria-label={`View request ${req.id}`}
                 >
-                  <Link
-                    to={`/owner/requests/${encodeURIComponent(req.id)}`}
-                    aria-label={`View request ${req.id}`}
-                  >
-                    View
-                  </Link>
-                </Button>
-              </div>
+                  <EyeIcon className="size-3.5" />
+                  View
+                </Link>
+              </Button>
             </div>
           </li>
         ))}

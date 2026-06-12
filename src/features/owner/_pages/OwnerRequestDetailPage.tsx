@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeftIcon, ClipboardListIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentBusinessId } from "../_hooks/useCurrentBusinessId";
 import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
@@ -34,9 +34,9 @@ export function OwnerRequestDetailPage() {
   return (
     <OwnerPage>
       <div>
-        <Button variant="ghost" size="sm" asChild className="-ml-2">
+        <Button variant="ghost" size="sm" asChild className="-ml-2 text-muted-foreground hover:text-foreground">
           <Link to="/owner/requests" aria-label="Back to requests list">
-            <ArrowLeft className="size-4" />
+            <ArrowLeftIcon className="size-4" />
             Back to requests
           </Link>
         </Button>
@@ -86,47 +86,49 @@ function DetailContent({
     request.updatedAt && request.updatedAt !== request.createdAt;
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-lg border bg-card p-4 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Request
-            </div>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-                {TYPE_LABEL[request.type] ?? request.type}
-              </h2>
-              <RequestStatusBadge status={request.status} />
-            </div>
-            <div className="mt-1 text-xs text-muted-foreground">
-              ID: <code className="truncate font-mono">{request.id}</code>
+    <div className="max-w-5xl space-y-4">
+      {/* ── Request header ────────────────────────────────────────── */}
+      <section className="rounded-2xl border bg-card px-6 py-7">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <ClipboardListIcon className="size-10 shrink-0 text-muted-foreground" />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-black tracking-tight text-primary">
+                  {TYPE_LABEL[request.type] ?? request.type}
+                </h2>
+                <RequestStatusBadge status={request.status} />
+              </div>
+              <div className="mt-1 text-xs font-semibold text-zinc-500">
+                ID: <code className="font-mono">{request.id}</code>
+              </div>
             </div>
           </div>
-          <dl className="text-right text-sm space-y-1">
+          <dl className="space-y-1 text-right">
             <div>
-              <dt className="text-xs text-muted-foreground">Created</dt>
-              <dd>{formatDateTime(request.createdAt)}</dd>
+              <dt className="text-xs font-semibold text-zinc-500">Created</dt>
+              <dd className="text-sm font-semibold text-foreground">{formatDateTime(request.createdAt)}</dd>
             </div>
             {showUpdated ? (
               <div>
-                <dt className="text-xs text-muted-foreground">Updated</dt>
-                <dd>{formatDateTime(request.updatedAt)}</dd>
+                <dt className="text-xs font-semibold text-zinc-500">Updated</dt>
+                <dd className="text-sm font-semibold text-foreground">{formatDateTime(request.updatedAt)}</dd>
               </div>
             ) : null}
             {request.branchName ? (
               <div>
-                <dt className="text-xs text-muted-foreground">Branch</dt>
-                <dd>{request.branchName}</dd>
+                <dt className="text-xs font-semibold text-zinc-500">Branch</dt>
+                <dd className="text-sm font-semibold text-foreground">{request.branchName}</dd>
               </div>
             ) : null}
           </dl>
         </div>
       </section>
 
-      <section className="rounded-lg border bg-card p-4 sm:p-6">
-        <h3 className="text-sm font-semibold tracking-tight">Customer</h3>
-        <dl className="mt-3 space-y-2 text-sm">
+      {/* ── Customer ──────────────────────────────────────────────── */}
+      <section className="rounded-2xl border bg-card px-6 py-7">
+        <h3 className="text-base font-black text-primary">Customer</h3>
+        <dl className="mt-4 space-y-2">
           <Row label="Name" value={request.customerName ?? "—"} />
           <Row
             label="Phone"
@@ -156,14 +158,15 @@ function DetailContent({
         </dl>
       </section>
 
+      {/* ── Items ─────────────────────────────────────────────────── */}
       {request.items && request.items.length > 0 ? (
-        <section className="rounded-lg border bg-card p-4 sm:p-6">
-          <h3 className="text-sm font-semibold tracking-tight">Items</h3>
-          <ul className="mt-3 divide-y">
+        <section className="rounded-2xl border bg-card px-6 py-7">
+          <h3 className="text-base font-black text-primary">Items</h3>
+          <ul className="mt-4 space-y-2">
             {request.items.map((item, idx) => (
               <li
                 key={item.id ?? `${idx}-${item.productId ?? item.productNameSnapshot ?? "item"}`}
-                className="py-3 first:pt-0 last:pb-0"
+                className="rounded-xl border px-4 py-3"
               >
                 <ItemRow item={item} />
               </li>
@@ -172,9 +175,10 @@ function DetailContent({
         </section>
       ) : null}
 
-      <section className="rounded-lg border bg-card p-4 sm:p-6">
-        <h3 className="text-sm font-semibold tracking-tight">Update status</h3>
-        <div className="mt-3">
+      {/* ── Status ────────────────────────────────────────────────── */}
+      <section className="rounded-2xl border bg-card px-6 py-7">
+        <h3 className="text-base font-black text-primary">Update status</h3>
+        <div className="mt-4">
           <RequestStatusActions
             currentStatus={request.status}
             isUpdating={isUpdatingStatus}
@@ -190,8 +194,8 @@ function DetailContent({
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="grid grid-cols-[5rem_1fr] gap-3 sm:grid-cols-[7rem_1fr]">
-      <dt className="text-xs text-muted-foreground pt-0.5">{label}</dt>
-      <dd className="text-sm">{value}</dd>
+      <dt className="text-xs font-semibold text-zinc-500 pt-0.5">{label}</dt>
+      <dd className="text-sm font-semibold text-foreground">{value}</dd>
     </div>
   );
 }
@@ -205,24 +209,24 @@ function ItemRow({ item }: { item: CustomerRequestDetailItem }) {
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <div className="text-sm font-medium">
+        <div className="text-sm font-black text-primary">
           {name}
           {qty > 1 ? (
-            <span className="text-muted-foreground"> ×{qty}</span>
+            <span className="text-zinc-500 font-semibold"> ×{qty}</span>
           ) : null}
         </div>
         {item.pricingTypeSnapshot ? (
-          <div className="text-xs text-muted-foreground">{item.pricingTypeSnapshot}</div>
+          <div className="text-xs font-semibold text-zinc-500">{item.pricingTypeSnapshot}</div>
         ) : null}
         {item.note ? (
-          <div className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap">
+          <div className="mt-1 text-xs font-semibold text-zinc-500 whitespace-pre-wrap">
             {item.note}
           </div>
         ) : null}
       </div>
       {hasPrice ? (
         <div className="shrink-0 text-right text-sm">
-          <div className="font-medium">{formatMoney(price)}</div>
+          <div className="font-black text-primary">{formatMoney(price)}</div>
         </div>
       ) : null}
     </div>

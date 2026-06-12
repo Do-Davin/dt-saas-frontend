@@ -86,7 +86,7 @@ export function BusinessListPage() {
               variant="outline"
               size="sm"
               asChild
-              className="rounded-xl border-2 border-primary text-primary font-black transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+              className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
             >
               <Link to="/owner/businesses/new">
                 <Building2Icon className="size-4" />
@@ -99,7 +99,7 @@ export function BusinessListPage() {
         {deleteError ? (
           <div
             role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
             {deleteError}
           </div>
