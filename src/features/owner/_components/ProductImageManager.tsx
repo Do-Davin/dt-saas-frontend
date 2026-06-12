@@ -1,9 +1,5 @@
 import { useState } from "react";
-<<<<<<< HEAD
-import { Loader2, Trash2Icon } from "lucide-react";
-=======
 import { Loader2, StarIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
->>>>>>> feature/001-dev
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,

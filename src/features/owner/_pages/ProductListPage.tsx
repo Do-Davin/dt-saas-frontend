@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-<<<<<<< HEAD
-import { PlusIcon, Trash2Icon } from "lucide-react";
-=======
 import { PackageIcon, PencilIcon, Trash2Icon } from "lucide-react";
->>>>>>> feature/001-dev
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -179,27 +175,6 @@ export function ProductListPage() {
             {productState.items.map((product) => (
               <li
                 key={product.id}
-<<<<<<< HEAD
-                className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
-              >
-                <div className="min-w-0 flex-1 w-full">
-                  <span className="block truncate font-medium text-foreground">
-                    {product.name}
-                  </span>
-                  {product.nameKm ? (
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {product.nameKm}
-                    </span>
-                  ) : null}
-                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                    {product.categoryId &&
-                      categoryById.has(product.categoryId) ? (
-                      <span>{categoryById.get(product.categoryId)!.name}</span>
-                    ) : null}
-                    {product.label ? (
-                      <span className="rounded bg-muted px-1.5 py-0.5 font-medium text-foreground">
-                        {product.label}
-=======
                 className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
               >
                 <div className="flex min-w-0 items-center gap-4">
@@ -211,12 +186,11 @@ export function ProductListPage() {
                     {product.nameKm ? (
                       <span className="block truncate text-sm font-semibold text-zinc-500">
                         {product.nameKm}
->>>>>>> feature/001-dev
                       </span>
                     ) : null}
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-semibold text-zinc-500">
                       {product.categoryId &&
-                      categoryById.has(product.categoryId) ? (
+                        categoryById.has(product.categoryId) ? (
                         <span>{categoryById.get(product.categoryId)!.name}</span>
                       ) : null}
                       {product.label ? (
@@ -228,15 +202,6 @@ export function ProductListPage() {
                   </div>
                 </div>
 
-<<<<<<< HEAD
-                <div className="flex w-full sm:w-auto flex-col items-end gap-1.5 border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0 border-border/40">
-                  <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end sm:flex-col sm:items-end gap-1.5">
-                    <ProductPrice product={product} />
-                    <StatusChips product={product} />
-                  </div>
-                  <div className="flex w-full sm:w-auto items-center justify-end gap-1.5 mt-1 sm:mt-0">
-                    <Button variant="outline" size="sm" asChild>
-=======
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   <ProductPrice product={product} />
                   <StatusChips product={product} />
@@ -247,7 +212,6 @@ export function ProductListPage() {
                       asChild
                       className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
                     >
->>>>>>> feature/001-dev
                       <Link
                         to={`/owner/products/${encodeURIComponent(product.id)}`}
                       >
