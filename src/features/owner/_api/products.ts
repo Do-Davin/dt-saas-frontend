@@ -24,6 +24,12 @@ export type UnitOfMeasure =
   | "HOUR"
   | "DAY";
 
+export interface ProductPrimaryImage {
+  id: string;
+  url: string;
+  alt: string | null;
+}
+
 export interface Product {
   id: string;
   businessId: string;
@@ -41,6 +47,7 @@ export interface Product {
   pricingType?: PricingType | null;
   isAvailable: boolean;
   isVisible: boolean;
+  primaryImage: ProductPrimaryImage | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -84,8 +91,20 @@ interface ProductRaw {
   pricingType?: unknown;
   isAvailable?: unknown;
   isVisible?: unknown;
+  primaryImage?: unknown;
   createdAt?: unknown;
   updatedAt?: unknown;
+}
+
+function parsePrimaryImage(v: unknown): ProductPrimaryImage | null {
+  if (v === null || typeof v !== "object") return null;
+  const r = v as Record<string, unknown>;
+  if (typeof r.id !== "string" || typeof r.url !== "string") return null;
+  return {
+    id: r.id,
+    url: r.url,
+    alt: typeof r.alt === "string" ? r.alt : null,
+  };
 }
 
 const VALID_PRICING_TYPES = new Set<string>([
@@ -152,6 +171,7 @@ function toProduct(raw: ProductRaw): Product {
     isAvailable:
       typeof raw.isAvailable === "boolean" ? raw.isAvailable : true,
     isVisible: typeof raw.isVisible === "boolean" ? raw.isVisible : true,
+    primaryImage: parsePrimaryImage(raw.primaryImage),
     createdAt: typeof raw.createdAt === "string" ? raw.createdAt : null,
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
   };
