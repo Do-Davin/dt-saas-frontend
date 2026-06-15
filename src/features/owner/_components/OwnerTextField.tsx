@@ -50,7 +50,7 @@ export function OwnerTextField({
           onBlur={() => setIsFocused(false)}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "h-14 w-full rounded-xl border bg-card text-sm font-semibold text-primary outline-none",
+            "h-14 w-full rounded-xl border bg-card text-sm font-semibold text-foreground outline-none",
             "transition-all duration-150",
             Icon ? "pl-10 pr-3" : "px-3",
             error
@@ -69,7 +69,7 @@ export function OwnerTextField({
               error
                 ? "text-destructive"
                 : isFocused
-                ? "text-primary"
+                ? "text-primary/75"
                 : "text-muted-foreground"
             )}
           >
@@ -101,7 +101,7 @@ export function OwnerTextField({
               : isFocused
               ? "text-primary"
               : isFloated
-              ? "text-zinc-500"
+              ? "text-muted-foreground"
               : "text-muted-foreground"
           )}
         >

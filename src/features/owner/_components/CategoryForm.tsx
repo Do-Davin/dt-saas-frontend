@@ -101,9 +101,9 @@ export function CategoryFormFields({
 
       {branches.length > 0 ? (
         <div>
-          <div className="relative">
+          <div className="relative group">
             <GitBranchIcon
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-[18px] text-muted-foreground"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-[18px] text-muted-foreground group-focus-within:text-primary/75"
               strokeWidth={2.5}
             />
             <select
@@ -111,7 +111,7 @@ export function CategoryFormFields({
               value={values.branchId}
               onChange={(e) => handleFieldChange("branchId", e.target.value)}
               disabled={disabled}
-              className="h-14 w-full appearance-none rounded-xl border border-input bg-card pl-10 pr-3 text-sm font-semibold text-primary outline-none transition-all duration-150 hover:border-primary/40 focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-14 w-full appearance-none rounded-xl border border-input bg-card pl-10 pr-3 text-sm font-semibold text-foreground outline-none transition-all duration-150 hover:border-primary/40 focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <option value="">All branches</option>
               {branches.map((b) => (
@@ -122,7 +122,7 @@ export function CategoryFormFields({
             </select>
             <label
               htmlFor="category-branch"
-              className="pointer-events-none absolute left-3 top-0 -translate-y-1/2 bg-card px-1 text-[11px] font-semibold text-zinc-500"
+              className="pointer-events-none absolute left-3 top-0 -translate-y-1/2 bg-card px-1 text-[11px] font-semibold text-muted-foreground group-focus-within:text-primary"
             >
               Branch
             </label>
