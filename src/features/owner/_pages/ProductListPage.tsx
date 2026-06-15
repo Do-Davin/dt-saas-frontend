@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PackageIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -66,7 +66,7 @@ export function ProductListPage() {
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   const SELECT_CLASS =
-    "w-full sm:w-auto flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+    "w-full sm:w-auto flex h-9 rounded-xl border border-input bg-card px-3 py-1 text-sm font-medium transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50";
 
   async function handleConfirmDelete() {
     if (!pendingDelete || !businessId) return;
@@ -95,9 +95,14 @@ export function ProductListPage() {
         <OwnerPageHeader
           title="Products"
           actions={
-            <Button asChild size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+            >
               <Link to="/owner/products/new">
-                <PlusIcon className="size-3.5" />
+                <PackageIcon className="size-4" />
                 New product
               </Link>
             </Button>
@@ -144,7 +149,7 @@ export function ProductListPage() {
         {deleteError ? (
           <div
             role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
             {deleteError}
           </div>
@@ -170,52 +175,60 @@ export function ProductListPage() {
             {productState.items.map((product) => (
               <li
                 key={product.id}
-                className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
+                className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
               >
-                <div className="min-w-0 flex-1 w-full">
-                  <span className="block truncate font-medium text-foreground">
-                    {product.name}
-                  </span>
-                  {product.nameKm ? (
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {product.nameKm}
+                <div className="flex min-w-0 items-center gap-4">
+                  <PackageIcon className="size-10 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <span className="block min-w-0 truncate text-base font-black text-primary">
+                      {product.name}
                     </span>
-                  ) : null}
-                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                    {product.categoryId &&
-                      categoryById.has(product.categoryId) ? (
-                      <span>{categoryById.get(product.categoryId)!.name}</span>
-                    ) : null}
-                    {product.label ? (
-                      <span className="rounded bg-muted px-1.5 py-0.5 font-medium text-foreground">
-                        {product.label}
+                    {product.nameKm ? (
+                      <span className="block truncate text-sm font-semibold text-zinc-500">
+                        {product.nameKm}
                       </span>
                     ) : null}
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-semibold text-zinc-500">
+                      {product.categoryId &&
+                        categoryById.has(product.categoryId) ? (
+                        <span>{categoryById.get(product.categoryId)!.name}</span>
+                      ) : null}
+                      {product.label ? (
+                        <span className="rounded bg-muted px-1.5 py-0.5 font-medium text-foreground">
+                          {product.label}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex w-full sm:w-auto flex-col items-end gap-1.5 border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0 border-border/40">
-                  <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end sm:flex-col sm:items-end gap-1.5">
-                    <ProductPrice product={product} />
-                    <StatusChips product={product} />
-                  </div>
-                  <div className="flex w-full sm:w-auto items-center justify-end gap-1.5 mt-1 sm:mt-0">
-                    <Button variant="outline" size="sm" asChild>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <ProductPrice product={product} />
+                  <StatusChips product={product} />
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
+                    >
                       <Link
                         to={`/owner/products/${encodeURIComponent(product.id)}`}
                       >
+                        <PencilIcon className="size-3.5" />
                         Edit
                       </Link>
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="text-destructive hover:text-destructive"
+                      className="gap-1.5 rounded-xl border-2 border-destructive/50 text-destructive font-black transition-all duration-200 ease-out hover:bg-destructive/5 hover:border-destructive hover:text-destructive hover:scale-[1.07]"
                       onClick={() => {
                         setDeleteError(null);
                         setPendingDelete(product);
                       }}
                     >
+                      <Trash2Icon className="size-3.5" />
                       Delete
                     </Button>
                   </div>
@@ -270,14 +283,14 @@ function ProductPrice({ product }: { product: Product }) {
     product.pricingType === "CONTACT_FOR_PRICE"
   ) {
     return (
-      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold text-zinc-500">{label}</span>
     );
   }
   if (product.salesPrice != null) {
     const prefix =
       product.pricingType === "STARTING_FROM" ? "From " : "";
     return (
-      <span className="text-sm font-medium">
+      <span className="text-sm font-black text-primary">
         {prefix}
         {product.salesPrice.toFixed(2)}
       </span>
@@ -290,16 +303,16 @@ function StatusChips({ product }: { product: Product }) {
   return (
     <div className="flex items-center gap-1">
       {product.isAvailable ? (
-        <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-800">
+        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
           Available
         </span>
       ) : (
-        <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
           Unavailable
         </span>
       )}
       {!product.isVisible ? (
-        <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
           Hidden
         </span>
       ) : null}

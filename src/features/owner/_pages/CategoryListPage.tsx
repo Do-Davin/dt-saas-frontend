@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { TagIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -80,9 +80,14 @@ export function CategoryListPage() {
         <OwnerPageHeader
           title="Categories"
           actions={
-            <Button asChild size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
+            >
               <Link to="/owner/categories/new">
-                <PlusIcon className="size-3.5" />
+                <TagIcon className="size-4" />
                 New category
               </Link>
             </Button>
@@ -92,7 +97,7 @@ export function CategoryListPage() {
         {deleteError ? (
           <div
             role="alert"
-            className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
           >
             {deleteError}
           </div>
@@ -109,18 +114,23 @@ export function CategoryListPage() {
             {state.items.map((cat) => (
               <li
                 key={cat.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border bg-card px-4 py-4 transition-all duration-200 ease-out hover:bg-muted/40 hover:-translate-y-0.5 hover:scale-[1.01]"
+                className="flex items-center justify-between gap-4 rounded-2xl border bg-card px-6 py-8 transition-all duration-200 ease-out hover:bg-primary/5 hover:border-primary hover:scale-[1.01]"
               >
-                <div className="min-w-0 flex-1 w-full">
-                  <span className="block truncate font-medium text-foreground">{cat.name}</span>
-                  {cat.nameKm ? (
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {cat.nameKm}
+                <div className="flex min-w-0 items-center gap-4">
+                  <TagIcon className="size-10 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <span className="block min-w-0 truncate text-base font-black text-primary">
+                      {cat.name}
                     </span>
-                  ) : null}
-                  <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span>Position {cat.position}</span>
-                    {cat.branchId ? <span>· Branch scoped</span> : null}
+                    {cat.nameKm ? (
+                      <span className="block truncate text-sm font-semibold text-zinc-500">
+                        {cat.nameKm}
+                      </span>
+                    ) : null}
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-500">
+                      <span>Position {cat.position}</span>
+                      {cat.branchId ? <span>· Branch scoped</span> : null}
+                    </div>
                   </div>
                 </div>
                 <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0 border-border/40">
@@ -133,26 +143,31 @@ export function CategoryListPage() {
                   >
                     {cat.isActive ? "Active" : "Inactive"}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link
-                        to={`/owner/categories/${encodeURIComponent(cat.id)}`}
-                      >
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => {
-                        setDeleteError(null);
-                        setPendingDelete(cat);
-                      }}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
+                  >
+                    <Link
+                      to={`/owner/categories/${encodeURIComponent(cat.id)}`}
                     >
-                      Delete
-                    </Button>
-                  </div>
+                      <PencilIcon className="size-3.5" />
+                      Edit
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 rounded-xl border-2 border-destructive/50 text-destructive font-black transition-all duration-200 ease-out hover:bg-destructive/5 hover:border-destructive hover:text-destructive hover:scale-[1.07]"
+                    onClick={() => {
+                      setDeleteError(null);
+                      setPendingDelete(cat);
+                    }}
+                  >
+                    <Trash2Icon className="size-3.5" />
+                    Delete
+                  </Button>
                 </div>
               </li>
             ))}

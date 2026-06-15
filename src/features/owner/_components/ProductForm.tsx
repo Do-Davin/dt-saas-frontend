@@ -1,4 +1,19 @@
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import type { ReactNode } from "react";
+import {
+  PackageIcon,
+  LanguagesIcon,
+  AlignLeftIcon,
+  DollarSignIcon,
+  PercentIcon,
+  TagIcon,
+  GitBranchIcon,
+  LayersIcon,
+  ScaleIcon,
+  WalletIcon,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { OwnerTextField } from "./OwnerTextField";
 import type {
   BranchOption,
   CategoryOption,
@@ -31,11 +46,122 @@ const UNIT_OF_MEASURE_OPTIONS: { value: UnitOfMeasure | ""; label: string }[] =
     { value: "DAY", label: "Day" },
   ];
 
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+function parseBackendError(raw: string | undefined): {
+  fieldErrors: Partial<ProductFormErrors>;
+  generic?: string;
+} {
+  if (!raw) return { fieldErrors: {} };
+  const lower = raw.toLowerCase();
+  if (lower.includes("discount")) return { fieldErrors: { discount: raw } };
+  if (lower.includes("purchase"))
+    return { fieldErrors: { purchasePrice: raw } };
+  if (lower.includes("sales") || lower.includes("price"))
+    return { fieldErrors: { salesPrice: raw } };
+  if (lower.includes("name")) return { fieldErrors: { name: raw } };
+  const generic = /validation\s*failed/i.test(raw)
+    ? "Please check the form and try again."
+    : raw;
+  return { fieldErrors: {}, generic };
+}
 
-const TEXTAREA_CLASS =
-  "flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[72px] resize-y";
+// ── Styled select — matches OwnerTextField height/look ──────────────────────
+
+interface StyledSelectProps {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+  leadingIcon: LucideIcon;
+  hint?: string;
+  children: ReactNode;
+}
+
+function StyledSelect({
+  label,
+  id,
+  value,
+  onChange,
+  disabled,
+  leadingIcon: Icon,
+  hint,
+  children,
+}: StyledSelectProps) {
+  return (
+    <div className={disabled ? "pointer-events-none opacity-60" : ""}>
+      <div className="relative">
+        <Icon
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-[18px] text-muted-foreground"
+          strokeWidth={2.5}
+        />
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          className="h-14 w-full appearance-none rounded-xl border border-input bg-card pl-10 pr-3 text-sm font-semibold text-primary outline-none transition-all duration-150 hover:border-primary/40 focus:border-primary focus:ring-1 focus:ring-primary/20"
+        >
+          {children}
+        </select>
+        <label
+          htmlFor={id}
+          className="pointer-events-none absolute left-3 top-0 -translate-y-1/2 bg-card px-1 text-[11px] font-semibold text-zinc-500"
+        >
+          {label}
+        </label>
+      </div>
+      {hint ? (
+        <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+// ── Styled textarea — matches OwnerTextField visual style ────────────────────
+
+interface StyledTextareaProps {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+  leadingIcon: LucideIcon;
+}
+
+function StyledTextarea({
+  label,
+  id,
+  value,
+  onChange,
+  disabled,
+  leadingIcon: Icon,
+}: StyledTextareaProps) {
+  return (
+    <div className={disabled ? "pointer-events-none opacity-60" : ""}>
+      <div className="relative">
+        <Icon
+          className="pointer-events-none absolute left-3 top-4 size-[18px] text-muted-foreground"
+          strokeWidth={2.5}
+        />
+        <textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          className="min-h-[88px] w-full resize-y rounded-xl border border-input bg-card py-4 pl-10 pr-3 text-sm font-semibold text-primary outline-none transition-all duration-150 hover:border-primary/40 focus:border-primary focus:ring-1 focus:ring-primary/20"
+        />
+        <label
+          htmlFor={id}
+          className="pointer-events-none absolute left-3 top-0 -translate-y-1/2 bg-card px-1 text-[11px] font-semibold text-zinc-500"
+        >
+          {label}
+        </label>
+      </div>
+    </div>
+  );
+}
+
+// ── Main form component ──────────────────────────────────────────────────────
 
 interface ProductFormFieldsProps {
   values: ProductFormValues;
@@ -47,9 +173,9 @@ interface ProductFormFieldsProps {
     field: K,
     value: ProductFormValues[K]
   ) => void;
+  submitError?: string;
 }
 
-// Shared field set used by both ProductNewPage and ProductEditPage.
 export function ProductFormFields({
   values,
   errors,
@@ -57,287 +183,254 @@ export function ProductFormFields({
   branches,
   categories,
   onChange,
+  submitError,
 }: ProductFormFieldsProps) {
+  const [editedSince, setEditedSince] = useState<{
+    errorKey: string | undefined;
+    fields: Set<string>;
+  }>({ errorKey: undefined, fields: new Set() });
+
+  function handleFieldChange<K extends keyof ProductFormValues>(
+    field: K,
+    value: ProductFormValues[K]
+  ) {
+    if (submitError) {
+      setEditedSince((prev) => {
+        const isSameError = prev.errorKey === submitError;
+        const next = isSameError ? new Set(prev.fields) : new Set<string>();
+        next.add(field as string);
+        return { errorKey: submitError, fields: next };
+      });
+    }
+    onChange(field, value);
+  }
+
+  const editedFields =
+    editedSince.errorKey === submitError ? editedSince.fields : new Set<string>();
+
+  const { fieldErrors: backendFieldErrors, generic: genericError } =
+    parseBackendError(submitError);
+
+  const displayErrors: ProductFormErrors = {};
+  const validatedFields: (keyof ProductFormErrors)[] = [
+    "name",
+    "salesPrice",
+    "purchasePrice",
+    "discount",
+  ];
+  for (const field of validatedFields) {
+    if (errors[field]) {
+      displayErrors[field] = errors[field];
+    } else if (backendFieldErrors[field] && !editedFields.has(field)) {
+      displayErrors[field] = backendFieldErrors[field];
+    }
+  }
+
   return (
     <div className="space-y-5">
-      {/* ── Basic info ──────────────────────────────────────────── */}
-      <div className="space-y-4">
-        <FieldRow
-          id="product-name"
-          label="Name"
+      {/* ── Basic info ─────────────────────────────────────────────────── */}
+      <div className="space-y-5">
+        <OwnerTextField
+          label="Product Name"
+          value={values.name}
+          onChange={(v) => handleFieldChange("name", v)}
+          name="name"
           required
-          error={errors.name}
-        >
-          <Input
-            id="product-name"
-            value={values.name}
-            onChange={(e) => onChange("name", e.target.value)}
-            disabled={disabled}
-            placeholder="Iced Coffee"
-            aria-required
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? "product-name-error" : undefined}
-          />
-        </FieldRow>
+          disabled={disabled}
+          error={displayErrors.name}
+          leadingIcon={PackageIcon}
+        />
 
-        <FieldRow id="product-name-km" label="Name (Khmer)">
-          <Input
-            id="product-name-km"
-            value={values.nameKm}
-            onChange={(e) => onChange("nameKm", e.target.value)}
-            disabled={disabled}
-            placeholder="កាហ្វេទឹកកក"
-          />
-        </FieldRow>
+        <OwnerTextField
+          label="Name (Khmer)"
+          value={values.nameKm}
+          onChange={(v) => handleFieldChange("nameKm", v)}
+          name="nameKm"
+          disabled={disabled}
+          leadingIcon={LanguagesIcon}
+        />
 
-        <FieldRow id="product-description" label="Description">
-          <textarea
-            id="product-description"
-            className={TEXTAREA_CLASS}
-            value={values.description}
-            onChange={(e) => onChange("description", e.target.value)}
-            disabled={disabled}
-            placeholder="Short description shown on the menu"
-          />
-        </FieldRow>
+        <StyledTextarea
+          label="Description"
+          id="product-description"
+          value={values.description}
+          onChange={(v) => handleFieldChange("description", v)}
+          disabled={disabled}
+          leadingIcon={AlignLeftIcon}
+        />
 
-        <FieldRow id="product-description-km" label="Description (Khmer)">
-          <textarea
-            id="product-description-km"
-            className={TEXTAREA_CLASS}
-            value={values.descriptionKm}
-            onChange={(e) => onChange("descriptionKm", e.target.value)}
-            disabled={disabled}
-          />
-        </FieldRow>
+        <StyledTextarea
+          label="Description (Khmer)"
+          id="product-description-km"
+          value={values.descriptionKm}
+          onChange={(v) => handleFieldChange("descriptionKm", v)}
+          disabled={disabled}
+          leadingIcon={AlignLeftIcon}
+        />
       </div>
 
-      {/* ── Assignment ──────────────────────────────────────────── */}
+      {/* ── Assignment ─────────────────────────────────────────────────── */}
       {(categories.length > 0 || branches.length > 0) && (
-        <div className="space-y-4 border-t pt-4">
+        <div className="space-y-5 border-t pt-5">
           {categories.length > 0 && (
-            <FieldRow id="product-category" label="Category">
-              <select
-                id="product-category"
-                className={SELECT_CLASS}
-                value={values.categoryId}
-                onChange={(e) => onChange("categoryId", e.target.value)}
-                disabled={disabled}
-              >
-                <option value="">— no category —</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </FieldRow>
+            <StyledSelect
+              label="Category"
+              id="product-category"
+              value={values.categoryId}
+              onChange={(v) => handleFieldChange("categoryId", v)}
+              disabled={disabled}
+              leadingIcon={LayersIcon}
+            >
+              <option value="">— no category —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </StyledSelect>
           )}
 
           {branches.length > 0 && (
-            <FieldRow id="product-branch" label="Branch">
-              <select
-                id="product-branch"
-                className={SELECT_CLASS}
-                value={values.branchId}
-                onChange={(e) => onChange("branchId", e.target.value)}
-                disabled={disabled}
-              >
-                <option value="">All branches</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </FieldRow>
+            <StyledSelect
+              label="Branch"
+              id="product-branch"
+              value={values.branchId}
+              onChange={(v) => handleFieldChange("branchId", v)}
+              disabled={disabled}
+              leadingIcon={GitBranchIcon}
+            >
+              <option value="">All branches</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </StyledSelect>
           )}
         </div>
       )}
 
-      {/* ── Pricing ─────────────────────────────────────────────── */}
-      <div className="space-y-4 border-t pt-4">
-        <FieldRow
-          id="product-pricing-type"
+      {/* ── Pricing ────────────────────────────────────────────────────── */}
+      <div className="space-y-5 border-t pt-5">
+        <StyledSelect
           label="Pricing type"
+          id="product-pricing-type"
+          value={values.pricingType}
+          onChange={(v) =>
+            handleFieldChange("pricingType", v as PricingType | "")
+          }
+          disabled={disabled}
+          leadingIcon={WalletIcon}
         >
-          <select
-            id="product-pricing-type"
-            className={SELECT_CLASS}
-            value={values.pricingType}
-            onChange={(e) =>
-              onChange("pricingType", e.target.value as PricingType | "")
-            }
-            disabled={disabled}
-          >
-            {PRICING_TYPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </FieldRow>
+          {PRICING_TYPE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </StyledSelect>
 
-        <FieldRow
-          id="product-sales-price"
+        <OwnerTextField
           label="Sales price"
-          error={errors.salesPrice}
-        >
-          <Input
-            id="product-sales-price"
-            type="text"
-            inputMode="decimal"
-            value={values.salesPrice}
-            onChange={(e) => onChange("salesPrice", e.target.value)}
-            disabled={disabled}
-            placeholder="0.00"
-            aria-invalid={!!errors.salesPrice}
-            aria-describedby={
-              errors.salesPrice ? "product-sales-price-error" : undefined
-            }
-          />
-        </FieldRow>
+          value={values.salesPrice}
+          onChange={(v) => handleFieldChange("salesPrice", v)}
+          name="salesPrice"
+          disabled={disabled}
+          error={displayErrors.salesPrice}
+          leadingIcon={DollarSignIcon}
+        />
 
-        <FieldRow
-          id="product-purchase-price"
+        <OwnerTextField
           label="Purchase price"
-          error={errors.purchasePrice}
-        >
-          <Input
-            id="product-purchase-price"
-            type="text"
-            inputMode="decimal"
-            value={values.purchasePrice}
-            onChange={(e) => onChange("purchasePrice", e.target.value)}
-            disabled={disabled}
-            placeholder="0.00"
-            aria-invalid={!!errors.purchasePrice}
-            aria-describedby={
-              errors.purchasePrice
-                ? "product-purchase-price-error"
-                : undefined
-            }
-          />
-        </FieldRow>
+          value={values.purchasePrice}
+          onChange={(v) => handleFieldChange("purchasePrice", v)}
+          name="purchasePrice"
+          disabled={disabled}
+          error={displayErrors.purchasePrice}
+          leadingIcon={DollarSignIcon}
+        />
 
-        <FieldRow
-          id="product-discount"
+        <OwnerTextField
           label="Discount"
-          error={errors.discount}
+          value={values.discount}
+          onChange={(v) => handleFieldChange("discount", v)}
+          name="discount"
+          disabled={disabled}
+          error={displayErrors.discount}
+          leadingIcon={PercentIcon}
+        />
+      </div>
+
+      {/* ── Attributes ─────────────────────────────────────────────────── */}
+      <div className="space-y-5 border-t pt-5">
+        <StyledSelect
+          label="Unit of measure"
+          id="product-unit"
+          value={values.unitOfMeasure}
+          onChange={(v) =>
+            handleFieldChange("unitOfMeasure", v as UnitOfMeasure | "")
+          }
+          disabled={disabled}
+          leadingIcon={ScaleIcon}
         >
-          <Input
-            id="product-discount"
-            type="text"
-            inputMode="decimal"
-            value={values.discount}
-            onChange={(e) => onChange("discount", e.target.value)}
-            disabled={disabled}
-            placeholder="0.00"
-            aria-invalid={!!errors.discount}
-            aria-describedby={
-              errors.discount ? "product-discount-error" : undefined
-            }
-          />
-        </FieldRow>
+          {UNIT_OF_MEASURE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </StyledSelect>
+
+        <OwnerTextField
+          label="Label"
+          value={values.label}
+          onChange={(v) => handleFieldChange("label", v)}
+          name="label"
+          disabled={disabled}
+          leadingIcon={TagIcon}
+        />
       </div>
 
-      {/* ── Attributes ──────────────────────────────────────────── */}
-      <div className="space-y-4 border-t pt-4">
-        <FieldRow id="product-unit" label="Unit of measure">
-          <select
-            id="product-unit"
-            className={SELECT_CLASS}
-            value={values.unitOfMeasure}
-            onChange={(e) =>
-              onChange("unitOfMeasure", e.target.value as UnitOfMeasure | "")
-            }
-            disabled={disabled}
-          >
-            {UNIT_OF_MEASURE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </FieldRow>
-
-        <FieldRow id="product-label" label="Label">
-          <Input
-            id="product-label"
-            value={values.label}
-            onChange={(e) => onChange("label", e.target.value)}
-            disabled={disabled}
-            placeholder="e.g. New, Popular, Chef's choice"
-          />
-        </FieldRow>
-      </div>
-
-      {/* ── Status ──────────────────────────────────────────────── */}
-      <div className="space-y-2 border-t pt-4">
-        <div className="flex items-center gap-2">
+      {/* ── Status ─────────────────────────────────────────────────────── */}
+      <div className="space-y-3 border-t pt-5">
+        <div className="flex items-center gap-3 rounded-xl border border-input bg-card px-4 py-3 transition-colors hover:border-primary/40">
           <input
             id="product-available"
             type="checkbox"
             checked={values.isAvailable}
-            onChange={(e) => onChange("isAvailable", e.target.checked)}
+            onChange={(e) => handleFieldChange("isAvailable", e.target.checked)}
             disabled={disabled}
-            className="h-4 w-4 rounded border-border accent-primary"
+            className="h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-primary"
           />
           <label
             htmlFor="product-available"
-            className="text-sm font-medium text-foreground"
+            className="cursor-pointer select-none text-sm font-semibold text-foreground"
           >
             Available for ordering
           </label>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 rounded-xl border border-input bg-card px-4 py-3 transition-colors hover:border-primary/40">
           <input
             id="product-visible"
             type="checkbox"
             checked={values.isVisible}
-            onChange={(e) => onChange("isVisible", e.target.checked)}
+            onChange={(e) => handleFieldChange("isVisible", e.target.checked)}
             disabled={disabled}
-            className="h-4 w-4 rounded border-border accent-primary"
+            className="h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-primary"
           />
           <label
             htmlFor="product-visible"
-            className="text-sm font-medium text-foreground"
+            className="cursor-pointer select-none text-sm font-semibold text-foreground"
           >
             Visible on menu
           </label>
         </div>
       </div>
-    </div>
-  );
-}
 
-interface FieldRowProps {
-  id: string;
-  label: string;
-  required?: boolean;
-  error?: string;
-  children: React.ReactNode;
-}
-
-function FieldRow({ id, label, required, error, children }: FieldRowProps) {
-  const errorId = error ? `${id}-error` : undefined;
-  return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block text-sm font-medium text-foreground">
-        {label}
-        {required && (
-          <span aria-hidden className="ml-0.5 text-destructive">
-            *
-          </span>
-        )}
-      </label>
-      {children}
-      {error && (
-        <p id={errorId} className="text-xs text-destructive">
-          {error}
+      {genericError ? (
+        <p role="alert" className="text-sm text-destructive">
+          {genericError}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

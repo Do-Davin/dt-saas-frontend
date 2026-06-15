@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Trash2Icon } from "lucide-react";
+import { Loader2, StarIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -126,11 +126,11 @@ export function ProductImageManager({
 
   return (
     <>
-      <section aria-labelledby="images-heading" className="max-w-lg">
-        <div className="rounded-lg border bg-card p-6 space-y-4">
+      <section aria-labelledby="images-heading" className="max-w-5xl">
+        <div className="rounded-2xl border bg-card px-6 py-7 space-y-4">
           <h3
             id="images-heading"
-            className="text-sm font-medium text-foreground"
+            className="text-base font-black text-primary"
           >
             Images
           </h3>
@@ -138,7 +138,7 @@ export function ProductImageManager({
           {deleteError ? (
             <div
               role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
               {deleteError}
             </div>
@@ -152,14 +152,16 @@ export function ProductImageManager({
           ) : state.status === "error" ? (
             <div
               role="alert"
-              className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
               {state.message}
             </div>
           ) : state.images.length === 0 ? (
-            <p className="py-2 text-sm text-muted-foreground">No images yet.</p>
+            <p className="py-2 text-sm font-semibold text-zinc-500">
+              No images yet.
+            </p>
           ) : (
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {state.images.map((img) => (
                 <ImageCard
                   key={img.id}
@@ -176,14 +178,14 @@ export function ProductImageManager({
           )}
 
           {/* Upload */}
-          <div className="space-y-2 border-t pt-4">
+          <div className="space-y-3 border-t pt-5">
             <label
               htmlFor="image-upload"
-              className="block text-sm font-medium text-foreground"
+              className="block text-sm font-semibold text-zinc-500"
             >
               Add image
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 key={fileInputKey}
                 id="image-upload"
@@ -191,14 +193,21 @@ export function ProductImageManager({
                 accept={ACCEPTED_ATTR}
                 onChange={handleFileSelect}
                 disabled={isUploading}
-                className="flex-1 text-sm text-foreground file:mr-3 file:rounded-md file:border file:border-input file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground hover:file:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex-1 min-w-0 text-sm font-semibold text-foreground file:mr-3 file:rounded-xl file:border-2 file:border-primary file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-black file:text-primary hover:file:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-50"
               />
               <Button
                 type="button"
+                variant="outline"
                 size="sm"
                 disabled={!selectedFile || isUploading}
                 onClick={() => void handleUpload()}
+                className="gap-1.5 rounded-xl border-2 border-primary text-primary font-black transition-all duration-200 ease-out hover:bg-primary/10 hover:border-primary hover:scale-[1.07]"
               >
+                {isUploading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <UploadCloudIcon className="size-4" />
+                )}
                 {isUploading ? "Uploading…" : "Upload"}
               </Button>
             </div>
@@ -267,7 +276,7 @@ function ImageCard({
   onDelete,
 }: ImageCardProps) {
   return (
-    <li className="group relative flex flex-col overflow-hidden rounded-md border bg-card">
+    <li className="flex flex-col overflow-hidden rounded-xl border bg-card transition-all duration-200 ease-out hover:border-primary">
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
           src={image.url}
@@ -275,21 +284,22 @@ function ImageCard({
           className="h-full w-full object-cover"
         />
         {image.isPrimary ? (
-          <span className="absolute left-1.5 top-1.5 rounded bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground">
+          <span className="absolute left-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
             Primary
           </span>
         ) : null}
       </div>
-      <div className="flex items-center justify-between gap-1 p-1.5">
+      <div className="flex items-center justify-between gap-1 border-t px-2 py-2">
         {!image.isPrimary ? (
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="h-7 flex-1 px-2 text-xs"
+            className="h-7 flex-1 gap-1 rounded-xl border font-black text-xs text-primary transition-all duration-150 hover:bg-primary/5 hover:border-primary"
             disabled={isSettingPrimary}
             onClick={onSetPrimary}
           >
+            <StarIcon className="size-3" />
             {isSettingPrimary ? "Setting…" : "Set primary"}
           </Button>
         ) : (
@@ -297,11 +307,12 @@ function ImageCard({
         )}
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+          className="h-7 gap-1 rounded-xl border border-destructive/40 font-black text-xs text-destructive transition-all duration-150 hover:bg-destructive/5 hover:border-destructive hover:text-destructive"
           onClick={onDelete}
         >
+          <Trash2Icon className="size-3" />
           Delete
         </Button>
       </div>

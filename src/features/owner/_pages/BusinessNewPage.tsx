@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { PlusCircleIcon } from "lucide-react";
+import { useNavigate, Link } from "react-router";
+import { PlusCircleIcon, ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
@@ -101,7 +101,7 @@ export function BusinessNewPage() {
               submitError={submitStatus.status === "error" ? submitStatus.message : undefined}
             />
 
-            <div className="mt-7 flex justify-center">
+            <div className="mt-7 flex justify-center gap-3">
               <Button
                 type="submit"
                 variant="outline"
@@ -110,6 +110,16 @@ export function BusinessNewPage() {
               >
                 <PlusCircleIcon className="size-4" />
                 {isSubmitting ? "Creating…" : "Create business"}
+              </Button>
+              <Button
+                variant="outline"
+                asChild
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
+              >
+                <Link to="/owner/businesses">
+                  <ArrowLeftIcon className="size-3.5" />
+                  Cancel
+                </Link>
               </Button>
             </div>
           </form>
