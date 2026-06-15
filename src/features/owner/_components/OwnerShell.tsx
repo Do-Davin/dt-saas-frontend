@@ -197,6 +197,10 @@ export function OwnerShell() {
 
   const initials = owner ? getInitials(owner.name, owner.email) : "—";
 
+  // Routes that render their own mobile toolbar in place of the shell header.
+  // Only hidden below md — desktop always shows the full shell header.
+  const hidesMobileHeader = location.pathname === "/owner/products";
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
 
@@ -270,7 +274,12 @@ export function OwnerShell() {
       <div className="flex flex-1 min-w-0 flex-col overflow-hidden">
 
         {/* Top header */}
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <header
+          className={cn(
+            "flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60",
+            hidesMobileHeader && "hidden md:flex",
+          )}
+        >
 
           {/* Mobile hamburger */}
           <button

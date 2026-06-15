@@ -208,87 +208,91 @@ export function ProductBrowserPanel({
           message="Add a product to get started."
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border bg-card">
+        <>
+          {/* ── Mobile dense table with sticky Product + Price ─────── */}
+          <MobileProductTable
+            items={productState.items}
+            onRequestDelete={(product) => {
+              setDeleteError(null);
+              setPendingDelete(product);
+            }}
+          />
+
+          {/* ── Desktop table ──────────────────────────────────────── */}
+          <div className="hidden md:block overflow-hidden rounded-2xl border-[1.5px] bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-sm">
+            <table className="w-full min-w-[640px] border-collapse text-[13px]">
               <thead>
-                <tr className="border-b">
-                  <th className="py-3 pl-4 pr-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <tr className="border-b-[1.5px]">
+                  <th className="py-2.5 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Product
                   </th>
-                  <th className="w-28 py-3 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="w-28 py-2.5 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Price
                   </th>
-                  <th className="w-24 py-3 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="w-24 py-2.5 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Discount
                   </th>
-                  <th className="w-20 py-3 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="w-20 py-2.5 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Menu
                   </th>
-                  <th className="w-28 py-3 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="w-28 py-2.5 px-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Status
                   </th>
-                  <th className="w-10 py-3 px-3" aria-hidden="true" />
-                  <th className="w-10 py-3 pl-3 pr-4" aria-hidden="true" />
+                  <th className="w-10 py-2.5 px-3" aria-hidden="true" />
+                  <th className="w-10 py-2.5 pl-3 pr-3" aria-hidden="true" />
                 </tr>
               </thead>
               <tbody>
                 {productState.items.map((product) => (
                   <tr
                     key={product.id}
-                    className="border-b transition-colors last:border-b-0 hover:bg-primary/5"
+                    className="border-b-[1.5px] transition-colors last:border-b-0 hover:bg-primary/5"
                   >
-                    <td className="py-4 pl-4 pr-3">
+                    <td className="py-2.5 px-3">
                       <div className="flex min-w-0 items-center gap-3">
                         <ProductThumbnail product={product} />
-                        <div className="min-w-0">
-                          <p className="truncate font-black text-primary">
-                            {product.name}
-                          </p>
-                          {product.nameKm ? (
-                            <p className="truncate text-xs text-zinc-500">
-                              {product.nameKm}
-                            </p>
-                          ) : null}
-                        </div>
+                        <p className="min-w-0 truncate text-[13px] font-semibold text-primary">
+                          {product.name}
+                        </p>
                       </div>
                     </td>
 
-                    <td className="py-4 px-3">
+                    <td className="py-2.5 px-3">
                       <ProductPrice product={product} />
                     </td>
 
-                    <td className="py-4 px-3 tabular-nums font-semibold text-zinc-600">
+                    <td className="py-2.5 px-3 tabular-nums font-semibold text-zinc-600">
                       {product.discount != null
                         ? product.discount.toFixed(2)
                         : "—"}
                     </td>
 
-                    <td className="py-4 px-3">
+                    <td className="py-2.5 px-3">
                       {product.isVisible ? (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
                           Shown
                         </span>
                       ) : (
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                           Hidden
                         </span>
                       )}
                     </td>
 
-                    <td className="py-4 px-3">
+                    <td className="py-2.5 px-3">
                       {product.isAvailable ? (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
                           Available
                         </span>
                       ) : (
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                           Unavailable
                         </span>
                       )}
                     </td>
 
-                    <td className="py-4 px-3">
+                    <td className="py-2.5 px-3">
                       <Button
                         variant="outline"
                         size="icon"
@@ -304,7 +308,7 @@ export function ProductBrowserPanel({
                       </Button>
                     </td>
 
-                    <td className="py-4 pl-3 pr-4">
+                    <td className="py-2.5 pl-3 pr-3">
                       <Button
                         variant="outline"
                         size="icon"
@@ -324,6 +328,7 @@ export function ProductBrowserPanel({
             </table>
           </div>
         </div>
+        </>
       )}
 
       <AlertDialog
@@ -459,4 +464,259 @@ function ProductPrice({ product }: { product: Product }) {
     );
   }
   return null;
+}
+
+// ─── Mobile dense table with sticky Product + Price columns ──────────────────
+//
+// Renders a real <table> on mobile. The first two columns (Product, Price)
+// stick to the left of the horizontal scroll container; Discount, Menu,
+// Status, Actions scroll out from under them.
+//
+// Column widths are shared between <th> and <td> via CSS custom properties
+// (--m-prod-w, --m-price-w) declared on the wrapper, so sticky offsets and
+// column widths never drift apart. Sticky cells use bg-card so scrolling
+// columns never bleed through. A 1px inset shadow on the right of the Price
+// column hints that more columns continue under it.
+
+const MOBILE_PRODUCT_W = "140px";
+const MOBILE_PRICE_W = "58px";
+// Sum of all column widths: 140 + 58 + 72 + 66 + 82 + 88 = 506. Set the table
+// min-width to that sum so columns hit their target widths exactly with no
+// extra blank space distributed to any cell.
+const MOBILE_TABLE_MIN_W = "506px";
+
+interface MobileProductTableProps {
+  items: Product[];
+  onRequestDelete: (product: Product) => void;
+}
+
+function MobileProductTable({
+  items,
+  onRequestDelete,
+}: MobileProductTableProps) {
+  // CSS variables let <th> and <td> share width / sticky-left values so they
+  // can never go out of sync. Cast required because TS does not model
+  // custom-property keys on CSSProperties.
+  const cssVars = {
+    "--m-prod-w": MOBILE_PRODUCT_W,
+    "--m-price-w": MOBILE_PRICE_W,
+  } as React.CSSProperties;
+
+  const headerStyle = "px-2 py-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-muted/40";
+
+  return (
+    <div
+      className="md:hidden -mx-4 overflow-x-auto border-y-[1.5px] bg-card"
+      style={cssVars}
+    >
+      <table
+        className="w-full border-collapse text-xs"
+        style={{ minWidth: MOBILE_TABLE_MIN_W }}
+      >
+        <thead>
+          <tr className="border-b-[1.5px]">
+            <th
+              scope="col"
+              className={cn(
+                headerStyle,
+                "sticky left-0 z-30 text-left pl-3",
+              )}
+              style={{
+                width: "var(--m-prod-w)",
+                minWidth: "var(--m-prod-w)",
+                maxWidth: "var(--m-prod-w)",
+              }}
+            >
+              Product
+            </th>
+            <th
+              scope="col"
+              className={cn(
+                headerStyle,
+                "sticky z-30 text-right",
+                "shadow-[inset_-1.5px_0_0_var(--border)]",
+              )}
+              style={{
+                left: "var(--m-prod-w)",
+                width: "var(--m-price-w)",
+                minWidth: "var(--m-price-w)",
+                maxWidth: "var(--m-price-w)",
+              }}
+            >
+              Price
+            </th>
+            <th
+              scope="col"
+              className={cn(headerStyle, "text-right")}
+              style={{ width: "72px", minWidth: "72px" }}
+            >
+              Discount
+            </th>
+            <th
+              scope="col"
+              className={cn(headerStyle, "text-left")}
+              style={{ width: "66px", minWidth: "66px" }}
+            >
+              Menu
+            </th>
+            <th
+              scope="col"
+              className={cn(headerStyle, "text-left")}
+              style={{ width: "82px", minWidth: "82px" }}
+            >
+              Status
+            </th>
+            <th
+              scope="col"
+              className={cn(headerStyle, "text-right pr-2")}
+              style={{ width: "88px", minWidth: "88px" }}
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((product) => (
+            <MobileProductTableRow
+              key={product.id}
+              product={product}
+              onDelete={() => onRequestDelete(product)}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+interface MobileProductTableRowProps {
+  product: Product;
+  onDelete: () => void;
+}
+
+function MobileProductTableRow({
+  product,
+  onDelete,
+}: MobileProductTableRowProps) {
+  // Hover background is applied per-cell (not on the <tr>) because sticky
+  // cells need their own opaque bg and a tr-level background does not paint
+  // beneath sticky positioning. Using a `group` class on the row lets every
+  // cell react to the same hover.
+  const bodyCell = "px-2 py-2 align-middle text-xs group-hover:bg-primary/5";
+
+  return (
+    <tr className="group border-t-[1.5px]">
+      {/* Sticky Product cell — left:0, opaque bg, name only (no Khmer) */}
+      <td
+        className={cn(
+          bodyCell,
+          "sticky left-0 z-20 bg-card pl-3",
+        )}
+        style={{
+          width: "var(--m-prod-w)",
+          minWidth: "var(--m-prod-w)",
+          maxWidth: "var(--m-prod-w)",
+        }}
+      >
+        <p className="line-clamp-2 text-xs font-semibold leading-tight text-primary">
+          {product.name}
+        </p>
+      </td>
+
+      {/* Sticky Price cell — left:var(--m-prod-w), 1.5px inset shadow */}
+      <td
+        className={cn(
+          bodyCell,
+          "sticky z-20 bg-card text-right whitespace-nowrap",
+          "shadow-[inset_-1.5px_0_0_var(--border)]",
+        )}
+        style={{
+          left: "var(--m-prod-w)",
+          width: "var(--m-price-w)",
+          minWidth: "var(--m-price-w)",
+          maxWidth: "var(--m-price-w)",
+        }}
+      >
+        <ProductPrice product={product} />
+      </td>
+
+      <td
+        className={cn(
+          bodyCell,
+          "text-right tabular-nums font-semibold text-zinc-600",
+        )}
+      >
+        {product.discount != null ? `−${product.discount.toFixed(2)}` : "—"}
+      </td>
+
+      <td className={bodyCell}>
+        <CompactBadge
+          on={product.isVisible}
+          onLabel="Shown"
+          offLabel="Hidden"
+        />
+      </td>
+
+      <td className={bodyCell}>
+        <CompactBadge
+          on={product.isAvailable}
+          onLabel="Available"
+          offLabel="Unavail."
+        />
+      </td>
+
+      <td
+        className={cn(
+          bodyCell,
+          "pr-2 text-right whitespace-nowrap",
+        )}
+      >
+        <div className="inline-flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            asChild
+            aria-label={`Edit ${product.name}`}
+            className="size-9 rounded-lg border-2 font-black transition-colors hover:border-primary hover:text-primary"
+          >
+            <Link to={`/owner/products/${encodeURIComponent(product.id)}`}>
+              <PencilIcon className="size-3.5" />
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={`Delete ${product.name}`}
+            className="size-9 rounded-lg border-2 border-destructive/50 text-destructive font-black transition-colors hover:border-destructive hover:bg-destructive/5 hover:text-destructive"
+            onClick={onDelete}
+          >
+            <Trash2Icon className="size-3.5" />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+// ─── Compact status badge ────────────────────────────────────────────────────
+
+interface CompactBadgeProps {
+  on: boolean;
+  onLabel: string;
+  offLabel: string;
+}
+
+function CompactBadge({ on, onLabel, offLabel }: CompactBadgeProps) {
+  return (
+    <span
+      className={cn(
+        "inline-block whitespace-nowrap rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+        on
+          ? "bg-green-100 text-green-700"
+          : "bg-muted text-muted-foreground",
+      )}
+    >
+      {on ? onLabel : offLabel}
+    </span>
+  );
 }

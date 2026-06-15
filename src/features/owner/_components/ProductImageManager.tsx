@@ -19,9 +19,10 @@ import {
   setProductImagePrimary,
 } from "../_api/productImages";
 import type { ProductImage } from "../_api/productImages";
-
-const ACCEPTED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-const ACCEPTED_ATTR = "image/jpeg,image/png,image/webp";
+import {
+  ACCEPTED_IMAGE_INPUT_ATTR,
+  validateImageFile,
+} from "../_utils/productImageValidation";
 
 type UploadStatus =
   | { status: "idle" }
@@ -31,11 +32,13 @@ type UploadStatus =
 interface ProductImageManagerProps {
   businessId: string;
   productId: string;
+  notice?: { kind: "partial" | "all"; failedNames: string[] };
 }
 
 export function ProductImageManager({
   businessId,
   productId,
+  notice,
 }: ProductImageManagerProps) {
   const { state, refetch } = useProductImages(businessId, productId);
 
@@ -52,6 +55,8 @@ export function ProductImageManager({
 
   const [settingPrimaryId, setSettingPrimaryId] = useState<string | null>(null);
 
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
     setFileError(null);
@@ -60,8 +65,9 @@ export function ProductImageManager({
       setSelectedFile(null);
       return;
     }
-    if (!ACCEPTED_MIME_TYPES.has(file.type)) {
-      setFileError("File must be a JPEG, PNG, or WebP image.");
+    const err = validateImageFile(file);
+    if (err) {
+      setFileError(err);
       setSelectedFile(null);
       return;
     }
@@ -135,6 +141,38 @@ export function ProductImageManager({
             Images
           </h3>
 
+          {notice && !noticeDismissed ? (
+            <div
+              role="alert"
+              className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="text-destructive">
+                  <p className="font-semibold">
+                    {notice.kind === "all"
+                      ? "All staged images failed to upload."
+                      : `${notice.failedNames.length} image${notice.failedNames.length === 1 ? "" : "s"} failed to upload.`}
+                  </p>
+                  {notice.failedNames.length > 0 ? (
+                    <p className="mt-1 text-xs text-destructive/80">
+                      Failed: {notice.failedNames.join(", ")}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Select them again below to retry.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNoticeDismissed(true)}
+                  className="shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           {deleteError ? (
             <div
               role="alert"
@@ -190,7 +228,7 @@ export function ProductImageManager({
                 key={fileInputKey}
                 id="image-upload"
                 type="file"
-                accept={ACCEPTED_ATTR}
+                accept={ACCEPTED_IMAGE_INPUT_ATTR}
                 onChange={handleFileSelect}
                 disabled={isUploading}
                 className="flex-1 min-w-0 text-sm font-semibold text-foreground file:mr-3 file:rounded-xl file:border-2 file:border-primary file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-black file:text-primary hover:file:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-50"
