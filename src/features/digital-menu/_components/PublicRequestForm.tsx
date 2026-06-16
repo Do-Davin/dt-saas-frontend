@@ -1,7 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { useState, useId } from "react";
 import { ApiError } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { createCatalogRequest } from "../_api/requests";
 import { useLanguageStore } from "../_store/languageStore";
@@ -27,9 +26,6 @@ type SubmitState =
   | { status: "error"; message: string }
   | { status: "success" };
 
-const TEXTAREA_CLASS =
-  "flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
-
 export function PublicRequestForm({
   businessSlug,
   productId,
@@ -42,7 +38,7 @@ export function PublicRequestForm({
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number | "">("");
   const [itemNote, setItemNote] = useState("");
   const [customerNote, setCustomerNote] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
@@ -55,7 +51,8 @@ export function PublicRequestForm({
     if (!customerName.trim()) next.customerName = t.validationNameRequired;
     if (!customerPhone.trim())
       next.customerPhone = t.validationPhoneRequired;
-    if (!Number.isFinite(quantity) || quantity < 1)
+    const q = Number(quantity);
+    if (quantity === "" || !Number.isFinite(q) || q < 1)
       next.quantity = t.validationQuantityMin;
     return next;
   }
@@ -75,7 +72,7 @@ export function PublicRequestForm({
         items: [
           {
             productId,
-            quantity: Math.max(1, Math.floor(quantity)),
+            quantity: Math.max(1, Math.floor(Number(quantity))),
             note: itemNote.trim() ? itemNote.trim() : undefined,
           },
         ],
@@ -121,78 +118,59 @@ export function PublicRequestForm({
         <div className="text-sm font-medium">{productName}</div>
       </div>
 
-      <Field
+      <FloatingField
         label={t.yourName}
-        htmlFor="req-name"
+        value={customerName}
+        onChange={setCustomerName}
+        required
+        disabled={isSubmitting}
         error={errors.customerName}
-      >
-        <Input
-          id="req-name"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-          autoComplete="name"
-          required
-          disabled={isSubmitting}
-          aria-invalid={errors.customerName ? true : undefined}
-        />
-      </Field>
+      />
 
-      <Field
+      <FloatingField
         label={t.phoneNumber}
-        htmlFor="req-phone"
+        type="tel"
+        value={customerPhone}
+        onChange={setCustomerPhone}
+        required
+        disabled={isSubmitting}
         error={errors.customerPhone}
-      >
-        <Input
-          id="req-phone"
-          type="tel"
-          inputMode="tel"
-          value={customerPhone}
-          onChange={(e) => setCustomerPhone(e.target.value)}
-          autoComplete="tel"
-          required
-          disabled={isSubmitting}
-          aria-invalid={errors.customerPhone ? true : undefined}
-        />
-      </Field>
+      />
 
-      <Field label={t.quantity} htmlFor="req-qty" error={errors.quantity}>
-        <Input
-          id="req-qty"
-          type="number"
-          min={1}
-          step={1}
-          value={quantity}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            setQuantity(Number.isFinite(n) ? n : 1);
-          }}
-          disabled={isSubmitting}
-          aria-invalid={errors.quantity ? true : undefined}
-          className="w-24"
-        />
-      </Field>
+      <FloatingField
+        label={t.quantity}
+        type="number"
+        min={1}
+        step={1}
+        value={quantity}
+        onChange={(v) => {
+          if (v === "") {
+            setQuantity("");
+            return;
+          }
+          const n = Number(v);
+          setQuantity(Number.isFinite(n) ? n : "");
+        }}
+        disabled={isSubmitting}
+        error={errors.quantity}
+        className="w-32"
+      />
 
-      <Field label={t.itemNote} htmlFor="req-item-note">
-        <textarea
-          id="req-item-note"
-          value={itemNote}
-          onChange={(e) => setItemNote(e.target.value)}
-          rows={2}
-          disabled={isSubmitting}
-          className={cn(TEXTAREA_CLASS)}
-        />
-      </Field>
+      <FloatingField
+        label={t.itemNote}
+        value={itemNote}
+        onChange={setItemNote}
+        multiline
+        disabled={isSubmitting}
+      />
 
-      <Field label={t.noteToBusiness} htmlFor="req-note">
-        <textarea
-          id="req-note"
-          value={customerNote}
-          onChange={(e) => setCustomerNote(e.target.value)}
-          rows={3}
-          disabled={isSubmitting}
-          className={cn(TEXTAREA_CLASS)}
-        />
-      </Field>
+      <FloatingField
+        label={t.noteToBusiness}
+        value={customerNote}
+        onChange={setCustomerNote}
+        multiline
+        disabled={isSubmitting}
+      />
 
       {submit.status === "error" ? (
         <p className="text-sm text-destructive" role="alert">
@@ -219,27 +197,102 @@ export function PublicRequestForm({
   );
 }
 
-function Field({
+function FloatingField({
   label,
-  htmlFor,
+  value,
+  onChange,
+  type = "text",
+  required = false,
+  disabled = false,
   error,
-  children,
+  multiline = false,
+  min,
+  step,
+  className,
 }: {
   label: string;
-  htmlFor: string;
+  value: string | number;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+  disabled?: boolean;
   error?: string;
-  children: ReactNode;
+  multiline?: boolean;
+  min?: number;
+  step?: number;
+  className?: string;
 }) {
+  const id = useId();
+  const [isFocused, setIsFocused] = useState(false);
+  const isFloated = isFocused || String(value).length > 0;
+
+  const baseClasses = cn(
+    "w-full rounded-xl border bg-card text-sm font-semibold text-foreground outline-none transition-all duration-150 px-3",
+    multiline ? "py-4 min-h-[100px] resize-y" : "h-14",
+    error
+      ? "border-destructive ring-1 ring-destructive/20"
+      : isFocused
+        ? "border-primary ring-1 ring-primary/20"
+        : "border-input hover:border-primary/40",
+    className
+  );
+
   return (
-    <div className="space-y-1">
-      <label htmlFor={htmlFor} className="block text-sm font-medium">
-        {label}
-      </label>
-      {children}
+    <div className={cn(disabled && "pointer-events-none opacity-60")}>
+      <div className="relative">
+        {multiline ? (
+          <textarea
+            id={id}
+            value={value}
+            disabled={disabled}
+            required={required}
+            aria-invalid={!!error}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            onChange={(e) => onChange(e.target.value)}
+            className={baseClasses}
+          />
+        ) : (
+          <input
+            id={id}
+            type={type}
+            min={min}
+            step={step}
+            value={value}
+            disabled={disabled}
+            required={required}
+            aria-invalid={!!error}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            onChange={(e) => onChange(e.target.value)}
+            className={baseClasses}
+          />
+        )}
+
+        <label
+          htmlFor={id}
+          className={cn(
+            "pointer-events-none absolute select-none transition-all duration-150 left-3",
+            isFloated
+              ? "top-0 -translate-y-1/2 bg-card px-1 text-[11px] font-semibold"
+              : cn("text-sm font-normal", multiline ? "top-4" : "top-1/2 -translate-y-1/2"),
+            error
+              ? "text-destructive"
+              : isFocused
+                ? "text-primary"
+                : "text-muted-foreground"
+          )}
+        >
+          {label}
+          {required ? (
+            <span aria-hidden className="ml-0.5 text-destructive">
+              *
+            </span>
+          ) : null}
+        </label>
+      </div>
       {error ? (
-        <p className="text-xs text-destructive" role="alert">
-          {error}
-        </p>
+        <p className="mt-1 text-xs text-destructive">{error}</p>
       ) : null}
     </div>
   );
