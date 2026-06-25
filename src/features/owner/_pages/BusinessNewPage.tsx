@@ -71,7 +71,7 @@ export function BusinessNewPage() {
       });
       void useOwnerBusinessesStore.getState().loadBusinesses();
       toast.success(`Business "${created.name}" created successfully`);
-      navigate("/owner/businesses", { replace: true });
+      navigate("/admin/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -87,7 +87,7 @@ export function BusinessNewPage() {
   return (
     <OwnerCrudTransition>
       <div className="max-w-5xl space-y-4">
-        <CrudBackButton to="/owner/businesses" />
+        <CrudBackButton to="/admin/businesses" />
 
         <OwnerPageHeader title="New business" />
 
@@ -116,7 +116,7 @@ export function BusinessNewPage() {
                 asChild
                 className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
               >
-                <Link to="/owner/businesses">
+                <Link to="/admin/businesses">
                   <ArrowLeftIcon className="size-3.5" />
                   Cancel
                 </Link>

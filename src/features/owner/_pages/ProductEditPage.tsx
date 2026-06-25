@@ -169,6 +169,8 @@ function ProductEditorForm({
   initialFailure,
 }: ProductEditorFormProps) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/owner";
 
   const [values, setValues] = useState<ProductFormValues>(() =>
     productToFormValues(product),
@@ -237,7 +239,7 @@ function ProductEditorForm({
           : {}),
       });
       toast.success(`Product "${values.name.trim()}" updated successfully`);
-      navigate("/owner/products", { replace: true });
+      navigate(`${base}/products`, { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -254,7 +256,7 @@ function ProductEditorForm({
     try {
       await deleteProduct(businessId, product.id);
       toast.success(`Product "${product.name}" deleted successfully`);
-      navigate("/owner/products", { replace: true });
+      navigate(`${base}/products`, { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -275,7 +277,7 @@ function ProductEditorForm({
     <>
       <OwnerCrudTransition>
         <div className="space-y-3 pb-24 sm:pb-0">
-          <CrudBackButton to="/owner/products" />
+          <CrudBackButton to={`${base}/products`} />
           <OwnerPageHeader title="Edit product" />
 
           <div className="rounded-2xl border bg-card px-4 py-4 sm:px-5 sm:py-5">
@@ -321,7 +323,7 @@ function ProductEditorForm({
                     variant="outline"
                     disabled={isBusy}
                     onClick={() =>
-                      navigate("/owner/products", { replace: true })
+                      navigate(`${base}/products`, { replace: true })
                     }
                     className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary"
                   >
@@ -350,7 +352,7 @@ function ProductEditorForm({
                   type="button"
                   variant="outline"
                   disabled={isBusy}
-                  onClick={() => navigate("/owner/products", { replace: true })}
+                  onClick={() => navigate(`${base}/products`, { replace: true })}
                   className="h-11 flex-1 rounded-xl border-2 border-primary text-primary font-black gap-1.5"
                 >
                   <ArrowLeftIcon className="size-3.5" />

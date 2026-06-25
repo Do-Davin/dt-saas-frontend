@@ -14,11 +14,11 @@ interface RequireOwnerAuthProps {
 
 // Protected-route guard for the owner dashboard surface.
 //
-// Without allowedRoles: synchronous token-presence check only (original behavior).
+// Without allowedRoles: synchronous token-presence check only.
 // With allowedRoles:    waits for the owner profile from ownerSession before
 //   checking the role. While the profile is still loading (owner === null),
 //   renders null so the OwnerShell parent keeps the layout stable. Once loaded,
-//   redirects to /owner/analytics if the role is not permitted.
+//   redirects to the role's home page if the role is not permitted.
 //
 // OwnerShell calls loadOwner() on mount. Because it is always the parent of any
 // route that uses allowedRoles, the profile will resolve without extra callers.
@@ -27,14 +27,15 @@ export function RequireOwnerAuth({ children, allowedRoles }: RequireOwnerAuthPro
   const owner = useOwnerSessionStore((s) => s.owner);
 
   if (!token) {
-    return <Navigate to="/owner/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles) {
     // Profile not loaded yet — defer until OwnerShell's loadOwner() resolves.
     if (owner === null) return null;
     if (!allowedRoles.includes(owner.role)) {
-      return <Navigate to="/owner/analytics" replace />;
+      const home = owner.role === "SUPER_ADMIN" ? "/admin/home" : "/owner/analytics";
+      return <Navigate to={home} replace />;
     }
   }
 

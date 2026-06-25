@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { SaveIcon, ArrowLeftIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
@@ -44,6 +44,8 @@ export function ProductNewPage() {
   const { state: branchState } = useBranches(businessId);
   const { state: categoryState } = useCategories(businessId);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/owner";
 
   const [values, setValues] = useState<ProductFormValues>(EMPTY_PRODUCT_FORM);
   const [errors, setErrors] = useState<ProductFormErrors>({});
@@ -147,7 +149,7 @@ export function ProductNewPage() {
     // Product exists. Never roll back on image failure.
     if (stagedImages.length === 0) {
       toast.success("Product created.");
-      navigate(`/owner/products/${newProductId}`, { replace: true });
+      navigate(`${base}/products/${newProductId}`, { replace: true });
       return;
     }
 
@@ -173,12 +175,12 @@ export function ProductNewPage() {
     const failedNames = failed.map((f) => f.name);
     if (failed.length === 0) {
       toast.success("Product created with images.");
-      navigate(`/owner/products/${newProductId}`, { replace: true });
+      navigate(`${base}/products/${newProductId}`, { replace: true });
     } else if (failed.length === stagedImages.length) {
       toast.error(
         `Product created but all ${failed.length} image${failed.length === 1 ? "" : "s"} failed to upload.`,
       );
-      navigate(`/owner/products/${newProductId}`, {
+      navigate(`${base}/products/${newProductId}`, {
         replace: true,
         state: { imageUploadFailure: { kind: "all", failedNames } },
       });
@@ -186,7 +188,7 @@ export function ProductNewPage() {
       toast.success(
         `Product created. ${failed.length} of ${stagedImages.length} image${stagedImages.length === 1 ? "" : "s"} failed.`,
       );
-      navigate(`/owner/products/${newProductId}`, {
+      navigate(`${base}/products/${newProductId}`, {
         replace: true,
         state: { imageUploadFailure: { kind: "partial", failedNames } },
       });
@@ -207,7 +209,7 @@ export function ProductNewPage() {
   return (
     <OwnerCrudTransition>
       <div className="space-y-3 pb-24 sm:pb-0">
-        <CrudBackButton to="/owner/products" />
+        <CrudBackButton to={`${base}/products`} />
         <OwnerPageHeader title="New product" />
 
         <div className="rounded-2xl border bg-card px-4 py-4 sm:px-5 sm:py-5">
@@ -241,7 +243,7 @@ export function ProductNewPage() {
                 type="button"
                 variant="outline"
                 disabled={isBusy}
-                onClick={() => navigate("/owner/products", { replace: true })}
+                onClick={() => navigate(`${base}/products`, { replace: true })}
                 className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary"
               >
                 <ArrowLeftIcon className="size-3.5" />
@@ -268,7 +270,7 @@ export function ProductNewPage() {
                 type="button"
                 variant="outline"
                 disabled={isBusy}
-                onClick={() => navigate("/owner/products", { replace: true })}
+                onClick={() => navigate(`${base}/products`, { replace: true })}
                 className="h-11 flex-1 rounded-xl border-2 border-primary text-primary font-black gap-1.5"
               >
                 <ArrowLeftIcon className="size-3.5" />

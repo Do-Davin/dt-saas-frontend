@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { TagIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,8 @@ export function CategoryListPage() {
   const { title: noBusinessTitle, description: noBusinessDesc } =
     useBusinessContextMessage();
   const { state, refetch } = useCategories(businessId);
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/owner";
 
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export function CategoryListPage() {
               asChild
               className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
             >
-              <Link to="/owner/categories/new">
+              <Link to={`${base}/categories/new`}>
                 <TagIcon className="size-4" />
                 New category
               </Link>
@@ -150,7 +152,7 @@ export function CategoryListPage() {
                     className="gap-1.5 rounded-xl border-2 font-black transition-all duration-200 ease-out hover:scale-[1.07]"
                   >
                     <Link
-                      to={`/owner/categories/${encodeURIComponent(cat.id)}`}
+                      to={`${base}/categories/${encodeURIComponent(cat.id)}`}
                     >
                       <PencilIcon className="size-3.5" />
                       Edit

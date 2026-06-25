@@ -24,39 +24,40 @@ import { OwnerReportsPage } from "./_pages/OwnerReportsPage";
 import { OwnerSalesPage } from "./_pages/OwnerSalesPage";
 import { OwnerStockPage } from "./_pages/OwnerStockPage";
 
-// Sends each role to its natural home page.
-// Renders null while the profile is loading so OwnerShell can trigger loadOwner()
-// before the role is known.
+// Waits for the session profile, then sends each role to its home page.
 function OwnerIndexRedirect() {
   const owner = useOwnerSessionStore((s) => s.owner);
   if (owner === null) return null;
   return (
     <Navigate
-      to={owner.role === "SUPER_ADMIN" ? "/owner/home" : "/owner/analytics"}
+      to={owner.role === "SUPER_ADMIN" ? "/admin/home" : "/owner/analytics"}
       replace
     />
   );
 }
 
-// Route objects for the owner dashboard surface. Mounted by the top-level
-// router in src/router.tsx. Future production target: dashboard.dtsaas.com.
-//
-// This file MUST NOT create its own <RouterProvider>, and MUST NOT be merged
-// into digitalMenuRoutes.
+// Route objects for the owner + admin surfaces. Mounted by src/router.tsx.
 //
 // Role model:
-//   SUPER_ADMIN — all pages (current owner system + future platform controls)
-//   OWNER       — business operation pages only (analytics, categories, products,
-//                 reports, sales, inventory)
+//   OWNER       — /owner/* only (analytics, categories, products, reports, sales, stock)
+//   SUPER_ADMIN — /admin/* only (home, businesses, requests, branches, categories, products)
+//
+// This file MUST NOT create its own <RouterProvider>.
 export const ownerRoutes: RouteObject[] = [
-  // /owner/login renders OUTSIDE the protected shell so an unauthenticated
-  // user can reach it without redirect loops.
+  // ── Auth ──────────────────────────────────────────────────────────────────
   {
-    path: "/owner/login",
+    path: "/login",
     element: <OwnerLoginPage />,
   },
-  // Everything else under /owner is gated by RequireOwnerAuth and wrapped in
-  // OwnerShell.
+  // Legacy redirect — old bookmarks or 401 redirects land here
+  {
+    path: "/owner/login",
+    element: <Navigate to="/login" replace />,
+  },
+
+  // ── OWNER surface (/owner/*) ─────────────────────────────────────────────
+  // Authenticated users reach this shell; OwnerIndexRedirect sends SUPER_ADMIN
+  // to /admin/home so they never need /owner/* navigation.
   {
     path: "/owner",
     element: (
@@ -65,10 +66,34 @@ export const ownerRoutes: RouteObject[] = [
       </RequireOwnerAuth>
     ),
     children: [
-      // Index: wait for profile then send each role to its home page.
       { index: true, element: <OwnerIndexRedirect /> },
+      { path: "select-business", element: <SelectBusinessPage /> },
+      { path: "analytics",       element: <OwnerAnalyticsPage /> },
+      { path: "categories",      element: <CategoryListPage /> },
+      { path: "categories/new",  element: <CategoryNewPage /> },
+      { path: "categories/:categoryId", element: <CategoryEditPage /> },
+      { path: "products",        element: <ProductListPage /> },
+      { path: "products/new",    element: <ProductNewPage /> },
+      { path: "products/:productId", element: <ProductEditPage /> },
+      { path: "reports",         element: <OwnerReportsPage /> },
+      { path: "sales",           element: <OwnerSalesPage /> },
+      { path: "stock",           element: <OwnerStockPage /> },
+      { path: "inventory",       element: <Navigate to="/owner/stock" replace /> },
+    ],
+  },
 
-      // ── SUPER_ADMIN-only pages ──────────────────────────────────────────
+  // ── SUPER_ADMIN surface (/admin/*) ────────────────────────────────────────
+  // All children are individually gated with allowedRoles={["SUPER_ADMIN"]}
+  // so an OWNER who manually navigates here is redirected to /owner/analytics.
+  {
+    path: "/admin",
+    element: (
+      <RequireOwnerAuth>
+        <OwnerShell />
+      </RequireOwnerAuth>
+    ),
+    children: [
+      { index: true, element: <Navigate to="/admin/home" replace /> },
       {
         path: "home",
         element: (
@@ -77,6 +102,7 @@ export const ownerRoutes: RouteObject[] = [
           </RequireOwnerAuth>
         ),
       },
+      { path: "select-business", element: <SelectBusinessPage /> },
       {
         path: "requests",
         element: (
@@ -141,22 +167,54 @@ export const ownerRoutes: RouteObject[] = [
           </RequireOwnerAuth>
         ),
       },
-
-      // ── Accessible to both SUPER_ADMIN and OWNER ────────────────────────
-      { path: "select-business", element: <SelectBusinessPage /> },
-      { path: "categories", element: <CategoryListPage /> },
-      { path: "categories/new", element: <CategoryNewPage /> },
-      { path: "categories/:categoryId", element: <CategoryEditPage /> },
-      { path: "products", element: <ProductListPage /> },
-      { path: "products/new", element: <ProductNewPage /> },
-      { path: "products/:productId", element: <ProductEditPage /> },
-
-      // ── OWNER pages (accessible to both roles) ─────────────────────────
-      { path: "analytics", element: <OwnerAnalyticsPage /> },
-      { path: "reports", element: <OwnerReportsPage /> },
-      { path: "sales", element: <OwnerSalesPage /> },
-      { path: "stock", element: <OwnerStockPage /> },
-      { path: "inventory", element: <Navigate to="/owner/stock" replace /> },
+      {
+        path: "categories",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <CategoryListPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "categories/new",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <CategoryNewPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "categories/:categoryId",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <CategoryEditPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "products",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <ProductListPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "products/new",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <ProductNewPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "products/:productId",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <ProductEditPage />
+          </RequireOwnerAuth>
+        ),
+      },
     ],
   },
 ];

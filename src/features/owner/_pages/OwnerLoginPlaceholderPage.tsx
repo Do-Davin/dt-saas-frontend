@@ -32,7 +32,7 @@ export function OwnerLoginPage() {
     try {
       const token = await loginOwner({ email, password });
       useOwnerAuthStore.getState().setToken(token);
-      navigate("/owner/home", { replace: true });
+      navigate("/owner", { replace: true });
     } catch (err) {
       setError(toSafeErrorMessage(err));
       setSubmitting(false);

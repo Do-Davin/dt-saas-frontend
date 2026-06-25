@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { cn } from "@/lib/utils";
 import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 import { OwnerPage } from "../_components/OwnerPage";
@@ -16,10 +16,12 @@ export function SelectBusinessPage() {
   );
   const isLoading = useOwnerBusinessesStore((s) => s.isLoading);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const home = pathname.startsWith("/admin") ? "/admin/home" : "/owner/analytics";
 
   function handleSelect(id: string) {
     useOwnerBusinessesStore.getState().selectBusiness(id);
-    navigate("/owner/home", { replace: true });
+    navigate(home, { replace: true });
   }
 
   if (isLoading && businesses.length === 0) {

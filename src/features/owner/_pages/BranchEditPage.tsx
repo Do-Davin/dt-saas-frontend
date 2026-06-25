@@ -128,7 +128,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
         isActive: values.isActive,
       });
       toast.success(`Branch "${values.name.trim()}" updated successfully`);
-      navigate("/owner/branches", { replace: true });
+      navigate("/admin/branches", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -145,7 +145,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
     try {
       await deleteBranch(businessId, branch.id);
       toast.success(`Branch "${branch.name}" deleted successfully`);
-      navigate("/owner/branches", { replace: true });
+      navigate("/admin/branches", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -165,7 +165,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
     <>
       <OwnerCrudTransition>
         <div className="max-w-5xl space-y-4">
-          <CrudBackButton to="/owner/branches" />
+          <CrudBackButton to="/admin/branches" />
 
           <OwnerPageHeader title="Edit branch" />
 
@@ -204,7 +204,7 @@ function BranchEditorForm({ branch, businessId }: BranchEditorFormProps) {
                     asChild
                     className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
                   >
-                    <Link to="/owner/branches">
+                    <Link to="/admin/branches">
                       <ArrowLeftIcon className="size-3.5" />
                       Cancel
                     </Link>

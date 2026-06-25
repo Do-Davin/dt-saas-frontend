@@ -86,7 +86,7 @@ export function BranchListPage() {
               asChild
               className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
             >
-              <Link to="/owner/branches/new">
+              <Link to="/admin/branches/new">
                 <GitBranchIcon className="size-4" />
                 New branch
               </Link>

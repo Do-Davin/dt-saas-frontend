@@ -19,31 +19,31 @@ interface QuickNavCard {
 
 const QUICK_NAV: QuickNavCard[] = [
   {
-    to: "/owner/businesses",
+    to: "/admin/businesses",
     label: "Businesses",
     description: "Add and manage your business profiles.",
     Icon: Building2Icon,
   },
   {
-    to: "/owner/requests",
+    to: "/admin/requests",
     label: "Requests",
     description: "Review and respond to incoming owner requests.",
     Icon: InboxIcon,
   },
   {
-    to: "/owner/branches",
+    to: "/admin/branches",
     label: "Branches",
     description: "Configure branch locations for your selected business.",
     Icon: GitBranchIcon,
   },
   {
-    to: "/owner/categories",
+    to: "/admin/categories",
     label: "Categories",
     description: "Organize menu items into categories.",
     Icon: TagIcon,
   },
   {
-    to: "/owner/products",
+    to: "/admin/products",
     label: "Products",
     description: "Add and manage products in your digital menu.",
     Icon: PackageIcon,
