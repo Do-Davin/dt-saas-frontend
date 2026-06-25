@@ -11,6 +11,8 @@ import {
   LayersIcon,
   ScaleIcon,
   WalletIcon,
+  ArchiveIcon,
+  BellIcon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -274,6 +276,8 @@ export function ProductFormFields({
     "salesPrice",
     "purchasePrice",
     "discount",
+    "stockQuantity",
+    "lowStockThreshold",
   ];
   for (const field of validatedFields) {
     if (errors[field]) {
@@ -456,6 +460,27 @@ export function ProductFormFields({
             name="label"
             disabled={disabled}
             leadingIcon={TagIcon}
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <OwnerTextField
+            label="Stock Quantity"
+            value={values.stockQuantity}
+            onChange={(v) => handleFieldChange("stockQuantity", v)}
+            name="stockQuantity"
+            disabled={disabled}
+            error={displayErrors.stockQuantity}
+            leadingIcon={ArchiveIcon}
+          />
+          <OwnerTextField
+            label="Low Stock Threshold"
+            value={values.lowStockThreshold}
+            onChange={(v) => handleFieldChange("lowStockThreshold", v)}
+            name="lowStockThreshold"
+            disabled={disabled}
+            error={displayErrors.lowStockThreshold}
+            leadingIcon={BellIcon}
           />
         </div>
 

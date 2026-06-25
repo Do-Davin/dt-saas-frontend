@@ -22,6 +22,7 @@ import {
   validateProductForm,
   hasErrors,
   parseMoney,
+  parsePositiveInt,
   EMPTY_PRODUCT_FORM,
 } from "../_utils/productForm";
 import type {
@@ -125,6 +126,12 @@ export function ProductNewPage() {
           : {}),
         isAvailable: values.isAvailable,
         isVisible: values.isVisible,
+        ...(parsePositiveInt(values.stockQuantity) !== undefined
+          ? { stockQuantity: parsePositiveInt(values.stockQuantity) }
+          : {}),
+        ...(parsePositiveInt(values.lowStockThreshold) !== undefined
+          ? { lowStockThreshold: parsePositiveInt(values.lowStockThreshold) }
+          : {}),
       });
       newProductId = newProduct.id;
     } catch (err: unknown) {

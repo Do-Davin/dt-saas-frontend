@@ -26,6 +26,8 @@ export interface ProductFormValues {
   pricingType: PricingType | "";
   isAvailable: boolean;
   isVisible: boolean;
+  stockQuantity: string;
+  lowStockThreshold: string;
 }
 
 export interface ProductFormErrors {
@@ -34,6 +36,8 @@ export interface ProductFormErrors {
   salesPrice?: string;
   purchasePrice?: string;
   discount?: string;
+  stockQuantity?: string;
+  lowStockThreshold?: string;
 }
 
 export const EMPTY_PRODUCT_FORM: ProductFormValues = {
@@ -51,6 +55,8 @@ export const EMPTY_PRODUCT_FORM: ProductFormValues = {
   pricingType: "FIXED",
   isAvailable: true,
   isVisible: true,
+  stockQuantity: "",
+  lowStockThreshold: "",
 };
 
 // Only these pricing types require a numeric sales price.
@@ -74,6 +80,18 @@ function isValidMoney(value: string): boolean {
   return Number.isFinite(n) && n >= 0;
 }
 
+function isValidPositiveInt(value: string): boolean {
+  if (!value.trim()) return true;
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0;
+}
+
+export function parsePositiveInt(value: string): number | undefined {
+  if (!value.trim()) return undefined;
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 0 ? n : undefined;
+}
+
 export function validateProductForm(
   values: ProductFormValues,
 ): ProductFormErrors {
@@ -95,6 +113,10 @@ export function validateProductForm(
     errors.purchasePrice = "Must be a valid non-negative number.";
   if (!isValidMoney(values.discount))
     errors.discount = "Must be a valid non-negative number.";
+  if (!isValidPositiveInt(values.stockQuantity))
+    errors.stockQuantity = "Must be a non-negative whole number.";
+  if (!isValidPositiveInt(values.lowStockThreshold))
+    errors.lowStockThreshold = "Must be a non-negative whole number.";
   return errors;
 }
 

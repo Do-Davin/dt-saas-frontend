@@ -47,9 +47,18 @@ export interface Product {
   pricingType?: PricingType | null;
   isAvailable: boolean;
   isVisible: boolean;
+  stockQuantity: number;
+  lowStockThreshold: number | null;
   primaryImage: ProductPrimaryImage | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+}
+
+export type StockAdjustmentReason = "RESTOCK" | "CORRECTION" | "WASTE";
+
+export interface AdjustStockInput {
+  adjustment: number;
+  reason: StockAdjustmentReason;
 }
 
 export interface ProductInput {
@@ -67,6 +76,8 @@ export interface ProductInput {
   pricingType?: PricingType;
   isAvailable?: boolean;
   isVisible?: boolean;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
 }
 
 export interface ListProductsOptions {
@@ -91,6 +102,8 @@ interface ProductRaw {
   pricingType?: unknown;
   isAvailable?: unknown;
   isVisible?: unknown;
+  stockQuantity?: unknown;
+  lowStockThreshold?: unknown;
   primaryImage?: unknown;
   createdAt?: unknown;
   updatedAt?: unknown;
@@ -171,6 +184,9 @@ function toProduct(raw: ProductRaw): Product {
     isAvailable:
       typeof raw.isAvailable === "boolean" ? raw.isAvailable : true,
     isVisible: typeof raw.isVisible === "boolean" ? raw.isVisible : true,
+    stockQuantity: typeof raw.stockQuantity === "number" ? raw.stockQuantity : 0,
+    lowStockThreshold:
+      typeof raw.lowStockThreshold === "number" ? raw.lowStockThreshold : null,
     primaryImage: parsePrimaryImage(raw.primaryImage),
     createdAt: typeof raw.createdAt === "string" ? raw.createdAt : null,
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
@@ -257,6 +273,19 @@ export async function updateProduct(
   const body = await ownerApiFetch<unknown>({
     method: "PATCH",
     url: `/businesses/${encodeURIComponent(businessId)}/products/${encodeURIComponent(productId)}`,
+    data: input,
+  });
+  return normalizeDetailResponse(body);
+}
+
+export async function adjustStock(
+  businessId: string,
+  productId: string,
+  input: AdjustStockInput
+): Promise<Product> {
+  const body = await ownerApiFetch<unknown>({
+    method: "PATCH",
+    url: `/businesses/${encodeURIComponent(businessId)}/products/${encodeURIComponent(productId)}/stock`,
     data: input,
   });
   return normalizeDetailResponse(body);
