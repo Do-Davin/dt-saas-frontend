@@ -8,6 +8,10 @@ import {
   GitBranchIcon,
   TagIcon,
   PackageIcon,
+  LayoutDashboardIcon,
+  FileTextIcon,
+  ShoppingCartIcon,
+  ArchiveIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   MenuIcon,
@@ -29,13 +33,22 @@ import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 
 type NavItem = { to: string; label: string; Icon: LucideIcon };
 
-const NAV_ITEMS: NavItem[] = [
+const SUPER_ADMIN_NAV: NavItem[] = [
   { to: "/owner/home", label: "Home", Icon: HomeIcon },
   { to: "/owner/businesses", label: "Businesses", Icon: Building2Icon },
   { to: "/owner/requests", label: "Requests", Icon: InboxIcon },
   { to: "/owner/branches", label: "Branches", Icon: GitBranchIcon },
   { to: "/owner/categories", label: "Categories", Icon: TagIcon },
   { to: "/owner/products", label: "Products", Icon: PackageIcon },
+];
+
+const OWNER_NAV: NavItem[] = [
+  { to: "/owner/analytics", label: "Analytics", Icon: LayoutDashboardIcon },
+  { to: "/owner/categories", label: "Categories", Icon: TagIcon },
+  { to: "/owner/products", label: "Products", Icon: PackageIcon },
+  { to: "/owner/reports", label: "Reports", Icon: FileTextIcon },
+  { to: "/owner/sales", label: "Sales", Icon: ShoppingCartIcon },
+  { to: "/owner/inventory", label: "Inventory", Icon: ArchiveIcon },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -94,9 +107,15 @@ interface NavLinksProps {
   collapsed?: boolean;
   activePath: string;
   onNav?: () => void;
+  role?: string;
 }
 
-function NavLinks({ collapsed = false, activePath, onNav }: NavLinksProps) {
+function NavLinks({ collapsed = false, activePath, onNav, role }: NavLinksProps) {
+  const items =
+    role === "SUPER_ADMIN" ? SUPER_ADMIN_NAV :
+    role === "OWNER" ? OWNER_NAV :
+    []; // profile not yet loaded — render nothing briefly
+
   function isActive(path: string) {
     return activePath === path || activePath.startsWith(path + "/");
   }
@@ -105,7 +124,7 @@ function NavLinks({ collapsed = false, activePath, onNav }: NavLinksProps) {
       aria-label="Owner dashboard navigation"
       className="flex-1 space-y-0.5 px-2 py-3"
     >
-      {NAV_ITEMS.map((item) => (
+      {items.map((item) => (
         <SidebarNavLink
           key={item.to}
           item={item}
@@ -197,6 +216,10 @@ export function OwnerShell() {
 
   const initials = owner ? getInitials(owner.name, owner.email) : "—";
 
+  // Routes that render their own mobile toolbar in place of the shell header.
+  // Only hidden below md — desktop always shows the full shell header.
+  const hidesMobileHeader = location.pathname === "/owner/products";
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
 
@@ -263,14 +286,19 @@ export function OwnerShell() {
           </button>
         </div>
 
-        <NavLinks collapsed={sidebarCollapsed} activePath={location.pathname} />
+        <NavLinks collapsed={sidebarCollapsed} activePath={location.pathname} role={owner?.role} />
       </aside>
 
       {/* ── Right column: header + main ──────────────────────────────── */}
       <div className="flex flex-1 min-w-0 flex-col overflow-hidden">
 
         {/* Top header */}
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <header
+          className={cn(
+            "flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60",
+            hidesMobileHeader && "hidden md:flex",
+          )}
+        >
 
           {/* Mobile hamburger */}
           <button
@@ -398,6 +426,7 @@ export function OwnerShell() {
           <NavLinks
             activePath={location.pathname}
             onNav={() => setMobileOpen(false)}
+            role={owner?.role}
           />
         </SheetContent>
       </Sheet>

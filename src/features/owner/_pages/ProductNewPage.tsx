@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
-import { ImageIcon, PlusCircleIcon, ArrowLeftIcon } from "lucide-react";
+import { useNavigate } from "react-router";
+import { SaveIcon, ArrowLeftIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/components/ui/toast";
@@ -9,26 +9,31 @@ import { useBusinessContextMessage } from "../_hooks/useBusinessContextMessage";
 import { useBranches } from "../_hooks/useBranches";
 import { useCategories } from "../_hooks/useCategories";
 import { createProduct } from "../_api/products";
+import { uploadProductImage } from "../_api/productImages";
 import { ProductFormFields } from "../_components/ProductForm";
+import { CreateProductImageField } from "../_components/CreateProductImageField";
 import {
   CrudBackButton,
   OwnerCrudTransition,
 } from "../_components/OwnerCrudTransition";
 import { OwnerPageHeader } from "../_components/OwnerPageHeader";
 import { OwnerPageState } from "../_components/OwnerPageState";
-import { ProductBrowserPanel } from "../_components/ProductBrowserPanel";
 import {
   validateProductForm,
   hasErrors,
   parseMoney,
   EMPTY_PRODUCT_FORM,
 } from "../_utils/productForm";
-import type { ProductFormValues, ProductFormErrors } from "../_utils/productForm";
+import type {
+  ProductFormValues,
+  ProductFormErrors,
+} from "../_utils/productForm";
 import type { PricingType, UnitOfMeasure } from "../_api/products";
 
 type SubmitStatus =
   | { status: "idle" }
-  | { status: "submitting" }
+  | { status: "creating" }
+  | { status: "uploading"; index: number; total: number }
   | { status: "error"; message: string };
 
 export function ProductNewPage() {
@@ -41,6 +46,8 @@ export function ProductNewPage() {
 
   const [values, setValues] = useState<ProductFormValues>(EMPTY_PRODUCT_FORM);
   const [errors, setErrors] = useState<ProductFormErrors>({});
+  const [stagedImages, setStagedImages] = useState<File[]>([]);
+  const [failedIndices, setFailedIndices] = useState<Set<number>>(new Set());
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({
     status: "idle",
   });
@@ -83,7 +90,11 @@ export function ProductNewPage() {
       setErrors(next);
       return;
     }
-    setSubmitStatus({ status: "submitting" });
+
+    setSubmitStatus({ status: "creating" });
+    setFailedIndices(new Set());
+
+    let newProductId: string;
     try {
       const newProduct = await createProduct(businessId, {
         name: values.name.trim(),
@@ -115,8 +126,7 @@ export function ProductNewPage() {
         isAvailable: values.isAvailable,
         isVisible: values.isVisible,
       });
-      toast.success("Product created. You can now upload product images.");
-      navigate(`/owner/products/${newProduct.id}`, { replace: true });
+      newProductId = newProduct.id;
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -124,111 +134,160 @@ export function ProductNewPage() {
           : "Something went wrong while creating the product.";
       setSubmitStatus({ status: "error", message });
       toast.error(message);
+      return;
+    }
+
+    // Product exists. Never roll back on image failure.
+    if (stagedImages.length === 0) {
+      toast.success("Product created.");
+      navigate(`/owner/products/${newProductId}`, { replace: true });
+      return;
+    }
+
+    const failed: { index: number; name: string }[] = [];
+    for (let i = 0; i < stagedImages.length; i++) {
+      setSubmitStatus({
+        status: "uploading",
+        index: i,
+        total: stagedImages.length,
+      });
+      try {
+        await uploadProductImage(businessId, newProductId, stagedImages[i]!);
+      } catch {
+        failed.push({ index: i, name: stagedImages[i]!.name });
+        setFailedIndices((prev) => {
+          const next = new Set(prev);
+          next.add(i);
+          return next;
+        });
+      }
+    }
+
+    const failedNames = failed.map((f) => f.name);
+    if (failed.length === 0) {
+      toast.success("Product created with images.");
+      navigate(`/owner/products/${newProductId}`, { replace: true });
+    } else if (failed.length === stagedImages.length) {
+      toast.error(
+        `Product created but all ${failed.length} image${failed.length === 1 ? "" : "s"} failed to upload.`,
+      );
+      navigate(`/owner/products/${newProductId}`, {
+        replace: true,
+        state: { imageUploadFailure: { kind: "all", failedNames } },
+      });
+    } else {
+      toast.success(
+        `Product created. ${failed.length} of ${stagedImages.length} image${stagedImages.length === 1 ? "" : "s"} failed.`,
+      );
+      navigate(`/owner/products/${newProductId}`, {
+        replace: true,
+        state: { imageUploadFailure: { kind: "partial", failedNames } },
+      });
     }
   }
 
-  const isSubmitting = submitStatus.status === "submitting";
+  const isCreating = submitStatus.status === "creating";
+  const isUploading = submitStatus.status === "uploading";
+  const isBusy = isCreating || isUploading;
+  const uploadingIndex = isUploading ? submitStatus.index : null;
+
+  const submitLabel = isCreating
+    ? "Creating…"
+    : isUploading
+      ? `Uploading ${submitStatus.index + 1}/${submitStatus.total}…`
+      : "Create product";
 
   return (
     <OwnerCrudTransition>
-      <div className="space-y-4">
+      <div className="space-y-3 pb-24 sm:pb-0">
         <CrudBackButton to="/owner/products" />
+        <OwnerPageHeader title="New product" />
 
-        {/*
-         * Split layout:
-         *   xl+ (1280px+): [Existing Products — flex-1] [New product form — 400px]
-         *   Below xl: stacked vertically, form below browser
-         */}
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-start">
-          {/* ── Left panel: existing product browser ── */}
-          <div className="min-w-0 flex-1">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Existing Products
-            </p>
-            {/*
-             * Pass prefetched branch/category data so the panel does not make
-             * its own duplicate requests. null = parent is still loading;
-             * the panel's hooks receive null and return idle with no fetch.
-             */}
-            <ProductBrowserPanel
-              businessId={businessId}
-              prefetchedBranches={
-                branchState.status === "ready" ? branchState.items : null
+        <div className="rounded-2xl border bg-card px-4 py-4 sm:px-5 sm:py-5">
+          <form onSubmit={(e) => void handleSubmit(e)} noValidate>
+            <ProductFormFields
+              values={values}
+              errors={errors}
+              disabled={isBusy}
+              branches={branches}
+              categories={categories}
+              onChange={handleChange}
+              submitError={
+                submitStatus.status === "error"
+                  ? submitStatus.message
+                  : undefined
               }
-              prefetchedCategories={
-                categoryState.status === "ready" ? categoryState.items : null
+              imageSlot={
+                <CreateProductImageField
+                  files={stagedImages}
+                  onChange={setStagedImages}
+                  disabled={isBusy}
+                  uploadingIndex={uploadingIndex}
+                  failedIndices={failedIndices}
+                />
               }
             />
-          </div>
 
-          {/* ── Right panel: create form ── */}
-          <div className="w-full shrink-0 xl:w-[400px]">
-            <OwnerPageHeader title="New product" />
-
-            <div className="mt-4 rounded-2xl border bg-card px-6 py-7">
-              <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-                <ProductFormFields
-                  values={values}
-                  errors={errors}
-                  disabled={isSubmitting}
-                  branches={branches}
-                  categories={categories}
-                  onChange={handleChange}
-                  submitError={
-                    submitStatus.status === "error"
-                      ? submitStatus.message
-                      : undefined
-                  }
-                />
-
-                {/* Images are managed after the product is saved. */}
-                <DisabledImageNotice />
-
-                <div className="mt-7 flex justify-center gap-3">
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    disabled={isSubmitting}
-                    className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.07]"
-                  >
-                    <PlusCircleIcon className="size-4" />
-                    {isSubmitting ? "Creating…" : "Create product"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    asChild
-                    className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
-                  >
-                    <Link to="/owner/products">
-                      <ArrowLeftIcon className="size-3.5" />
-                      Cancel
-                    </Link>
-                  </Button>
-                </div>
-              </form>
+            {/* Desktop footer */}
+            <div className="mt-4 hidden items-center justify-end gap-2 border-t pt-3 sm:flex">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isBusy}
+                onClick={() => navigate("/owner/products", { replace: true })}
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary"
+              >
+                <ArrowLeftIcon className="size-3.5" />
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={isBusy}
+                className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary"
+              >
+                {isBusy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <SaveIcon className="size-4" />
+                )}
+                {submitLabel}
+              </Button>
             </div>
-          </div>
+
+            {/* Mobile sticky footer */}
+            <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-background/85 sm:hidden">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isBusy}
+                onClick={() => navigate("/owner/products", { replace: true })}
+                className="h-11 flex-1 rounded-xl border-2 border-primary text-primary font-black gap-1.5"
+              >
+                <ArrowLeftIcon className="size-3.5" />
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={isBusy}
+                className="h-11 flex-1 rounded-xl border-2 border-primary text-primary font-black gap-1.5"
+              >
+                {isBusy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <SaveIcon className="size-4" />
+                )}
+                {isCreating
+                  ? "Creating…"
+                  : isUploading
+                    ? `${submitStatus.index + 1}/${submitStatus.total}`
+                    : "Save"}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </OwnerCrudTransition>
-  );
-}
-
-// ─── Disabled image notice ────────────────────────────────────────────────────
-
-function DisabledImageNotice() {
-  return (
-    <div
-      aria-disabled="true"
-      className="pointer-events-none mt-6 flex flex-col items-center gap-3 rounded-xl border border-dashed py-7 opacity-50"
-    >
-      <ImageIcon className="size-8 text-muted-foreground" />
-      <div className="text-center">
-        <p className="text-sm font-semibold text-foreground">Product images</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Save the product first before uploading images.
-        </p>
-      </div>
-    </div>
   );
 }

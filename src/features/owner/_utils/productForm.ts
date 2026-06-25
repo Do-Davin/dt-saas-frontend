@@ -14,6 +14,7 @@ export interface ProductFormValues {
   name: string;
   nameKm: string;
   description: string;
+  // Preserved for round-trip on Edit; not rendered in the form UI.
   descriptionKm: string;
   categoryId: string;
   branchId: string;
@@ -29,6 +30,7 @@ export interface ProductFormValues {
 
 export interface ProductFormErrors {
   name?: string;
+  pricingType?: string;
   salesPrice?: string;
   purchasePrice?: string;
   discount?: string;
@@ -51,6 +53,21 @@ export const EMPTY_PRODUCT_FORM: ProductFormValues = {
   isVisible: true,
 };
 
+// Only these pricing types require a numeric sales price.
+const PRICING_TYPES_REQUIRING_SALES_PRICE = new Set<PricingType>([
+  "FIXED",
+  "STARTING_FROM",
+]);
+
+export function isSalesPriceRequired(
+  pricingType: PricingType | "",
+): boolean {
+  return (
+    pricingType !== "" &&
+    PRICING_TYPES_REQUIRING_SALES_PRICE.has(pricingType as PricingType)
+  );
+}
+
 function isValidMoney(value: string): boolean {
   if (!value.trim()) return true;
   const n = parseFloat(value);
@@ -58,12 +75,22 @@ function isValidMoney(value: string): boolean {
 }
 
 export function validateProductForm(
-  values: ProductFormValues
+  values: ProductFormValues,
 ): ProductFormErrors {
   const errors: ProductFormErrors = {};
   if (!values.name.trim()) errors.name = "Name is required.";
-  if (!isValidMoney(values.salesPrice))
+
+  if (!values.pricingType) {
+    errors.pricingType = "Pricing type is required.";
+  }
+
+  const salesRequired = isSalesPriceRequired(values.pricingType);
+  if (salesRequired && !values.salesPrice.trim()) {
+    errors.salesPrice = "Sales price is required.";
+  } else if (!isValidMoney(values.salesPrice)) {
     errors.salesPrice = "Must be a valid non-negative number.";
+  }
+
   if (!isValidMoney(values.purchasePrice))
     errors.purchasePrice = "Must be a valid non-negative number.";
   if (!isValidMoney(values.discount))
