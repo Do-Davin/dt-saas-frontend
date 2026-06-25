@@ -5,6 +5,7 @@ import {
   HomeIcon,
   Building2Icon,
   CreditCardIcon,
+  BarChart3Icon,
   TagIcon,
   PackageIcon,
   LayoutDashboardIcon,
@@ -36,6 +37,7 @@ const SUPER_ADMIN_NAV: NavItem[] = [
   { to: "/admin/home",          label: "Home",          Icon: HomeIcon },
   { to: "/admin/businesses",    label: "Businesses",    Icon: Building2Icon },
   { to: "/admin/subscriptions", label: "Subscriptions", Icon: CreditCardIcon },
+  { to: "/admin/analytics",     label: "Analytics",     Icon: BarChart3Icon },
 ];
 
 const OWNER_NAV: NavItem[] = [
