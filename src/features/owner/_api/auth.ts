@@ -58,31 +58,42 @@ export async function loginOwner(
 
 // ─── Session validation ───────────────────────────────────────────────────────
 
+export type OwnerRole = "SUPER_ADMIN" | "OWNER";
+
 // Only the fields the frontend needs. Explicitly typed so the normalizer below
 // cannot accidentally forward unsafe backend fields (e.g. passwordHash).
 export interface OwnerProfile {
   id: string;
   email: string;
   name?: string | null;
+  role: OwnerRole;
 }
 
-// Confirmed Spring Boot /auth/me shape: flat { id, email, name }.
-// { data: { id, email, name } } retained as a fallback for envelope wrapping.
+// Confirmed Spring Boot /auth/me shape: flat { id, email, name, role }.
+// { data: { ... } } retained as a fallback for envelope wrapping.
 interface MeResponseRaw {
   id?: unknown;
   email?: unknown;
   name?: unknown;
+  role?: unknown;
   data?: {
     id?: unknown;
     email?: unknown;
     name?: unknown;
+    role?: unknown;
   };
+}
+
+// Coerces an unknown value to a valid OwnerRole, defaulting to "OWNER".
+function normalizeRole(v: unknown): OwnerRole {
+  if (v === "SUPER_ADMIN" || v === "OWNER") return v;
+  return "OWNER";
 }
 
 // Returns true when `v` has the minimum required shape for OwnerProfile.
 function isOwnerCandidate(
   v: unknown
-): v is { id: string; email: string; name?: unknown } {
+): v is { id: string; email: string; name?: unknown; role?: unknown } {
   if (v === null || typeof v !== "object") return false;
   const r = v as Record<string, unknown>;
   return (
@@ -101,6 +112,7 @@ function extractOwnerProfile(body: MeResponseRaw): OwnerProfile | null {
         id: candidate.id,
         email: candidate.email,
         name: typeof candidate.name === "string" ? candidate.name : null,
+        role: normalizeRole(candidate.role),
       };
     }
   }
