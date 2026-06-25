@@ -115,7 +115,7 @@ function StepBusinessType() {
                 <CheckIcon className="size-3.5 text-primary" />
               </span>
             )}
-            <span className="text-xl leading-none">{bt.emoji}</span>
+            <bt.Icon className="size-5 text-muted-foreground" />
             <p className="mt-1.5 text-xs font-medium text-foreground leading-tight">
               {bt.label}
             </p>

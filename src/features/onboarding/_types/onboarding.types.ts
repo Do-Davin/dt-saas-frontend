@@ -1,3 +1,17 @@
+import type { LucideIcon } from 'lucide-react';
+import {
+  CoffeeIcon,
+  ShirtIcon,
+  UtensilsIcon,
+  CakeSliceIcon,
+  UtensilsCrossedIcon,
+  CarIcon,
+  WrenchIcon,
+  ShoppingBagIcon,
+  StoreIcon,
+  BriefcaseIcon,
+} from 'lucide-react';
+
 export type PlanId = 'MONTHLY' | 'ANNUALLY' | 'CUSTOM';
 
 export type BusinessTypeId =
@@ -17,17 +31,17 @@ export interface TemplateCategory {
   products: string[];
 }
 
-export const BUSINESS_TYPES: { id: BusinessTypeId; label: string; emoji: string }[] = [
-  { id: 'CAFE_SHOP',        label: 'Cafe Shop',        emoji: '☕' },
-  { id: 'CLOTHING_STORE',   label: 'Clothing Store',   emoji: '👗' },
-  { id: 'RESTAURANT',       label: 'Restaurant',       emoji: '🍽️' },
-  { id: 'BAKERY',           label: 'Bakery',           emoji: '🥐' },
-  { id: 'BUFFET',           label: 'Buffet',           emoji: '🍱' },
-  { id: 'CAR_WASH',         label: 'Car Wash',         emoji: '🚗' },
-  { id: 'GARAGE',           label: 'Garage',           emoji: '🔧' },
-  { id: 'ONLINE_SELLER',    label: 'Online Seller',    emoji: '📦' },
-  { id: 'RETAIL_STORE',     label: 'Retail Store',     emoji: '🏪' },
-  { id: 'SERVICE_BUSINESS', label: 'Service Business', emoji: '💼' },
+export const BUSINESS_TYPES: { id: BusinessTypeId; label: string; Icon: LucideIcon }[] = [
+  { id: 'CAFE_SHOP',        label: 'Cafe Shop',        Icon: CoffeeIcon },
+  { id: 'CLOTHING_STORE',   label: 'Clothing Store',   Icon: ShirtIcon },
+  { id: 'RESTAURANT',       label: 'Restaurant',       Icon: UtensilsIcon },
+  { id: 'BAKERY',           label: 'Bakery',           Icon: CakeSliceIcon },
+  { id: 'BUFFET',           label: 'Buffet',           Icon: UtensilsCrossedIcon },
+  { id: 'CAR_WASH',         label: 'Car Wash',         Icon: CarIcon },
+  { id: 'GARAGE',           label: 'Garage',           Icon: WrenchIcon },
+  { id: 'ONLINE_SELLER',    label: 'Online Seller',    Icon: ShoppingBagIcon },
+  { id: 'RETAIL_STORE',     label: 'Retail Store',     Icon: StoreIcon },
+  { id: 'SERVICE_BUSINESS', label: 'Service Business', Icon: BriefcaseIcon },
 ];
 
 export const BUSINESS_TYPE_TEMPLATES: Record<BusinessTypeId, TemplateCategory[]> = {
