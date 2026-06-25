@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import type { LucideIcon } from "lucide-react";
-import { Building2Icon, CreditCardIcon } from "lucide-react";
+import { Building2Icon, CreditCardIcon, BarChart3Icon } from "lucide-react";
 import { OwnerPage } from "../_components/OwnerPage";
 import { OwnerPageHeader } from "../_components/OwnerPageHeader";
 
@@ -24,6 +24,12 @@ const QUICK_NAV: QuickNavCard[] = [
     label: "Subscriptions",
     description: "View subscription plans, expiry dates, and monthly revenue.",
     Icon: CreditCardIcon,
+  },
+  {
+    to: "/admin/analytics",
+    label: "Analytics",
+    description: "Estimated revenue metrics and subscription finance overview.",
+    Icon: BarChart3Icon,
   },
 ];
 

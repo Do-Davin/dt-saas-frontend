@@ -37,7 +37,7 @@ function OwnerIndexRedirect() {
 //
 // Role model:
 //   OWNER       — /owner/* only (analytics, categories, products, reports, sales, stock)
-//   SUPER_ADMIN — /admin/* only (home, businesses)
+//   SUPER_ADMIN — /admin/* only (home, businesses, subscriptions, analytics)
 //
 // This file MUST NOT create its own <RouterProvider>.
 export const ownerRoutes: RouteObject[] = [
