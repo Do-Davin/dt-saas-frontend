@@ -4,8 +4,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   HomeIcon,
   Building2Icon,
-  InboxIcon,
-  GitBranchIcon,
   TagIcon,
   PackageIcon,
   LayoutDashboardIcon,
@@ -36,10 +34,6 @@ type NavItem = { to: string; label: string; Icon: LucideIcon };
 const SUPER_ADMIN_NAV: NavItem[] = [
   { to: "/admin/home", label: "Home", Icon: HomeIcon },
   { to: "/admin/businesses", label: "Businesses", Icon: Building2Icon },
-  { to: "/admin/requests", label: "Requests", Icon: InboxIcon },
-  { to: "/admin/branches", label: "Branches", Icon: GitBranchIcon },
-  { to: "/admin/categories", label: "Categories", Icon: TagIcon },
-  { to: "/admin/products", label: "Products", Icon: PackageIcon },
 ];
 
 const OWNER_NAV: NavItem[] = [
@@ -219,8 +213,7 @@ export function OwnerShell() {
   // Routes that render their own mobile toolbar in place of the shell header.
   // Only hidden below md — desktop always shows the full shell header.
   const hidesMobileHeader =
-    location.pathname === "/owner/products" ||
-    location.pathname === "/admin/products";
+    location.pathname === "/owner/products";
 
   const selectBusinessPath =
     owner?.role === "SUPER_ADMIN" ? "/admin/select-business" : "/owner/select-business";

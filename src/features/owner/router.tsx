@@ -4,12 +4,7 @@ import { RequireOwnerAuth } from "./_components/RequireOwnerAuth";
 import { useOwnerSessionStore } from "./_store/ownerSession";
 import { OwnerLoginPage } from "./_pages/OwnerLoginPlaceholderPage";
 import { OwnerHomePage } from "./_pages/OwnerHomePage";
-import { OwnerRequestListPage } from "./_pages/OwnerRequestListPage";
-import { OwnerRequestDetailPage } from "./_pages/OwnerRequestDetailPage";
 import { SelectBusinessPage } from "./_pages/SelectBusinessPage";
-import { BranchListPage } from "./_pages/BranchListPage";
-import { BranchNewPage } from "./_pages/BranchNewPage";
-import { BranchEditPage } from "./_pages/BranchEditPage";
 import { CategoryListPage } from "./_pages/CategoryListPage";
 import { CategoryNewPage } from "./_pages/CategoryNewPage";
 import { CategoryEditPage } from "./_pages/CategoryEditPage";
@@ -40,7 +35,7 @@ function OwnerIndexRedirect() {
 //
 // Role model:
 //   OWNER       — /owner/* only (analytics, categories, products, reports, sales, stock)
-//   SUPER_ADMIN — /admin/* only (home, businesses, requests, branches, categories, products)
+//   SUPER_ADMIN — /admin/* only (home, businesses)
 //
 // This file MUST NOT create its own <RouterProvider>.
 export const ownerRoutes: RouteObject[] = [
@@ -104,46 +99,6 @@ export const ownerRoutes: RouteObject[] = [
       },
       { path: "select-business", element: <SelectBusinessPage /> },
       {
-        path: "requests",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <OwnerRequestListPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "requests/:requestId",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <OwnerRequestDetailPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "branches",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <BranchListPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "branches/new",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <BranchNewPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "branches/:branchId",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <BranchEditPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
         path: "businesses",
         element: (
           <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
@@ -164,54 +119,6 @@ export const ownerRoutes: RouteObject[] = [
         element: (
           <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
             <BusinessEditPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "categories",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <CategoryListPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "categories/new",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <CategoryNewPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "categories/:categoryId",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <CategoryEditPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "products",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <ProductListPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "products/new",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <ProductNewPage />
-          </RequireOwnerAuth>
-        ),
-      },
-      {
-        path: "products/:productId",
-        element: (
-          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
-            <ProductEditPage />
           </RequireOwnerAuth>
         ),
       },
