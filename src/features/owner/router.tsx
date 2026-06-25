@@ -14,6 +14,7 @@ import { ProductEditPage } from "./_pages/ProductEditPage";
 import { BusinessListPage } from "./_pages/BusinessListPage";
 import { BusinessNewPage } from "./_pages/BusinessNewPage";
 import { BusinessEditPage } from "./_pages/BusinessEditPage";
+import { AdminSubscriptionsPage } from "./_pages/AdminSubscriptionsPage";
 import { OwnerAnalyticsPage } from "./_pages/OwnerAnalyticsPage";
 import { OwnerReportsPage } from "./_pages/OwnerReportsPage";
 import { OwnerSalesPage } from "./_pages/OwnerSalesPage";
@@ -119,6 +120,14 @@ export const ownerRoutes: RouteObject[] = [
         element: (
           <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
             <BusinessEditPage />
+          </RequireOwnerAuth>
+        ),
+      },
+      {
+        path: "subscriptions",
+        element: (
+          <RequireOwnerAuth allowedRoles={["SUPER_ADMIN"]}>
+            <AdminSubscriptionsPage />
           </RequireOwnerAuth>
         ),
       },

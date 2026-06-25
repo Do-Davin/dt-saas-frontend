@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { digitalMenuRoutes } from "./features/digital-menu";
 import { ownerRoutes } from "./features/owner/router";
+import { onboardingRoutes } from "./features/onboarding/router";
 
 /**
  * Top-level app router.
@@ -38,6 +39,10 @@ export const appRouter = createBrowserRouter([
   // Lives here for local dev; planned to move to src/apps/dashboard/ with its
   // own entry point when production deployment splits subdomains.
   ...ownerRoutes,
+
+  // ── public onboarding surface (/subscribe, /subscribe/onboard) ─────────
+  // No auth required. Demo-only until Milestone 7 wires the backend.
+  ...onboardingRoutes,
 
   // ── admin surface (future host: admin.dtsaas.com) ──────────────────────
   // Lives in its own router/entry once introduced. Do not add admin routes here.

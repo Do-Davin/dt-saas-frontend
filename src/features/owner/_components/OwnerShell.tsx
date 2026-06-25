@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   HomeIcon,
   Building2Icon,
+  CreditCardIcon,
   TagIcon,
   PackageIcon,
   LayoutDashboardIcon,
@@ -32,8 +33,9 @@ import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 type NavItem = { to: string; label: string; Icon: LucideIcon };
 
 const SUPER_ADMIN_NAV: NavItem[] = [
-  { to: "/admin/home", label: "Home", Icon: HomeIcon },
-  { to: "/admin/businesses", label: "Businesses", Icon: Building2Icon },
+  { to: "/admin/home",          label: "Home",          Icon: HomeIcon },
+  { to: "/admin/businesses",    label: "Businesses",    Icon: Building2Icon },
+  { to: "/admin/subscriptions", label: "Subscriptions", Icon: CreditCardIcon },
 ];
 
 const OWNER_NAV: NavItem[] = [
@@ -208,7 +210,7 @@ export function OwnerShell() {
   const selectedBusiness =
     businesses.find((b) => b.id === selectedBusinessId) ?? null;
 
-  const initials = owner ? getInitials(owner.name, owner.email) : "—";
+  const initials = owner ? getInitials(owner.name, owner.username ?? owner.email) : "—";
 
   // Routes that render their own mobile toolbar in place of the shell header.
   // Only hidden below md — desktop always shows the full shell header.
@@ -374,11 +376,11 @@ export function OwnerShell() {
                   {owner ? (
                     <>
                       <p className="truncate text-sm font-medium text-foreground">
-                        {owner.name ?? owner.email}
+                        {owner.name ?? owner.username ?? owner.email}
                       </p>
-                      {owner.name ? (
+                      {owner.username ? (
                         <p className="truncate text-xs text-muted-foreground">
-                          {owner.email}
+                          @{owner.username}
                         </p>
                       ) : null}
                     </>

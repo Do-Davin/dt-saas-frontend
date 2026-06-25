@@ -13,6 +13,13 @@ export interface OwnerBusiness {
   slug?: string | null;
   type?: string | null;
   catalogMode?: string | null;
+  subscriptionStatus?: string | null;
+  subscriptionStartDate?: string | null;
+  subscriptionExpiresAt?: string | null;
+  subscriptionPlan?: string | null;
+  userLimit?: number | null;
+  menuItemLimit?: number | null;
+  monthlyPrice?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -35,6 +42,13 @@ interface BusinessRaw {
   slug?: unknown;
   type?: unknown;
   catalogMode?: unknown;
+  subscriptionStatus?: unknown;
+  subscriptionStartDate?: unknown;
+  subscriptionExpiresAt?: unknown;
+  subscriptionPlan?: unknown;
+  userLimit?: unknown;
+  menuItemLimit?: unknown;
+  monthlyPrice?: unknown;
   createdAt?: unknown;
   updatedAt?: unknown;
 }
@@ -67,6 +81,13 @@ function toOwnerBusiness(raw: BusinessRaw): OwnerBusiness {
     slug: typeof raw.slug === "string" ? raw.slug : null,
     type: typeof raw.type === "string" ? raw.type : null,
     catalogMode: typeof raw.catalogMode === "string" ? raw.catalogMode : null,
+    subscriptionStatus: typeof raw.subscriptionStatus === "string" ? raw.subscriptionStatus : null,
+    subscriptionStartDate: typeof raw.subscriptionStartDate === "string" ? raw.subscriptionStartDate : null,
+    subscriptionExpiresAt: typeof raw.subscriptionExpiresAt === "string" ? raw.subscriptionExpiresAt : null,
+    subscriptionPlan: typeof raw.subscriptionPlan === "string" ? raw.subscriptionPlan : null,
+    userLimit: typeof raw.userLimit === "number" ? raw.userLimit : null,
+    menuItemLimit: typeof raw.menuItemLimit === "number" ? raw.menuItemLimit : null,
+    monthlyPrice: typeof raw.monthlyPrice === "number" ? raw.monthlyPrice : null,
     createdAt: typeof raw.createdAt === "string" ? raw.createdAt : null,
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
   };

@@ -20,11 +20,10 @@ const QUICK_NAV: QuickNavCard[] = [
     Icon: Building2Icon,
   },
   {
-    to: "#",
+    to: "/admin/subscriptions",
     label: "Subscriptions",
-    description: "Manage subscription plans and billing. Coming soon.",
+    description: "View subscription plans, expiry dates, and monthly revenue.",
     Icon: CreditCardIcon,
-    disabled: true,
   },
 ];
 
