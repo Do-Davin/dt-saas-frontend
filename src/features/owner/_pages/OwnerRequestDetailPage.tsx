@@ -35,7 +35,7 @@ export function OwnerRequestDetailPage() {
     <OwnerPage>
       <div>
         <Button variant="ghost" size="sm" asChild className="-ml-2 text-muted-foreground hover:text-foreground">
-          <Link to="/owner/requests" aria-label="Back to requests list">
+          <Link to="/admin/requests" aria-label="Back to requests list">
             <ArrowLeftIcon className="size-4" />
             Back to requests
           </Link>

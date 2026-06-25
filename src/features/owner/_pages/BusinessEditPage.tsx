@@ -119,7 +119,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
       useOwnerBusinessesStore.getState().clearBusinesses();
       void useOwnerBusinessesStore.getState().loadBusinesses();
       toast.success(`Business "${values.name.trim()}" updated successfully`);
-      navigate("/owner/businesses", { replace: true });
+      navigate("/admin/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -144,7 +144,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
         // auto-select if only one business remains.
       }
       toast.success(`Business "${business.name}" deleted successfully`);
-      navigate("/owner/businesses", { replace: true });
+      navigate("/admin/businesses", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -164,7 +164,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
     <>
       <OwnerCrudTransition>
         <div className="max-w-5xl space-y-4">
-          <CrudBackButton to="/owner/businesses" />
+          <CrudBackButton to="/admin/businesses" />
 
           <OwnerPageHeader title="Edit business" />
 
@@ -203,7 +203,7 @@ function BusinessEditorForm({ business }: BusinessEditorFormProps) {
                     asChild
                     className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
                   >
-                    <Link to="/owner/businesses">
+                    <Link to="/admin/businesses">
                       <ArrowLeftIcon className="size-3.5" />
                       Cancel
                     </Link>

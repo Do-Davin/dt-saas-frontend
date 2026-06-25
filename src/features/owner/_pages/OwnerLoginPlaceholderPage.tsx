@@ -8,7 +8,7 @@ import { useOwnerAuthStore } from "../_store/ownerAuth";
 
 function toSafeErrorMessage(err: unknown): string {
   if (err instanceof ApiError) {
-    if (err.status === 401) return "Invalid email or password.";
+    if (err.status === 401) return "Invalid username or password.";
     if (err.status === 0)
       return "Could not connect to the server. Please check your connection.";
     return "Login failed. Please try again.";
@@ -19,7 +19,7 @@ function toSafeErrorMessage(err: unknown): string {
 
 export function OwnerLoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +30,9 @@ export function OwnerLoginPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const token = await loginOwner({ email, password });
+      const token = await loginOwner({ username, password });
       useOwnerAuthStore.getState().setToken(token);
-      navigate("/owner/home", { replace: true });
+      navigate("/owner", { replace: true });
     } catch (err) {
       setError(toSafeErrorMessage(err));
       setSubmitting(false);
@@ -52,18 +52,18 @@ export function OwnerLoginPage() {
         >
           <div className="space-y-1.5">
             <label
-              htmlFor="owner-email"
+              htmlFor="owner-username"
               className="text-sm font-medium text-foreground"
             >
-              Email
+              Username
             </label>
             <Input
-              id="owner-email"
-              type="email"
-              autoComplete="email"
-              placeholder="owner@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="owner-username"
+              type="text"
+              autoComplete="username"
+              placeholder="your-username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               disabled={submitting}
               required
             />
@@ -95,6 +95,31 @@ export function OwnerLoginPage() {
             {submitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
+
+        {/* Demo credentials */}
+        <div className="mt-5 rounded-md bg-muted p-3 text-xs text-muted-foreground space-y-1">
+          <p className="font-semibold text-foreground">Demo credentials</p>
+          <p>
+            SUPER_ADMIN:{" "}
+            <code className="font-mono bg-background px-1 py-0.5 rounded border border-border">
+              dev
+            </code>{" "}
+            /{" "}
+            <code className="font-mono bg-background px-1 py-0.5 rounded border border-border">
+              dev-password
+            </code>
+          </p>
+          <p>
+            OWNER:{" "}
+            <code className="font-mono bg-background px-1 py-0.5 rounded border border-border">
+              demo-owner
+            </code>{" "}
+            /{" "}
+            <code className="font-mono bg-background px-1 py-0.5 rounded border border-border">
+              demo-password
+            </code>
+          </p>
+        </div>
       </div>
     </div>
   );

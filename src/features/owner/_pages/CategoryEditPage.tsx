@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams, Link } from "react-router";
+import { useNavigate, useParams, useLocation, Link } from "react-router";
 import { SaveIcon, ArrowLeftIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -101,6 +101,8 @@ function CategoryEditorForm({
   branches,
 }: CategoryEditorFormProps) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/owner";
 
   const [values, setValues] = useState<CategoryFormValues>(() =>
     categoryToFormValues(category)
@@ -139,7 +141,7 @@ function CategoryEditorForm({
         isActive: values.isActive,
       });
       toast.success(`Category "${values.name.trim()}" updated successfully`);
-      navigate("/owner/categories", { replace: true });
+      navigate(`${base}/categories`, { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -156,7 +158,7 @@ function CategoryEditorForm({
     try {
       await deleteCategory(businessId, category.id);
       toast.success(`Category "${category.name}" deleted successfully`);
-      navigate("/owner/categories", { replace: true });
+      navigate(`${base}/categories`, { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -176,7 +178,7 @@ function CategoryEditorForm({
     <>
       <OwnerCrudTransition>
         <div className="max-w-5xl space-y-4">
-          <CrudBackButton to="/owner/categories" />
+          <CrudBackButton to={`${base}/categories`} />
 
           <OwnerPageHeader title="Edit category" />
 
@@ -216,7 +218,7 @@ function CategoryEditorForm({
                     asChild
                     className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
                   >
-                    <Link to="/owner/categories">
+                    <Link to={`${base}/categories`}>
                       <ArrowLeftIcon className="size-3.5" />
                       Cancel
                     </Link>

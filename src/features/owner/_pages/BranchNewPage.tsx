@@ -73,7 +73,7 @@ export function BranchNewPage() {
         isActive: values.isActive,
       });
       toast.success(`Branch "${values.name.trim()}" created successfully`);
-      navigate("/owner/branches", { replace: true });
+      navigate("/admin/branches", { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -89,7 +89,7 @@ export function BranchNewPage() {
   return (
     <OwnerCrudTransition>
       <div className="max-w-5xl space-y-4">
-        <CrudBackButton to="/owner/branches" />
+        <CrudBackButton to="/admin/branches" />
 
         <OwnerPageHeader title="New branch" />
 
@@ -118,7 +118,7 @@ export function BranchNewPage() {
                 asChild
                 className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
               >
-                <Link to="/owner/branches">
+                <Link to="/admin/branches">
                   <ArrowLeftIcon className="size-3.5" />
                   Cancel
                 </Link>

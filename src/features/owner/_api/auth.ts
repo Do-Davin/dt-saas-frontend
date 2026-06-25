@@ -10,7 +10,7 @@ import { ownerApiFetch } from "./ownerApiFetch";
 // ─── Login ────────────────────────────────────────────────────────────────────
 
 export interface OwnerLoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -65,20 +65,23 @@ export type OwnerRole = "SUPER_ADMIN" | "OWNER";
 export interface OwnerProfile {
   id: string;
   email: string;
+  username?: string | null;
   name?: string | null;
   role: OwnerRole;
 }
 
-// Confirmed Spring Boot /auth/me shape: flat { id, email, name, role }.
+// Confirmed Spring Boot /auth/me shape: flat { id, email, username, name, role }.
 // { data: { ... } } retained as a fallback for envelope wrapping.
 interface MeResponseRaw {
   id?: unknown;
   email?: unknown;
+  username?: unknown;
   name?: unknown;
   role?: unknown;
   data?: {
     id?: unknown;
     email?: unknown;
+    username?: unknown;
     name?: unknown;
     role?: unknown;
   };
@@ -93,7 +96,7 @@ function normalizeRole(v: unknown): OwnerRole {
 // Returns true when `v` has the minimum required shape for OwnerProfile.
 function isOwnerCandidate(
   v: unknown
-): v is { id: string; email: string; name?: unknown; role?: unknown } {
+): v is { id: string; email: string; username?: unknown; name?: unknown; role?: unknown } {
   if (v === null || typeof v !== "object") return false;
   const r = v as Record<string, unknown>;
   return (
@@ -111,6 +114,7 @@ function extractOwnerProfile(body: MeResponseRaw): OwnerProfile | null {
       return {
         id: candidate.id,
         email: candidate.email,
+        username: typeof candidate.username === "string" ? candidate.username : null,
         name: typeof candidate.name === "string" ? candidate.name : null,
         role: normalizeRole(candidate.role),
       };

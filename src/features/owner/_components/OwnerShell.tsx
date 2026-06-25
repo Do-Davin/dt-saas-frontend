@@ -4,8 +4,8 @@ import type { LucideIcon } from "lucide-react";
 import {
   HomeIcon,
   Building2Icon,
-  InboxIcon,
-  GitBranchIcon,
+  CreditCardIcon,
+  BarChart3Icon,
   TagIcon,
   PackageIcon,
   LayoutDashboardIcon,
@@ -34,12 +34,10 @@ import { useOwnerBusinessesStore } from "../_store/ownerBusinesses";
 type NavItem = { to: string; label: string; Icon: LucideIcon };
 
 const SUPER_ADMIN_NAV: NavItem[] = [
-  { to: "/owner/home", label: "Home", Icon: HomeIcon },
-  { to: "/owner/businesses", label: "Businesses", Icon: Building2Icon },
-  { to: "/owner/requests", label: "Requests", Icon: InboxIcon },
-  { to: "/owner/branches", label: "Branches", Icon: GitBranchIcon },
-  { to: "/owner/categories", label: "Categories", Icon: TagIcon },
-  { to: "/owner/products", label: "Products", Icon: PackageIcon },
+  { to: "/admin/home",          label: "Home",          Icon: HomeIcon },
+  { to: "/admin/businesses",    label: "Businesses",    Icon: Building2Icon },
+  { to: "/admin/subscriptions", label: "Subscriptions", Icon: CreditCardIcon },
+  { to: "/admin/analytics",     label: "Analytics",     Icon: BarChart3Icon },
 ];
 
 const OWNER_NAV: NavItem[] = [
@@ -208,17 +206,21 @@ export function OwnerShell() {
     useOwnerAuthStore.getState().clearToken();
     useOwnerSessionStore.getState().clearOwner();
     useOwnerBusinessesStore.getState().clearBusinesses();
-    navigate("/owner/login", { replace: true });
+    navigate("/login", { replace: true });
   }
 
   const selectedBusiness =
     businesses.find((b) => b.id === selectedBusinessId) ?? null;
 
-  const initials = owner ? getInitials(owner.name, owner.email) : "—";
+  const initials = owner ? getInitials(owner.name, owner.username ?? owner.email) : "—";
 
   // Routes that render their own mobile toolbar in place of the shell header.
   // Only hidden below md — desktop always shows the full shell header.
-  const hidesMobileHeader = location.pathname === "/owner/products";
+  const hidesMobileHeader =
+    location.pathname === "/owner/products";
+
+  const selectBusinessPath =
+    owner?.role === "SUPER_ADMIN" ? "/admin/select-business" : "/owner/select-business";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -337,7 +339,7 @@ export function OwnerShell() {
                   </span>
                   {businesses.length > 1 ? (
                     <Link
-                      to="/owner/select-business"
+                      to={selectBusinessPath}
                       className="shrink-0 text-xs underline-offset-2 hover:underline"
                     >
                       Switch
@@ -346,7 +348,7 @@ export function OwnerShell() {
                 </>
               ) : businesses.length > 1 ? (
                 <Link
-                  to="/owner/select-business"
+                  to={selectBusinessPath}
                   className="text-xs underline-offset-2 hover:underline"
                 >
                   Select business
@@ -376,11 +378,11 @@ export function OwnerShell() {
                   {owner ? (
                     <>
                       <p className="truncate text-sm font-medium text-foreground">
-                        {owner.name ?? owner.email}
+                        {owner.name ?? owner.username ?? owner.email}
                       </p>
-                      {owner.name ? (
+                      {owner.username ? (
                         <p className="truncate text-xs text-muted-foreground">
-                          {owner.email}
+                          @{owner.username}
                         </p>
                       ) : null}
                     </>

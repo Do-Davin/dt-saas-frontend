@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import { PlusCircleIcon, ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
@@ -33,6 +33,8 @@ export function CategoryNewPage() {
     useBusinessContextMessage();
   const { state: branchState } = useBranches(businessId);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/owner";
 
   const [values, setValues] = useState<CategoryFormValues>(EMPTY_CATEGORY_FORM);
   const [errors, setErrors] = useState<CategoryFormErrors>({});
@@ -78,7 +80,7 @@ export function CategoryNewPage() {
         isActive: values.isActive,
       });
       toast.success(`Category "${values.name.trim()}" created successfully`);
-      navigate("/owner/categories", { replace: true });
+      navigate(`${base}/categories`, { replace: true });
     } catch (err: unknown) {
       const message =
         err instanceof ApiError
@@ -94,7 +96,7 @@ export function CategoryNewPage() {
   return (
     <OwnerCrudTransition>
       <div className="max-w-5xl space-y-4">
-        <CrudBackButton to="/owner/categories" />
+        <CrudBackButton to={`${base}/categories`} />
 
         <OwnerPageHeader title="New category" />
 
@@ -124,7 +126,7 @@ export function CategoryNewPage() {
                 asChild
                 className="rounded-xl border-2 border-primary text-primary font-black gap-1.5 transition-all duration-200 ease-out hover:bg-primary/10 hover:text-primary hover:border-primary hover:scale-[1.03]"
               >
-                <Link to="/owner/categories">
+                <Link to={`${base}/categories`}>
                   <ArrowLeftIcon className="size-3.5" />
                   Cancel
                 </Link>

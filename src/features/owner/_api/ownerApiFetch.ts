@@ -27,7 +27,7 @@ export async function ownerApiFetch<T>(config: AxiosRequestConfig): Promise<T> {
     if (err instanceof ApiError && err.status === 401) {
       clearOwnerToken();
       if (typeof window !== "undefined") {
-        window.location.replace("/owner/login");
+        window.location.replace("/login");
       }
     }
     throw err;
