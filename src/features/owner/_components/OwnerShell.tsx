@@ -48,7 +48,7 @@ const OWNER_NAV: NavItem[] = [
   { to: "/owner/products", label: "Products", Icon: PackageIcon },
   { to: "/owner/reports", label: "Reports", Icon: FileTextIcon },
   { to: "/owner/sales", label: "Sales", Icon: ShoppingCartIcon },
-  { to: "/owner/inventory", label: "Inventory", Icon: ArchiveIcon },
+  { to: "/owner/stock", label: "Stock", Icon: ArchiveIcon },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

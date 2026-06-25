@@ -22,7 +22,7 @@ import { BusinessEditPage } from "./_pages/BusinessEditPage";
 import { OwnerAnalyticsPage } from "./_pages/OwnerAnalyticsPage";
 import { OwnerReportsPage } from "./_pages/OwnerReportsPage";
 import { OwnerSalesPage } from "./_pages/OwnerSalesPage";
-import { OwnerInventoryPage } from "./_pages/OwnerInventoryPage";
+import { OwnerStockPage } from "./_pages/OwnerStockPage";
 
 // Sends each role to its natural home page.
 // Renders null while the profile is loading so OwnerShell can trigger loadOwner()
@@ -151,11 +151,12 @@ export const ownerRoutes: RouteObject[] = [
       { path: "products/new", element: <ProductNewPage /> },
       { path: "products/:productId", element: <ProductEditPage /> },
 
-      // ── OWNER placeholder pages (accessible to both roles) ──────────────
+      // ── OWNER pages (accessible to both roles) ─────────────────────────
       { path: "analytics", element: <OwnerAnalyticsPage /> },
       { path: "reports", element: <OwnerReportsPage /> },
       { path: "sales", element: <OwnerSalesPage /> },
-      { path: "inventory", element: <OwnerInventoryPage /> },
+      { path: "stock", element: <OwnerStockPage /> },
+      { path: "inventory", element: <Navigate to="/owner/stock" replace /> },
     ],
   },
 ];

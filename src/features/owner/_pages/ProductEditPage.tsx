@@ -33,6 +33,7 @@ import {
   validateProductForm,
   hasErrors,
   parseMoney,
+  parsePositiveInt,
 } from "../_utils/productForm";
 import type { Product, PricingType, UnitOfMeasure } from "../_api/products";
 import type {
@@ -141,6 +142,9 @@ function productToFormValues(product: Product): ProductFormValues {
     pricingType: product.pricingType ?? "",
     isAvailable: product.isAvailable,
     isVisible: product.isVisible,
+    stockQuantity: String(product.stockQuantity),
+    lowStockThreshold:
+      product.lowStockThreshold != null ? String(product.lowStockThreshold) : "",
   };
 }
 
@@ -225,6 +229,12 @@ function ProductEditorForm({
           : {}),
         isAvailable: values.isAvailable,
         isVisible: values.isVisible,
+        ...(parsePositiveInt(values.stockQuantity) !== undefined
+          ? { stockQuantity: parsePositiveInt(values.stockQuantity) }
+          : {}),
+        ...(parsePositiveInt(values.lowStockThreshold) !== undefined
+          ? { lowStockThreshold: parsePositiveInt(values.lowStockThreshold) }
+          : {}),
       });
       toast.success(`Product "${values.name.trim()}" updated successfully`);
       navigate("/owner/products", { replace: true });
