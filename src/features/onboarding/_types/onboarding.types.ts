@@ -48,7 +48,7 @@ export const BUSINESS_TYPE_TEMPLATES: Record<BusinessTypeId, TemplateCategory[]>
   CAFE_SHOP: [
     { name: 'Iced Coffee', products: ['Iced Latte', 'Iced Vanilla', 'Iced Americano'] },
     { name: 'Hot Coffee',  products: ['Hot Latte', 'Hot Americano', 'Hot Mocha'] },
-    { name: 'Tea & Milk',  products: ['Thai Milk Tea', 'Brown Sugar Milk', 'Green Tea Latte'] },
+    { name: 'Tea & Milk',  products: ['Iced Milk Tea', 'Brown Sugar Milk', 'Green Tea Latte'] },
     { name: 'Food',        products: ['Sandwich', 'Croissant', 'Egg Toast'] },
     { name: 'Snack',       products: ['Muffin', 'Cookie', 'Donut'] },
   ],

@@ -22,7 +22,7 @@ export function BusinessHeroCarousel({ business }: BusinessHeroCarouselProps) {
     ? business.heroImages
     : business.coverImageUrl
       ? [business.coverImageUrl]
-      : [];
+      : ["/mock-images/cover.jpg"];
 
   const hasImages = images.length > 0;
   const hasMultiple = images.length > 1;
